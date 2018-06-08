@@ -3,6 +3,8 @@
 ## Integrantes:
 > Christian Elster
 >
+> Gustavo Quinteiro
+>
 > Igor de Almeida
 >
 > Luis Grappi
