@@ -4,6 +4,9 @@ about: Template para uma issue global.
 
 ---
 
+## Descrição
+> Descreva aqui
+>
 ### Tarefas
 - [ ] Tarefa 1
 - [ ] Tarefa 2
