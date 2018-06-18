@@ -5,10 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+    <include layout="@layout/content_main" />
+
+    <RelativeLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="64dp"
+        android:background="@color/colorPrimary">
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/blackBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_black">
+
+    </FrameLayout>
 
         <com.mancj.materialsearchbar.MaterialSearchBar
             android:id="@+id/searchBar"
@@ -18,9 +31,5 @@
             android:layout_margin="8dp"
             app:mt_navIconEnabled="false"
             app:mt_placeholder="BaratinhoVéi" />
-
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>
