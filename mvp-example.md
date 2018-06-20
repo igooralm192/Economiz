@@ -112,3 +112,11 @@ da **ExampleMVP.ReqPresenterOps**. Feito as capturas requisitadas no banco de da
 
 Voltando para a Presenter, estamos na função **_returnSomething()_** que no final, após realizar
 os devidos ajustes, irá chamar o **_showSomething()_** para mostrar os resultados na Activity.
+
+### Organização
+**_activity_**
+- example
+    - ExampleActivity
+    - ExamplePresenter
+    - ExampleModel
+    - ExampleMVP
