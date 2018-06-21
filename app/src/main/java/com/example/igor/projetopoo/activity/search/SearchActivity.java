@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.adapter.SuggestionAdapter;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.ArrayList;

@@ -1,15 +1,18 @@
-package com.example.igor.projetopoo.activity.search;
+package com.example.igor.projetopoo.activity.adapter;
 
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.search.Product;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 
-public class SuggestionAdapter extends SuggestionsAdapter<Product, SuggestionHolder> {
+public class SuggestionAdapter extends SuggestionsAdapter<Product, SuggestionAdapter.SuggestionHolder> {
 
     public SuggestionAdapter(LayoutInflater inflater) {
         super(inflater);
@@ -18,7 +21,7 @@ public class SuggestionAdapter extends SuggestionsAdapter<Product, SuggestionHol
     @Override
     public void onBindSuggestionHolder(Product suggestion, SuggestionHolder holder, int position) {
         holder.title.setText(suggestion.getProductName());
-        holder.subtitle.setText("Com preço médio de: R$ " + suggestion.getPrice());
+        holder.subtitle.setText(String.valueOf(suggestion.getPrice()));
     }
 
     @NonNull
@@ -31,6 +34,20 @@ public class SuggestionAdapter extends SuggestionsAdapter<Product, SuggestionHol
     @Override
     public int getSingleViewHeight() {
         return 0;
+    }
+
+    static class SuggestionHolder extends RecyclerView.ViewHolder{
+
+            private final int id;
+            protected TextView title;
+            protected TextView subtitle;
+
+            public SuggestionHolder(View itemView){
+                super(itemView);
+                id = R.layout.activity_search;
+                title = itemView.findViewById(id);
+            }
+
     }
 
 }
