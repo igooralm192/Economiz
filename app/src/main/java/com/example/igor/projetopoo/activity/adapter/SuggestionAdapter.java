@@ -9,17 +9,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
-import com.example.igor.projetopoo.activity.search.Product;
+import com.example.igor.projetopoo.activity.search.Item;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 
-public class SuggestionAdapter extends SuggestionsAdapter<Product, SuggestionAdapter.SuggestionHolder> {
+public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapter.SuggestionHolder> {
 
     public SuggestionAdapter(LayoutInflater inflater) {
         super(inflater);
     }
 
     @Override
-    public void onBindSuggestionHolder(Product suggestion, SuggestionHolder holder, int position) {
+    public void onBindSuggestionHolder(Item suggestion, SuggestionHolder holder, int position) {
         holder.title.setText(suggestion.getProductName());
         holder.subtitle.setText(String.valueOf(suggestion.getPrice()));
     }

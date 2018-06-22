@@ -1,11 +1,11 @@
 package com.example.igor.projetopoo.activity.search;
 
 
-public class Product {
+public class Item {
     private String productName;
     private double price;
 
-    public Product(String name, double price){
+    public Item(String name, double price){
         this.productName = name;
         this.price = price;
     }
