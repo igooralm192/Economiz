@@ -4,7 +4,7 @@
     android:id="@+id/constraint_layout_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".MainActivity"
+    tools:context=".activity.main.MainActivity"
     tools:showIn="@layout/activity_main">
 
 </android.support.constraint.ConstraintLayout>
