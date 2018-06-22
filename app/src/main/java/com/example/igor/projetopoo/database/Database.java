@@ -9,7 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class Database {
+public class Database implements DatabaseRequests {
     private static FirebaseFirestore firestore;
 
     public static void initFirebase() {
