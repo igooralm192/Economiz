@@ -1,21 +1,21 @@
 package com.example.igor.projetopoo.activity.search;
 
 
-public class Product {
+public class Item {
     private String productName;
-    private double price;
+    private int idIcon;
 
-    public Product(String name, double price){
+    public Item(String name, int idIcon){
         this.productName = name;
-        this.price = price;
-    }
-    
-    public void setPrice(double price) {
-        this.price = price;
+        this.idIcon = idIcon;
     }
 
-    public double getPrice() {
-        return price;
+    public int getIdIcon() {
+        return idIcon;
+    }
+
+    public void setIdIcon(int idIcon) {
+        this.idIcon = idIcon;
     }
 
     public String getProductName() {
