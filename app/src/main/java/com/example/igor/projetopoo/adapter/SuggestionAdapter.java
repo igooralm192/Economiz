@@ -6,12 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.entities.Item;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapter.Holder> {
 
@@ -28,6 +32,33 @@ public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapte
     @Override
     public int getSingleViewHeight() {
         return 60;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                String term = constraint.toString();
+
+                if(term.isEmpty()) suggestions = suggestions_clone;
+                else {
+                    suggestions = new ArrayList<>();
+                    for (Item item: suggestions_clone)
+                        if(item.getName().toLowerCase().contains(term.toLowerCase()))
+                            suggestions.add(item);
+                }
+                results.values = suggestions;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                suggestions = (List<Item>) results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     @NonNull
