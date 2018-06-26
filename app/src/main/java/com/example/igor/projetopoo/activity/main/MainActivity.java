@@ -13,7 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
-import com.example.igor.projetopoo.categories.Category;
+import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.fragment.ListFragment;
 
 import android.view.LayoutInflater;
@@ -38,13 +38,15 @@ public class MainActivity extends AppCompatActivity implements  OnSearchActionLi
 
         setContentView(R.layout.activity_main);
 
-        final MainActivity mainActivity = this;
-
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
         MaterialSearchBar searchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
 
         searchBar.setOnSearchActionListener(this);
 
+        setCategoryList(this);
+    }
+
+    private void setCategoryList(final Context context) {
         ArrayList<Category> categories = new ArrayList<Category>();
         categories.add(new Category("Alimentos", R.drawable.food));
         categories.add(new Category("Limpeza", R.drawable.cleaning2));
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements  OnSearchActionLi
                 holder.nameCategory.setText(category.getName());
                 holder.backCategory.setImageResource(category.getBackground());
 
-                Blur.blurImage(holder.backCategory, 5, mainActivity);
+                Blur.blurImage(holder.backCategory, 5, context);
             }
         });
 

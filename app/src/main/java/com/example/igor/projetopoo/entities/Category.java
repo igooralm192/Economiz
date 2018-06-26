@@ -1,4 +1,4 @@
-package com.example.igor.projetopoo.categories;
+package com.example.igor.projetopoo.entities;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
