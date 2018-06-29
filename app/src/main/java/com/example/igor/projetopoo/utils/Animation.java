@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.widget.FrameLayout;
 
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
@@ -132,15 +133,35 @@ public class Animation {
         fadeOutView(hideView, duration);
     }
 
-    public static void openSearch(MaterialSearchBar search, ActionBar actionBar, ConstraintLayout layout) {
+    public static void openSearch(MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
+        search.setVisibility(View.VISIBLE);
+
         circleRevealView(search, ANIMATION_DURATION_SHORT);
         search.enableSearch();
 
-
         actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
 
         TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.startTransition(1000);
+    }
+
+    public static void closeSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
+        search.hideSuggestionsList();
+
+        circleHideView(search, ANIMATION_DURATION_MEDIUM, new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                search.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        final TransitionDrawable background = (TransitionDrawable) layout.getBackground();
+        background.reverseTransition(1000);
 
 
     }
