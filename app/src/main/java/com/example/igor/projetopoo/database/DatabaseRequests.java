@@ -10,4 +10,7 @@ public interface DatabaseRequests {
     DocumentSnapshot getDocument(DocumentReference documentReference);
     QuerySnapshot getDocuments(CollectionReference collectionReference);
     QuerySnapshot getDocuments(Query query);
+    DocumentReference addDocument(CollectionReference collectionReference, Object object);
+    void updateDocument(DocumentReference documentReference, Object object);
+    void deleteDocument(DocumentReference documentReference);
 }

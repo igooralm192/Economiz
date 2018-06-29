@@ -27,6 +27,7 @@ public class Database implements DatabaseRequests {
     private QuerySnapshot querySnapshot;
     private FirebaseFirestore firestore;
     private DocumentSnapshot documentSnapshot;
+    private DocumentReference documentReference;
 
     public Database(FirebaseFirestore firestore) { this.firestore = firestore; }
 
@@ -81,6 +82,42 @@ public class Database implements DatabaseRequests {
                 });
 
         return querySnapshot;
+    }
+
+    public DocumentReference addDocument(CollectionReference collectionReference, Object object) {
+        collectionReference.add(object)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Database.this.documentReference = documentReference;
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+
+        return documentReference;
+    }
+
+    public void updateDocument(DocumentReference documentReference, Object object) {
+        documentReference.set(object).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+    public void deleteDocument(DocumentReference documentReference) {
+        documentReference.delete().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
     }
 
 }
