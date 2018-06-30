@@ -118,6 +118,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:elevation="21dp"
+        android:visibility="invisible"
         app:layout_scrollFlags="enterAlwaysCollapsed"
         app:mt_navIconEnabled="false"
         app:mt_placeholder="BaratinhoVéi">
