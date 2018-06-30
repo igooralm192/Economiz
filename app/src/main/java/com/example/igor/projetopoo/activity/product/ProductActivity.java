@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
+import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -97,6 +98,7 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     MaterialSearchBar search_bar;
+    FrameLayout black_bar = findViewById(R.id.black_bar);
 
     private void makeSearchBar() {
         search_bar = (MaterialSearchBar) findViewById(R.id.product_search_bar);
@@ -104,11 +106,11 @@ public class ProductActivity extends AppCompatActivity {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(inflater);
 
-        List<Item> suggestions = new ArrayList<Item>();
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Abacaxi"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Banana"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Carne"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Amendoim"));
+        List<Item> suggestions = new ArrayList<>();
+        suggestions.add(new Item("Abacaxi"));
+        suggestions.add(new Item("Banana"));
+        suggestions.add(new Item("Carne"));
+        suggestions.add(new Item("Amendoim"));
 
         customSuggestionsAdapter.setSuggestions(suggestions);
         search_bar.setCustomSuggestionAdapter(customSuggestionsAdapter);
@@ -131,7 +133,7 @@ public class ProductActivity extends AppCompatActivity {
 
     @Override
     public void onSearchStateChanged(boolean enabled) {
-        TransitionDrawable background = (TransitionDrawable) blackBar.getBackground();
+        TransitionDrawable background = (TransitionDrawable) black_bar.getBackground();
 
         if (enabled) {
             search_bar.hideSuggestionsList();
