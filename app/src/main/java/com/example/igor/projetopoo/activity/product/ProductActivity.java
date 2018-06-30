@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.content.Context;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -12,6 +13,8 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -93,6 +96,62 @@ public class ProductActivity extends AppCompatActivity {
         });
     }
 
+    MaterialSearchBar search_bar;
+
+    private void makeSearchBar() {
+        search_bar = (MaterialSearchBar) findViewById(R.id.product_search_bar);
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(inflater);
+
+        List<Item> suggestions = new ArrayList<Item>();
+        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Abacaxi"));
+        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Banana"));
+        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Carne"));
+        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Amendoim"));
+
+        customSuggestionsAdapter.setSuggestions(suggestions);
+        search_bar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+
+        search_bar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                customSuggestionsAdapter.getFilter().filter(search_bar.getText());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        search_bar.setOnSearchActionListener(this);
+    }
+
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        TransitionDrawable background = (TransitionDrawable) blackBar.getBackground();
+
+        if (enabled) {
+            search_bar.hideSuggestionsList();
+            background.startTransition(300);
+        } else {
+            background.reverseTransition(300);
+        }
+    }
+
+    @Override
+    public void onSearchConfirmed(CharSequence text) {
+
+    }
+
+    @Override
+    public void onButtonClicked(int buttonCode) {
+
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -120,5 +179,6 @@ public class ProductActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }
