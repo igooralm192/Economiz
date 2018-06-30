@@ -23,6 +23,8 @@ import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.utils.Animation;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +109,11 @@ public class ProductActivity extends AppCompatActivity {
         if(id == android.R.id.home){
             finish();
         }
-        if(id == R.id.searchBar){
-
+        if(id == R.id.app_bar_search){
+            MaterialSearchBar search_bar = findViewById(R.id.product_search_bar);
+            Animation animation = new Animation();
+            if(search_bar.getVisibility() == View.VISIBLE)animation.closeSearch(search_bar);
+            else animation.openSearch(search_bar);
         }
         return super.onOptionsItemSelected(item);
     }
