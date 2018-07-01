@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.activity.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -30,11 +33,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener {
 
     FrameLayout blackBar;
+
     MaterialSearchBar searchBar;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
+    public static final String RECENT_MESSAGE = "search.name.recent";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
 
-        //makeSearchBar();
+        makeSearchBar();
     }
 
     private void makeSearchBar() {
@@ -96,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
                         searchBar.updateLastSuggestions(recentQueriesClone);
 
                 }
-
             }
 
         });
@@ -121,20 +126,6 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         saveRecentQueries(recent);
     }
 
-    private void saveRecentQueries(List<Item> recent) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        JSONArray array = new JSONArray();
-
-        for (Item item : recent) {
-            JSONObject object = item.toJson();
-            array.put(object.toString());
-        }
-        Log.i("TAG", array.toString());
-        editor.putString("recent", array.toString());
-        editor.apply();
-    }
-
     @Override
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) blackBar.getBackground();
@@ -150,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     @Override
     public void onSearchConfirmed(CharSequence text) {
         String newText = text.toString();
-        searchBar.setPlaceHolder(newText);
+
 
         Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
         if (text.length() != 0)
@@ -161,8 +152,14 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
                 recentQueries.add(item);
             }
 
-
         searchBar.setLastSuggestions(recentQueriesClone);
+
+        this.saveRecentQueries(recentQueriesClone);
+
+        Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra(RECENT_MESSAGE, newText);
+        startActivity(intent);
+
         searchBar.disableSearch();
     }
 
@@ -175,8 +172,26 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
 
+        searchBar.setLastSuggestions(recentQueriesClone);
         searchBar.disableSearch();
-        searchBar.setPlaceHolder(query.getText());
+
+        Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra(RECENT_MESSAGE, query.getText());
+        startActivity(intent);
+    }
+
+    private void saveRecentQueries(List<Item> recent) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        JSONArray array = new JSONArray();
+
+        for (Item item : recent) {
+            JSONObject object = item.toJson();
+            array.put(object.toString());
+        }
+        Log.i("TAG", array.toString());
+        editor.putString("recent", array.toString());
+        editor.apply();
     }
 
     private List<Item> loadRecentQueries() {
@@ -185,20 +200,21 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         try {
             String arrayStr = sharedPreferences.getString("recent", null);
 
-            JSONArray array = new JSONArray(arrayStr);
+            if (arrayStr != null) {
+                JSONArray array = new JSONArray(arrayStr);
 
-            for (int i=0; i<array.length(); i++) {
-                JSONObject object = new JSONObject((String) array.get(i));
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject object = new JSONObject((String) array.get(i));
 
-                Item item = new Item(
-                        object.getInt("idIcon"),
-                        object.getString("name"),
-                        object.getString("type")
-                );
+                    Item item = new Item(
+                            object.getInt("idIcon"),
+                            object.getString("name"),
+                            object.getString("type")
+                    );
 
-                recent.add(item);
+                    recent.add(item);
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
