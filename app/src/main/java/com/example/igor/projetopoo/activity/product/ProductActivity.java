@@ -79,6 +79,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         AppBarLayout apbar = findViewById(R.id.appbar);
+
         apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -86,7 +87,6 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
                 card.setAlpha((float)(1+(verticalOffset/400.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 card.setTranslationY(verticalOffset);
-                System.out.print((verticalOffset/400));
                 return;
             }
         });
@@ -114,7 +114,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
                     List<Item> recent = new ArrayList<>();
                     for (Item item: recentQueries) {
                         if (recent.size() >= 2) break;
-                        if (item.getName().toLowerCase().startsWith( s.toLowerCase() ))
+                        if (item.getName().toLowerCase().startsWith( s.trim().toLowerCase() ))
                             recent.add(item);
                     }
 
@@ -186,13 +186,10 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         newText = newText.trim();
 
         if (newText.length() != 0) {
-            System.out.print(12);
             Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
             if (text.length() != 0)
                 if (!recentQueriesClone.contains(item)) {
                     if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
-
-                    System.out.print(14);
 
                     recentQueriesClone.add(0, item);
                     recentQueries.add(item);
@@ -205,6 +202,8 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
             this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
 
             searchBar.disableSearch();
+        }else{
+            searchBar.showSuggestionsList();
         }
     }
 
@@ -233,6 +232,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
                 this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
             }
         }
+        finish();
     }
 
     private void startActivity(String text, Class activity, String keyMessage) {
