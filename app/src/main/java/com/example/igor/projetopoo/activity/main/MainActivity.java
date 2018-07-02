@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
+    Map<String, Class> index;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,8 +146,9 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     @Override
     public void onSearchConfirmed(CharSequence text) {
         String newText = text.toString();
+        newText = newText.trim();
 
-        if (newText.trim().length() != 0) {
+        if (newText.length() != 0) {
             Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
             if (text.length() != 0)
                 if (!recentQueriesClone.contains(item)) {
@@ -159,9 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
             this.saveRecentQueries(recentQueriesClone);
 
-            Intent intent = new Intent(this, SearchActivity.class);
-            intent.putExtra(RECENT_MESSAGE, newText);
-            startActivity(intent);
+            this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
 
             searchBar.disableSearch();
         }
@@ -172,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
     }
 
-    Map<String, Item> index;
-
     @Override
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
@@ -181,23 +180,24 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         searchBar.setLastSuggestions(recentQueriesClone);
         searchBar.disableSearch();
         
-        index = new HashMap<String, Item>();
-        index.put("recent", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "recent"));
-        index.put("product", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "product"));
-        index.put("category", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "category"));
+        index = new HashMap<String, Class>();
+        index.put("recent", SearchActivity.class);
+        //index.put("product", );
+        //index.put("category", );
 
         for (String type : index.keySet()) {
-            int indItem = recentQueries.indexOf(index.get(type));
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
+            int indItem = recentQueries.indexOf(item);
 
             if (indItem != -1) {
-                this.startSearchActivity(query.getText().toString());
+                this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
             }
         }
     }
 
-    private void startSearchActivity(String text) {
-        Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra(RECENT_MESSAGE, text);
+    private void startActivity(String text, Class activity, String keyMessage) {
+        Intent intent = new Intent(this, activity);
+        intent.putExtra(keyMessage, text);
         startActivity(intent);
     }
 
