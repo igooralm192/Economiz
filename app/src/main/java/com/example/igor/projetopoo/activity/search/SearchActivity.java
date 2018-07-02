@@ -1,24 +1,29 @@
-package com.example.igor.projetopoo.activity.category;
+package com.example.igor.projetopoo.activity.search;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
-import com.example.igor.projetopoo.activity.search.SearchActivity;
+import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
-import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
+import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,61 +34,61 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryActivity extends AppCompatActivity implements
+public class SearchActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
         SuggestionAdapter.OnItemViewClickListener {
-    private Toolbar toolbar;
-    private FrameLayout blackLayout;
+
     private MaterialSearchBar searchBar;
+    private FrameLayout blackBackground;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
-    public static final String RECENT_MESSAGE = "search.name.recent";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_category);
+        setContentView(R.layout.activity_search);
 
-        blackLayout = findViewById(R.id.black_category);
-        searchBar = findViewById(R.id.search_bar_category);
-
-        toolbar = findViewById(R.id.toolbar_category);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle("Categorias");
-
-        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
-
-        /*List<Item> suggestions = new ArrayList<Item>();
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Abacaxi", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Banana", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Carne", "product"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Amendoim", "category"));*/
-
+        searchBar = findViewById(R.id.search_searchbar);
+        blackBackground = findViewById(R.id.black_search);
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
+
+        //Intent intent = getIntent();
+        //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
+        //searchBar.setPlaceHolder(query);
+
+        blackBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (searchBar.isSearchEnabled())
+                    searchBar.disableSearch();
+            }
+        });
 
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
 
+        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
         customSuggestionsAdapter.setOnItemViewClickListener(this);
         customSuggestionsAdapter.setSuggestions(recentQueries);
         searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
 
         searchBar.addTextChangeListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //customSuggestionsAdapter.getFilter().filter(searchBar.getText());
+
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 String s = editable.toString();
-                s = s.trim();
+
                 if (s.length() > 0) {
                     List<Item> recent = new ArrayList<>();
                     for (Item item: recentQueries) {
@@ -101,11 +106,13 @@ public class CategoryActivity extends AppCompatActivity implements
                         searchBar.updateLastSuggestions(recentQueriesClone);
 
                 }
+
             }
 
         });
 
         searchBar.setOnSearchActionListener(this);
+
     }
 
     @Override
@@ -125,93 +132,6 @@ public class CategoryActivity extends AppCompatActivity implements
         saveRecentQueries(recent);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar_category, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == android.R.id.home) finish();
-        else if (id == R.id.search_icon_category) {
-            Animation.openSearch(searchBar, getSupportActionBar(), blackLayout);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSearchStateChanged(boolean enabled) {
-        if (enabled) {
-
-        } else {
-            Animation.closeSearch(searchBar, getSupportActionBar(), blackLayout);
-        }
-    }
-
-    @Override
-    public void onSearchConfirmed(CharSequence text) {
-        String newText = text.toString();
-        newText = newText.trim();
-
-        if (newText.length() != 0) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
-
-            if (!recentQueriesClone.contains(item)) {
-                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
-
-                recentQueriesClone.add(0, item);
-                recentQueries.add(item);
-            }
-
-            searchBar.setLastSuggestions(recentQueriesClone);
-
-            this.saveRecentQueries(recentQueriesClone);
-
-            this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
-
-            searchBar.disableSearch();
-        } else searchBar.showSuggestionsList();
-    }
-
-    @Override
-    public void onButtonClicked(int buttonCode) {
-
-    }
-
-    @Override
-    public void onItemClick(View view) {
-        TextView query = view.findViewById(R.id.name_suggestion);
-
-        searchBar.setLastSuggestions(recentQueriesClone);
-        searchBar.disableSearch();
-
-        Map<String, Class> index = new HashMap<>();
-        index.put("recent", SearchActivity.class);
-        //index.put("product", );
-        index.put("category", CategoryActivity.class);
-
-        for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
-            int indItem = recentQueries.indexOf(item);
-
-            if (indItem != -1) {
-                this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
-            }
-        }
-    }
-
-    private void startActivity(String text, Class activity, String keyMessage) {
-        Intent intent = new Intent(this, activity);
-        intent.putExtra(keyMessage, text);
-        startActivity(intent);
-    }
-
-
     private void saveRecentQueries(List<Item> recent) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -221,7 +141,7 @@ public class CategoryActivity extends AppCompatActivity implements
             JSONObject object = item.toJson();
             array.put(object.toString());
         }
-
+        Log.i("TAG", array.toString());
         editor.putString("recent", array.toString());
         editor.apply();
     }
@@ -235,7 +155,7 @@ public class CategoryActivity extends AppCompatActivity implements
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);
 
-                for (int i = 0; i < array.length(); i++) {
+                for (int i=0; i<array.length(); i++) {
                     JSONObject object = new JSONObject((String) array.get(i));
 
                     Item item = new Item(
@@ -252,5 +172,70 @@ public class CategoryActivity extends AppCompatActivity implements
         }
 
         return recent;
+    }
+
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        TransitionDrawable background = (TransitionDrawable) blackBackground.getBackground();
+
+        if (enabled) background.startTransition(300);
+        else background.reverseTransition(300);
+    }
+
+    @Override
+    public void onSearchConfirmed(CharSequence text) {
+        String newText = text.toString();
+        newText = newText.trim();
+        searchBar.setPlaceHolder(newText);
+
+        Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
+        if (newText.length() != 0)
+            if (!recentQueriesClone.contains(item)) {
+                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
+
+                recentQueriesClone.add(0, item);
+                recentQueries.add(item);
+            }
+
+
+        searchBar.setLastSuggestions(recentQueriesClone);
+        searchBar.disableSearch();
+    }
+
+    @Override
+    public void onButtonClicked(int buttonCode) {
+
+
+    }
+
+    @Override
+    public void onItemClick(View view) {
+        TextView query = view.findViewById(R.id.name_suggestion);
+
+        searchBar.disableSearch();
+
+        Map<String, Class> index = new HashMap<>();
+        index.put("recent", SearchActivity.class);
+        //index.put("product", );
+        //index.put("category", );
+
+        for (String type : index.keySet()) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
+            int indItem = recentQueries.indexOf(item);
+
+            if (indItem != -1) {
+                if (type.equals("recent")) {
+                    searchBar.setPlaceHolder(item.getName());
+                } else {
+                    //this.startActivity(query.getText().toString(), index.get(type), MainActivity.RECENT_MESSAGE);
+                }
+            }
+        }
+    }
+
+    private void startActivity(String text, Class activity, String keyMessage) {
+        Intent intent = new Intent(this, activity);
+        intent.putExtra(keyMessage, text);
+        startActivity(intent);
     }
 }
