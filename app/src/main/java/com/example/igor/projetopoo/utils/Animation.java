@@ -136,14 +136,14 @@ public class Animation {
     public static void openSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
         search.setVisibility(View.VISIBLE);
 
-        circleRevealView(search, ANIMATION_DURATION_MEDIUM);
+        circleRevealView(search, ANIMATION_DURATION_SHORT);
 
         search.postDelayed(new Runnable() {
             @Override
             public void run() {
                 search.enableSearch();
             }
-        }, ANIMATION_DURATION_MEDIUM);
+        }, ANIMATION_DURATION_SHORT);
 
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -160,18 +160,12 @@ public class Animation {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-//                        search.setVisibility(View.INVISIBLE);
+                        search.setVisibility(View.INVISIBLE);
                     }
                 });
             }
-        }, ANIMATION_DURATION_SHORT);
-        search.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                search.setVisibility(View.INVISIBLE);
-            }
-        }, 350);
-        //search.setVisibility(View.INVISIBLE);
+        }, 300);
+
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 

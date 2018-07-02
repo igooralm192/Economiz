@@ -163,10 +163,9 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
             finish();
         }
         if(id == R.id.app_bar_search){
-            Animation.openSearch(searchBar, getSupportActionBar(),blackBar);
-//            searchBar.setVisibility(View.VISIBLE);
-//            searchBar.enableSearch();
+            Animation.openSearch(searchBar, getSupportActionBar(), blackBar);
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -176,6 +175,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
         } else{
             Animation.closeSearch(searchBar, getSupportActionBar(), blackBar);
+
         }
     }
 

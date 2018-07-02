@@ -111,18 +111,27 @@
 
     </FrameLayout>
 
-    <com.mancj.materialsearchbar.MaterialSearchBar
-        android:id="@+id/product_search_bar"
-        style="@style/MaterialSearchBarLight"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:elevation="21dp"
-        android:visibility="invisible"
-        app:layout_scrollFlags="enterAlwaysCollapsed"
-        app:mt_navIconEnabled="false"
-        app:mt_placeholder="BaratinhoVéi">
+        android:elevation="22dp">
 
-    </com.mancj.materialsearchbar.MaterialSearchBar>
+        <com.mancj.materialsearchbar.MaterialSearchBar
+            android:id="@+id/product_search_bar"
+            style="@style/MaterialSearchBarLight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:elevation="21dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_scrollFlags="enterAlwaysCollapsed"
+            app:mt_navIconEnabled="false">
+
+        </com.mancj.materialsearchbar.MaterialSearchBar>
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>
