@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
@@ -27,7 +28,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener {
@@ -142,25 +145,26 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     public void onSearchConfirmed(CharSequence text) {
         String newText = text.toString();
 
+        if (newText.trim().length() != 0) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
+            if (text.length() != 0)
+                if (!recentQueriesClone.contains(item)) {
+                    if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
 
-        Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
-        if (text.length() != 0)
-            if (!recentQueriesClone.contains(item)) {
-                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
+                    recentQueriesClone.add(0, item);
+                    recentQueries.add(item);
+                }
 
-                recentQueriesClone.add(0, item);
-                recentQueries.add(item);
-            }
+            searchBar.setLastSuggestions(recentQueriesClone);
 
-        searchBar.setLastSuggestions(recentQueriesClone);
+            this.saveRecentQueries(recentQueriesClone);
 
-        this.saveRecentQueries(recentQueriesClone);
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra(RECENT_MESSAGE, newText);
+            startActivity(intent);
 
-        Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra(RECENT_MESSAGE, newText);
-        startActivity(intent);
-
-        searchBar.disableSearch();
+            searchBar.disableSearch();
+        }
     }
 
     @Override
@@ -168,17 +172,35 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
     }
 
+    Map<String, Item> index;
+
     @Override
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
 
         searchBar.setLastSuggestions(recentQueriesClone);
         searchBar.disableSearch();
+        
+        index = new HashMap<String, Item>();
+        index.put("recent", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "recent"));
+        index.put("product", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "product"));
+        index.put("category", new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), "category"));
 
+        for (String type : index.keySet()) {
+            int indItem = recentQueries.indexOf(index.get(type));
+
+            if (indItem != -1) {
+                this.startSearchActivity(query.getText().toString());
+            }
+        }
+    }
+
+    private void startSearchActivity(String text) {
         Intent intent = new Intent(this, SearchActivity.class);
-        intent.putExtra(RECENT_MESSAGE, query.getText());
+        intent.putExtra(RECENT_MESSAGE, text);
         startActivity(intent);
     }
+
 
     private void saveRecentQueries(List<Item> recent) {
         SharedPreferences.Editor editor = sharedPreferences.edit();

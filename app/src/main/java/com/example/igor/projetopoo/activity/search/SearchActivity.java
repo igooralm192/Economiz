@@ -1,5 +1,6 @@
 package com.example.igor.projetopoo.activity.search;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -46,6 +48,9 @@ public class SearchActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        Intent intent = getIntent();
+        String mainMessage = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
+
         searchBar = findViewById(R.id.search_searchbar);
         blackBackground = findViewById(R.id.black_search);
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
@@ -65,6 +70,8 @@ public class SearchActivity extends AppCompatActivity implements
         customSuggestionsAdapter.setOnItemViewClickListener(this);
         customSuggestionsAdapter.setSuggestions(recentQueries);
         searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+
+        searchBar.setPlaceHolder(mainMessage);
 
         searchBar.addTextChangeListener(new TextWatcher() {
             @Override
