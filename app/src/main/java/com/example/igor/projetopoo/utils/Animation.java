@@ -133,11 +133,17 @@ public class Animation {
         fadeOutView(hideView, duration);
     }
 
-    public static void openSearch(MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
+    public static void openSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
         search.setVisibility(View.VISIBLE);
 
-        circleRevealView(search, ANIMATION_DURATION_SHORT);
-        search.enableSearch();
+        circleRevealView(search, ANIMATION_DURATION_MEDIUM);
+
+        search.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                search.enableSearch();
+            }
+        }, ANIMATION_DURATION_MEDIUM);
 
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);
@@ -147,16 +153,25 @@ public class Animation {
     }
 
     public static void closeSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
-        search.hideSuggestionsList();
-
-        circleHideView(search, ANIMATION_DURATION_MEDIUM, new AnimatorListenerAdapter() {
+        search.postDelayed(new Runnable() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
+            public void run() {
+                circleHideView(search, ANIMATION_DURATION_MEDIUM, new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+//                        search.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        }, ANIMATION_DURATION_SHORT);
+        search.postDelayed(new Runnable() {
+            @Override
+            public void run() {
                 search.setVisibility(View.INVISIBLE);
             }
-        });
-
+        }, 350);
+        //search.setVisibility(View.INVISIBLE);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 

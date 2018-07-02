@@ -16,11 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            app:layout_scrollFlags="enterAlwaysCollapsed"
             app:mt_navIconEnabled="false"
-            app:mt_placeholder="BaratinhoVéi">
-
-        </com.mancj.materialsearchbar.MaterialSearchBar>
+            app:mt_placeholder="BaratinhoVéi" />
 
     </android.support.design.widget.AppBarLayout>
 
