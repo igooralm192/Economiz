@@ -1,22 +1,34 @@
 package com.example.igor.projetopoo.activity.category;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
+import com.example.igor.projetopoo.adapter.ListAdapter;
+import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
+import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
@@ -32,6 +44,8 @@ import java.util.Map;
 public class CategoryActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
         SuggestionAdapter.OnItemViewClickListener {
+
+    private Context context;
     private Toolbar toolbar;
     private FrameLayout blackLayout;
     private MaterialSearchBar searchBar;
@@ -52,17 +66,58 @@ public class CategoryActivity extends AppCompatActivity implements
         toolbar = findViewById(R.id.toolbar_category);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("Categorias");
-
-        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
-
-        /*List<Item> suggestions = new ArrayList<Item>();
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Abacaxi", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Banana", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Carne", "product"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Amendoim", "category"));*/
-
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
+        context = getApplicationContext();
+
+        getSupportActionBar().setTitle("Categorias");
+        createSearchBar();
+        createListCategories();
+    }
+
+    private void createListCategories() {
+        List<Category> categories = new ArrayList<>();
+
+        categories.add(new Category("Carnes"));
+        categories.add(new Category("Bebidas"));
+        categories.add(new Category("Doces"));
+        categories.add(new Category("Frios"));
+
+        final ListGenericAdapter<Category, Category.Holder> adapter = new ListGenericAdapter<>(
+                context,
+                categories,
+                new ListAdapter<Category, Category.Holder>() {
+                    @Override
+                    public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
+
+                        return new Category.Holder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
+                        holder.name.setText(items.get(position).getName());
+                    }
+                }
+        );
+
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(adapter);
+                lista.setLayoutManager(new LinearLayoutManager(context));
+                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                return lista;
+            }
+        });
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container_category, listFragment);
+        transaction.commit();
+    }
+
+    private void createSearchBar() {
+        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
 
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
