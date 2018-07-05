@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -106,6 +107,7 @@ public class CategoryActivity extends AppCompatActivity implements
                 lista.setAdapter(adapter);
                 lista.setLayoutManager(new LinearLayoutManager(context));
                 lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                lista.setItemAnimator(new DefaultItemAnimator());
                 return lista;
             }
         });
