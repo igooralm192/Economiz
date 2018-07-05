@@ -34,7 +34,7 @@ public class Database implements DatabaseRequests {
     public FirebaseFirestore getFirestore() { return this.firestore; }
 
     public DocumentSnapshot getDocument(DocumentReference documentReference) {
-        documentReference.get()
+        Task task = documentReference.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -47,11 +47,20 @@ public class Database implements DatabaseRequests {
 
                     }
                 });
+
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         return documentSnapshot;
     }
 
     public QuerySnapshot getDocuments(CollectionReference collectionReference) {
-        collectionReference.get()
+        Task task = collectionReference.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -64,12 +73,20 @@ public class Database implements DatabaseRequests {
 
                     }
                 });
+
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         return querySnapshot;
     }
 
     public QuerySnapshot getDocuments(Query query) {
-        query.get()
+        Task task = query.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -83,11 +100,19 @@ public class Database implements DatabaseRequests {
                     }
                 });
 
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         return querySnapshot;
     }
 
     public DocumentReference addDocument(CollectionReference collectionReference, Object object) {
-        collectionReference.add(object)
+        Task task = collectionReference.add(object)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -101,25 +126,49 @@ public class Database implements DatabaseRequests {
                     }
                 });
 
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         return documentReference;
     }
 
     public void updateDocument(DocumentReference documentReference, Object object) {
-        documentReference.set(object).addOnFailureListener(new OnFailureListener() {
+        Task task = documentReference.set(object).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
             }
         });
+
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void deleteDocument(DocumentReference documentReference) {
-        documentReference.delete().addOnFailureListener(new OnFailureListener() {
+        Task task = documentReference.delete().addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
             }
         });
+
+        while (!task.isSuccessful()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
