@@ -17,9 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
@@ -227,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         final ListGenericAdapter<Category, Category.Holder> listGenericAdapter = new ListGenericAdapter<Category, Category.Holder>(this, categories, new ListAdapter<Category, Category.Holder>() {
             @Override
             public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(context).inflate(R.layout.category_view, parent, false);
+                View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
 
                 Category.Holder holder = new Category.Holder(view);
 
