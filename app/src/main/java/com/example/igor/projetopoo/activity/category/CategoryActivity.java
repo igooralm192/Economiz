@@ -15,11 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
@@ -27,10 +30,13 @@ import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
+import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.utils.Animation;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import org.json.JSONArray;
@@ -49,6 +55,7 @@ public class CategoryActivity extends AppCompatActivity implements
 
     private Context context;
     private Toolbar toolbar;
+    private ProgressBar progressBar;
     private FrameLayout blackLayout;
     private MaterialSearchBar searchBar;
     private List<Item> recentQueries;
@@ -63,63 +70,22 @@ public class CategoryActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        presenterOps = new CategoryPresenter(this);
+        presenterOps = new CategoryPresenter(this, new Database(FirebaseFirestore.getInstance()));
 
         blackLayout = findViewById(R.id.black_category);
         searchBar = findViewById(R.id.search_bar_category);
+        progressBar = findViewById(R.id.progress_bar);
 
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         context = getApplicationContext();
+
         toolbar = findViewById(R.id.toolbar_category);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setTitle("Categorias");
         createSearchBar();
-        createListCategories();
-    }
 
-    private void createListCategories() {
-        List<Category> categories = new ArrayList<>();
-
-        categories.add(new Category("Carnes"));
-        categories.add(new Category("Bebidas"));
-        categories.add(new Category("Doces"));
-        categories.add(new Category("Frios"));
-
-        final ListGenericAdapter<Category, Category.Holder> adapter = new ListGenericAdapter<>(
-                context,
-                categories,
-                new ListAdapter<Category, Category.Holder>() {
-                    @Override
-                    public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
-
-                        return new Category.Holder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
-                        holder.name.setText(items.get(position).getName());
-                    }
-                }
-        );
-
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(context));
-                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-                lista.setItemAnimator(new DefaultItemAnimator());
-
-                return lista;
-            }
-        });
-
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container_category, listFragment);
-        transaction.commit();
+        presenterOps.getCategory("Alimentos");
     }
 
     private void createSearchBar() {
@@ -265,8 +231,56 @@ public class CategoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void showCategory() {
+    public void showSubcategories(List<Category> subcategories) {
+        final ListGenericAdapter<Category, Category.Holder> adapter = new ListGenericAdapter<>(
+                context,
+                subcategories,
+                new ListAdapter<Category, Category.Holder>() {
+                    @Override
+                    public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
 
+                        return new Category.Holder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
+                        holder.name.setText(items.get(position).getName());
+                    }
+                }
+        );
+
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(adapter);
+                lista.setLayoutManager(new LinearLayoutManager(context));
+                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                lista.setItemAnimator(new DefaultItemAnimator());
+
+                return lista;
+            }
+        });
+
+        Slide slide = new Slide();
+        slide.setSlideEdge(Gravity.RIGHT);
+        slide.setDuration(500);
+        listFragment.setEnterTransition(slide);
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.container_category, listFragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void showProducts(List<Product> products) {
+
+    }
+
+    @Override
+    public void showProgressBar(boolean enabled) {
+        progressBar.setVisibility(enabled?View.VISIBLE:View.GONE);
     }
 
     private void startActivity(String text, Class activity, String keyMessage) {

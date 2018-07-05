@@ -1,19 +1,26 @@
 package com.example.igor.projetopoo.activity.category;
 
+import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Product;
+
+import java.util.List;
+
 public interface CategoryMVP {
     public interface PresenterOps {
-        void getCategory(String name);
+        void getCategory(final String name);
     }
 
     public interface ModelOps {
-        void categoryRequest(String name);
+        void categoryRequest(final String name);
     }
 
     public interface ReqPresenterOps {
-        void returnCategory();
+        void onReturnedCategory(String type, List<Object> objects);
     }
 
     public interface ReqViewOps {
-        void showCategory();
+        void showSubcategories(List<Category> subcategories);
+        void showProducts(List<Product> products);
+        void showProgressBar(boolean enabled);
     }
 }
