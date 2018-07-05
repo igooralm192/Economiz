@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
 
-        searchBar.setOnSearchActionListener(this);
-
         setCategoryList(this);
 
         makeSearchBar();
