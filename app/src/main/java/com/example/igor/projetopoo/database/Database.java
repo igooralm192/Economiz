@@ -30,6 +30,8 @@ public class Database implements DatabaseRequests {
     private DocumentReference documentReference;
 
     public Database(FirebaseFirestore firestore) { this.firestore = firestore; }
+    
+    public FirebaseFirestore getFirestore() { return this.firestore; }
 
     public DocumentSnapshot getDocument(DocumentReference documentReference) {
         documentReference.get()
