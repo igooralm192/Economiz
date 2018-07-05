@@ -33,4 +33,9 @@ public class ListGenericAdapter<T, VH extends RecyclerView.ViewHolder> extends R
     public int getItemCount() {
         return items.size();
     }
+    
+    public interface OnItemViewClickListener {
+        void onSubcategoryClick(View view);
+        void onProductClick(View view);
+    }
 }
