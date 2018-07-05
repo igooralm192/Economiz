@@ -108,7 +108,6 @@ public class CategoryActivity extends AppCompatActivity implements
                 lista.setLayoutManager(new LinearLayoutManager(context));
                 lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
                 lista.setItemAnimator(new DefaultItemAnimator());
-
                 return lista;
             }
         });
