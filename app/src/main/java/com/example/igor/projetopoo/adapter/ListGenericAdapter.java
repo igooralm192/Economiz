@@ -35,7 +35,7 @@ public class ListGenericAdapter<T, VH extends RecyclerView.ViewHolder> extends R
     }
     
     public interface OnItemViewClickListener {
-        void onSubcategoryClick(View view);
+        void onCategoryClick(View view);
         void onProductClick(View view);
     }
 }
