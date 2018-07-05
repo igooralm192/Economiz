@@ -44,7 +44,8 @@ import java.util.Map;
 
 public class CategoryActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener {
+        SuggestionAdapter.OnItemViewClickListener,
+        CategoryMVP.ReqViewOps {
 
     private Context context;
     private Toolbar toolbar;
@@ -53,6 +54,7 @@ public class CategoryActivity extends AppCompatActivity implements
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
+    private CategoryMVP.PresenterOps presenterOps;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
@@ -61,14 +63,15 @@ public class CategoryActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
+        presenterOps = new CategoryPresenter(this);
+
         blackLayout = findViewById(R.id.black_category);
         searchBar = findViewById(R.id.search_bar_category);
 
-        toolbar = findViewById(R.id.toolbar_category);
-        setSupportActionBar(toolbar);
-
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         context = getApplicationContext();
+        toolbar = findViewById(R.id.toolbar_category);
+        setSupportActionBar(toolbar);
 
         getSupportActionBar().setTitle("Categorias");
         createSearchBar();
@@ -204,9 +207,7 @@ public class CategoryActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchStateChanged(boolean enabled) {
-        if (enabled) {
-
-        } else {
+        if (!enabled) {
             Animation.closeSearch(searchBar, getSupportActionBar(), blackLayout);
         }
     }
@@ -263,6 +264,11 @@ public class CategoryActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void showCategory() {
+
+    }
+
     private void startActivity(String text, Class activity, String keyMessage) {
         Intent intent = new Intent(this, activity);
         intent.putExtra(keyMessage, text);
@@ -311,4 +317,6 @@ public class CategoryActivity extends AppCompatActivity implements
 
         return recent;
     }
+
+
 }
