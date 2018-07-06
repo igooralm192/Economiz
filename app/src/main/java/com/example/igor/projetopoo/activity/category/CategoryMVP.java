@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface CategoryMVP {
     public interface PresenterOps {
-        void getCategory(final String name);
+        void getCategory(final Category category);
     }
 
     public interface ModelOps {
-        void categoryRequest(final String name);
+        void categoryRequest(final Category category);
     }
 
     public interface ReqPresenterOps {

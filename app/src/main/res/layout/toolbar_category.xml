@@ -13,6 +13,8 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+        app:subtitleTextAppearance="@style/TextAppearance.AppCompat"
         app:subtitleTextColor="@android:color/white"
+        app:title="Frutas"
         app:titleTextColor="@android:color/white" />
 </android.support.constraint.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +53,8 @@ import java.util.Map;
 public class CategoryActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
         SuggestionAdapter.OnItemViewClickListener,
-        CategoryMVP.ReqViewOps {
+        CategoryMVP.ReqViewOps,
+        ListGenericAdapter.OnItemViewClickListener {
 
     private Context context;
     private Toolbar toolbar;
@@ -61,7 +64,10 @@ public class CategoryActivity extends AppCompatActivity implements
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
+
     private CategoryMVP.PresenterOps presenterOps;
+    private Map<Category, Category> categoryLinks = new HashMap<>();
+    private Category currentCategory;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
@@ -82,10 +88,16 @@ public class CategoryActivity extends AppCompatActivity implements
         toolbar = findViewById(R.id.toolbar_category);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("Categorias");
         createSearchBar();
 
-        presenterOps.getCategory("Alimentos");
+        Intent intent = getIntent();
+        //String category = intent.getStringExtra("category");
+        Category category = new Category("Alimentos", "", true);
+        currentCategory = category;
+        getSupportActionBar().setTitle(currentCategory.getName());
+        categoryLinks.put(category, null);
+
+        presenterOps.getCategory(category);
     }
 
     private void createSearchBar() {
@@ -153,6 +165,27 @@ public class CategoryActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+        Integer count = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) super.onBackPressed();
+        else {
+            toolbar.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getSupportActionBar().setTitle( categoryLinks.get(currentCategory).getName() );
+                    currentCategory = categoryLinks.get(currentCategory);
+                    if (categoryLinks.get(currentCategory) == null) toolbar.setSubtitle("");
+                    else toolbar.setSubtitle(currentCategory.getName());
+                }
+            }, 500);
+
+            getSupportFragmentManager().popBackStack();
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar_category, menu);
 
@@ -163,7 +196,7 @@ public class CategoryActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == android.R.id.home) finish();
+        if (id == android.R.id.home) this.onBackPressed();
         else if (id == R.id.search_icon_category) {
             Animation.openSearch(searchBar, getSupportActionBar(), blackLayout);
         }
@@ -240,11 +273,12 @@ public class CategoryActivity extends AppCompatActivity implements
                     public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
                         View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
 
-                        return new Category.Holder(view);
+                        return new Category.Holder(view, CategoryActivity.this);
                     }
 
                     @Override
                     public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
+                        holder.setCategory(items.get(position));
                         holder.name.setText(items.get(position).getName());
                     }
                 }
@@ -263,19 +297,56 @@ public class CategoryActivity extends AppCompatActivity implements
         });
 
         Slide slide = new Slide();
+
         slide.setSlideEdge(Gravity.RIGHT);
         slide.setDuration(500);
         listFragment.setEnterTransition(slide);
 
+        slide.setSlideEdge(Gravity.RIGHT);
+        slide.setDuration(500);
+        listFragment.setExitTransition(slide);
+
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container_category, listFragment);
+        transaction.add(R.id.container_category, listFragment, currentCategory.getName());
         transaction.commit();
     }
 
     @Override
     public void showProducts(List<Product> products) {
+        final ListGenericAdapter<Product, Product.Holder> adapter = new ListGenericAdapter<>(
+                context,
+                products,
+                new ListAdapter<Product, Product.Holder>() {
+                    @Override
+                    public Product.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_product, parent, false);
 
+                        return new Product.Holder(view, CategoryActivity.this);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Product> items, @NonNull Product.Holder holder, int position) {
+                        holder.setProduct(items.get(position));
+                        holder.name.setText(items.get(position).getName());
+                        holder.averagePrice.setText("R$ " + String.format("%.2f", items.get(position).getAveragePrice()));
+                    }
+                }
+        );
+
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(adapter);
+                lista.setLayoutManager(new LinearLayoutManager(context));
+                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                lista.setItemAnimator(new DefaultItemAnimator());
+
+                return lista;
+            }
+        });
+
+        changeListFragment(listFragment);
     }
 
     @Override
@@ -288,7 +359,6 @@ public class CategoryActivity extends AppCompatActivity implements
         intent.putExtra(keyMessage, text);
         startActivity(intent);
     }
-
 
     private void saveRecentQueries(List<Item> recent) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -332,5 +402,53 @@ public class CategoryActivity extends AppCompatActivity implements
         return recent;
     }
 
+    private void changeListFragment(ListFragment newFragment) {
+        FragmentManager manager = getSupportFragmentManager();
+        Fragment oldFragment = manager.findFragmentByTag(categoryLinks.get( currentCategory ).getName());
 
+        Slide slide = new Slide();
+        slide.setDuration(500);
+
+        slide.setSlideEdge(Gravity.RIGHT);
+        oldFragment.setEnterTransition(slide);
+
+        slide.setSlideEdge(Gravity.LEFT);
+        oldFragment.setExitTransition(slide);
+
+        Slide slide2 = new Slide();
+        slide2.setDuration(500);
+
+        slide2.setSlideEdge(Gravity.LEFT);
+        newFragment.setEnterTransition(slide2);
+
+        slide2.setSlideEdge(Gravity.RIGHT);
+        newFragment.setExitTransition(slide2);
+
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.container_category, newFragment, currentCategory.getName());
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        toolbar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toolbar.setTitle(currentCategory.getName());
+                toolbar.setSubtitle( categoryLinks.get(currentCategory).getName() );
+            }
+        }, 500);
+
+    }
+
+    @Override
+    public void onCategoryClick(Category category) {
+        categoryLinks.put(category, currentCategory);
+        currentCategory = category;
+
+        presenterOps.getCategory(category);
+    }
+
+    @Override
+    public void onProductClick(Product product) {
+
+    }
 }

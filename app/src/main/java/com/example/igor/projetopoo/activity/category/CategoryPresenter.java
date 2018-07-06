@@ -20,7 +20,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
     }
 
     @Override
-    public void getCategory(final String name) {
+    public void getCategory(final Category category) {
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -29,7 +29,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.categoryRequest(name);
+                modelOps.categoryRequest(category);
 
                 return null;
             }

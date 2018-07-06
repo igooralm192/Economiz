@@ -7,17 +7,22 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 import java.util.Map;
 
 public class Product {
     private String name;
-    private Float averagePrice;
+    private Double averagePrice;
     private String parentCategory;
     private String[] feedbacks;
     private Pair<Double, Double> priceRange;
 
-    public Product(String name, Float averagePrice, String parentCategory, String[] feedbacks, @Nullable Pair<Double, Double> priceRange) {
+    public Product(String name, Double averagePrice, String parentCategory, String[] feedbacks, Pair<Double, Double> priceRange) {
         this.name = name;
         this.averagePrice = averagePrice;
         this.parentCategory = parentCategory;
@@ -26,7 +31,12 @@ public class Product {
     }
 
     public Product(Map<String, Object> map) {
-        this((String) map.get("name"), (Float) map.get("average_price"), (String) map.get("parent_category"), (String[]) map.get("feedbacks"), null);
+        this((String) map.get("name"), (Double) map.get("average_price"), (String) map.get("parent_category"), null, null);
+
+        List<String> list = (List<String>) map.get("feedbacks");
+        String[] feedbacks = new String[]{};
+        this.feedbacks = list.toArray(feedbacks);
+
         Map<String, Object> range = (Map<String, Object>) map.get("price_range");
         this.priceRange = new Pair<>((Double) map.get("minimum_price"), (Double) map.get("maximum_price"));
     }
@@ -35,9 +45,9 @@ public class Product {
 
     public void setName(String name) { this.name = name; }
 
-    public Float getAveragePrice() { return averagePrice; }
+    public Double getAveragePrice() { return averagePrice; }
 
-    public void setAveragePrice(Float averagePrice) { this.averagePrice = averagePrice; }
+    public void setAveragePrice(Double averagePrice) { this.averagePrice = averagePrice; }
 
     public String getParentCategory() { return parentCategory; }
 
@@ -51,15 +61,47 @@ public class Product {
 
     public void setPriceRange(Pair<Double, Double> priceRange) { this.priceRange = priceRange; }
 
-    public static class Holder extends RecyclerView.ViewHolder {
-        protected TextView name;
-        protected TextView averagePrice;
+    public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
 
-        public Holder(View view) {
+        try {
+            object.put("name", this.getName());
+            object.put("parent_category", this.getParentCategory());
+            object.put("average_price", this.getAveragePrice());
+            object.put("feedbacks", this.getFeedbacks());
+            object.put("price_range", this.getPriceRange());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return object;
+    }
+
+    public static class Holder extends RecyclerView.ViewHolder {
+        public TextView name;
+        public TextView averagePrice;
+        public Product product;
+
+        public Holder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
             super(view);
 
             name = view.findViewById(R.id.name_product);
             averagePrice = view.findViewById(R.id.price_product);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onProductClick( Holder.this.getProduct() );
+                }
+            });
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
         }
     }
 }

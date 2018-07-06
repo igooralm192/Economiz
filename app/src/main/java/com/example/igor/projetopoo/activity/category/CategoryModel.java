@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -24,22 +25,25 @@ public class CategoryModel implements CategoryMVP.ModelOps {
     }
 
     @Override
-    public void categoryRequest(final String name) {
+    public void categoryRequest(final Category category) {
         List<Object> objects = new ArrayList<>();
 
         FirebaseFirestore firestore = database.getFirestore();
-        Query query = firestore.collection("categories").whereEqualTo("parent_category", name);
-        QuerySnapshot querySnapshot = database.getDocuments(query);
+        CollectionReference collectionReference;
 
-        String path = querySnapshot.getDocuments().get(0).getReference().getPath().split("/")[0];
+        if (category.getHaveSubcategories()) collectionReference = firestore.collection("categories");
+        else collectionReference = firestore.collection("products");
+
+        Query query = collectionReference.whereEqualTo("parent_category", category.getName());
+        QuerySnapshot querySnapshot = database.getDocuments(query);
 
         for (DocumentSnapshot documentSnapshot: querySnapshot) {
             Map<String, Object> data = documentSnapshot.getData();
 
-            if (path.equals("categories")) {
+            if (collectionReference.getId().equals("categories")) {
                 if (data != null) {
-                    Category category = new Category(data);
-                    objects.add(category);
+                    Category subcategory = new Category(data);
+                    objects.add(subcategory);
                 }
             } else {
                 if (data != null) {
@@ -49,6 +53,6 @@ public class CategoryModel implements CategoryMVP.ModelOps {
             }
         }
 
-        reqPresenterOps.onReturnedCategory(path, objects);
+        reqPresenterOps.onReturnedCategory(collectionReference.getId(), objects);
     }
 }
