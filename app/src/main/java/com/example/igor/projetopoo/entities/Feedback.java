@@ -6,15 +6,15 @@ import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
 
-import java.math.BigDecimal;
+import java.lang.Double;
 import java.util.Date;
 
 public class Feedback {
     private String location;
     private String date;
-    private BigDecimal price;
+    private Double price;
 
-    public Feedback(String location, String date, BigDecimal price) {
+    public Feedback(String location, String date, Double price) {
         this.location = location;
         this.date = date;
         this.price = price;
@@ -28,7 +28,7 @@ public class Feedback {
         return date;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -38,7 +38,7 @@ public class Feedback {
 
     public void setDate(String date) { this.date = date; }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

@@ -79,7 +79,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
 
         for(int i = 0; i < 51; i++){
-            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", BigDecimal.valueOf(6.5)));
+            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
         }
 
         final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
@@ -96,7 +96,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
                     public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
                         holder.location.setText(items.get(position).getLocation());
                         holder.day.setText(items.get(position).getDate().toUpperCase());
-                        String s = "R$ "+items.get(position).getPrice().setScale(2);
+                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
                         s = s.replace('.',',');
                         holder.price.setText(s);
                     }
@@ -129,6 +129,10 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 CardView card = findViewById(R.id.ProductCard);
                 RecyclerView re = findViewById(R.id.feedback_recycler);
+                TextView a = findViewById(R.id.toolbar_name);
+                TextView b = findViewById(R.id.toolbar_price);
+                a.setAlpha((float)(-verticalOffset/400.0));
+                b.setAlpha((float)(-verticalOffset/400.0));
                 card.setAlpha((float)(1+(verticalOffset/400.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 card.setTranslationY(verticalOffset);
