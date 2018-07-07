@@ -71,6 +71,7 @@ public class CategoryActivity extends AppCompatActivity implements
     private Category currentCategory;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
+    public static final String SELECTED_PRODUCT = "Selected Product";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -463,6 +464,8 @@ public class CategoryActivity extends AppCompatActivity implements
 
     @Override
     public void onProductClick(Product product) {
+        //String json = product.toJSON().toString();
 
+        //startActivity(json, ProductActivity.class, SELECTED_PRODUCT);
     }
 }

@@ -60,6 +60,19 @@ public class Category {
         return object;
     }
 
+    public static Category toObject(JSONObject object) {
+        try {
+            return new Category(
+                    (String) object.get("name"),
+                    (String) object.get("parent_category"),
+                    (Boolean) object.get("have_subcategories")
+            );
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static class Holder extends RecyclerView.ViewHolder {
         public TextView name;
         public Category category;
