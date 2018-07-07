@@ -25,6 +25,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
             @Override
             public void onPreExecute() {
                 reqViewOps.showProgressBar(true);
+
             }
 
             @Override

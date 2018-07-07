@@ -21,6 +21,6 @@ public interface CategoryMVP {
     public interface ReqViewOps {
         void showSubcategories(List<Category> subcategories);
         void showProducts(List<Product> products);
-        void showProgressBar(boolean enabled);
+        void showProgressBar(Boolean enabled);
     }
 }

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -58,8 +59,8 @@ public class CategoryActivity extends AppCompatActivity implements
 
     private Context context;
     private Toolbar toolbar;
-    private ProgressBar progressBar;
     private FrameLayout blackLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private MaterialSearchBar searchBar;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
@@ -80,7 +81,7 @@ public class CategoryActivity extends AppCompatActivity implements
 
         blackLayout = findViewById(R.id.black_category);
         searchBar = findViewById(R.id.search_bar_category);
-        progressBar = findViewById(R.id.progress_bar);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
 
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         context = getApplicationContext();
@@ -98,6 +99,13 @@ public class CategoryActivity extends AppCompatActivity implements
         categoryLinks.put(category, null);
 
         presenterOps.getCategory(category);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenterOps.getCategory(currentCategory);
+            }
+        });
     }
 
     private void createSearchBar() {
@@ -168,7 +176,7 @@ public class CategoryActivity extends AppCompatActivity implements
     public void onBackPressed() {
         Integer count = getSupportFragmentManager().getBackStackEntryCount();
 
-        if (count == 0) super.onBackPressed();
+        if (count == 0) finish();
         else {
             toolbar.postDelayed(new Runnable() {
                 @Override
@@ -296,20 +304,7 @@ public class CategoryActivity extends AppCompatActivity implements
             }
         });
 
-        Slide slide = new Slide();
-
-        slide.setSlideEdge(Gravity.RIGHT);
-        slide.setDuration(500);
-        listFragment.setEnterTransition(slide);
-
-        slide.setSlideEdge(Gravity.RIGHT);
-        slide.setDuration(500);
-        listFragment.setExitTransition(slide);
-
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.container_category, listFragment, currentCategory.getName());
-        transaction.commit();
+        changeListFragment(listFragment);
     }
 
     @Override
@@ -350,8 +345,8 @@ public class CategoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void showProgressBar(boolean enabled) {
-        progressBar.setVisibility(enabled?View.VISIBLE:View.GONE);
+    public void showProgressBar(Boolean enabled) {
+        swipeRefreshLayout.setRefreshing(enabled);
     }
 
     private void startActivity(String text, Class activity, String keyMessage) {
@@ -404,36 +399,55 @@ public class CategoryActivity extends AppCompatActivity implements
 
     private void changeListFragment(ListFragment newFragment) {
         FragmentManager manager = getSupportFragmentManager();
-        Fragment oldFragment = manager.findFragmentByTag(categoryLinks.get( currentCategory ).getName());
+        final Category oldcategory = categoryLinks.get( currentCategory );
+        Fragment oldFragment;
 
-        Slide slide = new Slide();
-        slide.setDuration(500);
+        if (oldcategory != null) {
+            oldFragment = manager.findFragmentByTag(oldcategory.getName());
 
-        slide.setSlideEdge(Gravity.RIGHT);
-        oldFragment.setEnterTransition(slide);
+            Slide slide = new Slide();
+            slide.setDuration(500);
 
-        slide.setSlideEdge(Gravity.LEFT);
-        oldFragment.setExitTransition(slide);
+            slide.setSlideEdge(Gravity.END);
+            oldFragment.setEnterTransition(slide);
+
+            slide.setSlideEdge(Gravity.START);
+            oldFragment.setExitTransition(slide);
+        } else {
+            Integer count = manager.getBackStackEntryCount();
+
+            if (count == 0) {
+                oldFragment = manager.findFragmentByTag(currentCategory.getName());
+                if (oldFragment != null) {
+                    Slide slide = new Slide();
+                    slide.setDuration(500);
+
+                    slide.setSlideEdge(Gravity.START);
+                    oldFragment.setExitTransition(slide);
+                }
+            }
+        }
 
         Slide slide2 = new Slide();
         slide2.setDuration(500);
 
-        slide2.setSlideEdge(Gravity.LEFT);
+        slide2.setSlideEdge(Gravity.START);
         newFragment.setEnterTransition(slide2);
 
-        slide2.setSlideEdge(Gravity.RIGHT);
+        slide2.setSlideEdge(Gravity.END);
         newFragment.setExitTransition(slide2);
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_category, newFragment, currentCategory.getName());
-        transaction.addToBackStack(null);
+        if (oldcategory != null) transaction.addToBackStack(null);
         transaction.commit();
 
         toolbar.postDelayed(new Runnable() {
             @Override
             public void run() {
                 toolbar.setTitle(currentCategory.getName());
-                toolbar.setSubtitle( categoryLinks.get(currentCategory).getName() );
+                if (oldcategory != null) toolbar.setSubtitle( oldcategory.getName() );
+                else toolbar.setSubtitle("");
             }
         }, 500);
 
