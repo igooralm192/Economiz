@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener {
+public class MainActivity extends AppCompatActivity implements OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener, MainMVP.ReqViewOps {
 
     FrameLayout blackBar;
 
@@ -55,11 +55,14 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
 
     Map<String, Class> index;
 
+    private MainMVP.PresenterOps presenterOps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        presenterOps = new MainPresenter(this);
 
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
 
