@@ -1,23 +1,28 @@
 package com.example.igor.projetopoo.activity.main;
 
+import com.example.igor.projetopoo.entities.Category;
+
+import java.util.List;
+
 public interface MainMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
-        //void doSomething();
+        void getCategoryList();
     }
 
     public interface ModelOps {
         // Model methods => Presenter acess
-        //void catchSomething();
+        void categoryListRequest();
     }
 
     public interface ReqPresenterOps {
         // Presenter methods => Model acess
-        //void returnSomething();
+        void onReturnedCategoryList(List<Object> objects);
     }
 
     public interface ReqViewOps {
         // View methods => Presenter access
-        //void showSomething();
+        void showCategories(List<Category> categories);
+        void showProgressBar(Boolean enabled);
     }
 }

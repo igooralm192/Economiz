@@ -5,19 +5,28 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Visibility;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
@@ -25,10 +34,12 @@ import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
+import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Blur;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.MaterialSearchBar.OnSearchActionListener;
 
@@ -42,11 +53,19 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener, MainMVP.ReqViewOps {
+public class MainActivity extends AppCompatActivity implements
+        OnSearchActionListener,
+        SuggestionAdapter.OnItemViewClickListener,
+        MainMVP.ReqViewOps,
+        ListGenericAdapter.OnItemViewClickListener {
 
-    FrameLayout blackBar;
+    private Context context;
 
-    MaterialSearchBar searchBar;
+    private FrameLayout blackBar;
+    private RelativeLayout appBar;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private MaterialSearchBar searchBar;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
@@ -62,13 +81,24 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        presenterOps = new MainPresenter(this);
+        context = getApplicationContext();
+
+        presenterOps = new MainPresenter(this, new Database(FirebaseFirestore.getInstance()));
 
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
-
-        setCategoryList(this);
+        appBar = (RelativeLayout) findViewById(R.id.appBar);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
 
         makeSearchBar();
+
+        //setCategoryList(this);
+        presenterOps.getCategoryList();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenterOps.getCategoryList();
+            }
+        });
     }
 
     private void makeSearchBar() {
@@ -129,6 +159,97 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
     }
 
     @Override
+    public void showCategories(List<Category> categories) {
+        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<Category, Category.MainHolder>(
+                context,
+                categories,
+                new ListAdapter<Category, Category.MainHolder>() {
+            @Override
+            public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
+
+                Category.MainHolder holder = new Category.MainHolder(view, MainActivity.this);
+
+                return holder;
+            }
+
+            @Override
+            public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
+                Category category = items.get(position);
+                holder.name.setText(category.getName());
+                holder.background.setImageResource(category.getBackground());
+
+                Blur.blurImage(holder.background, 5, context);
+            }
+        });
+
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(listGenericAdapter);
+                lista.setLayoutManager(new LinearLayoutManager(context));
+                lista.setItemAnimator(new DefaultItemAnimator());
+
+                return lista;
+            }
+        });
+
+        changeListFragment(listFragment);
+    }
+
+    private void changeListFragment(ListFragment newFragment) {
+        FragmentManager manager = getSupportFragmentManager();
+        //final Category oldcategory = categoryLinks.get( currentCategory );
+        Fragment oldFragment;
+
+        /*if (oldcategory != null) {
+            oldFragment = manager.findFragmentByTag(oldcategory.getName());
+
+            Slide slide = new Slide();
+            slide.setDuration(500);
+
+            slide.setSlideEdge(Gravity.END);
+            oldFragment.setEnterTransition(slide);
+
+            slide.setSlideEdge(Gravity.START);
+            oldFragment.setExitTransition(slide);
+        } else {
+            Integer count = manager.getBackStackEntryCount();
+
+            if (count == 0) {
+                oldFragment = manager.findFragmentByTag(currentCategory.getName());
+                if (oldFragment != null) {
+                    Slide slide = new Slide();
+                    slide.setDuration(500);
+
+                    slide.setSlideEdge(Gravity.START);
+                    oldFragment.setExitTransition(slide);
+                }
+            }
+        }*/
+
+        Slide slide2 = new Slide();
+        slide2.setDuration(500);
+        slide2.setSlideEdge(Gravity.START);
+
+        newFragment.setEnterTransition(slide2);
+
+        Fade fade = new Fade();
+        fade.setDuration(350);
+        newFragment.setExitTransition(fade);
+
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.constraint_layout_main, newFragment);
+        //if (oldcategory != null) transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void showProgressBar(Boolean enabled) {
+        swipeRefreshLayout.setRefreshing(enabled);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
 
@@ -182,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         }
     }
 
+
     @Override
     public void onButtonClicked(int buttonCode) {
 
@@ -213,54 +335,6 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         Intent intent = new Intent(this, activity);
         intent.putExtra(keyMessage, text);
         startActivity(intent);
-    }
-
-    private void setCategoryList(final Context context) {
-        ArrayList<Category> categories = new ArrayList<Category>();
-        categories.add(new Category("Alimentos", R.drawable.food));
-        categories.add(new Category("Limpeza", R.drawable.cleaning2));
-        categories.add(new Category("Farmácia", R.drawable.farmacia));
-        categories.add(new Category("Zoológico", R.drawable.food));
-
-        final RecyclerView.LayoutManager layout = new LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL, false);
-
-        final ListGenericAdapter<Category, Category.Holder> listGenericAdapter = new ListGenericAdapter<Category, Category.Holder>(this, categories, new ListAdapter<Category, Category.Holder>() {
-            @Override
-            public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
-
-                Category.Holder holder = new Category.Holder(view);
-
-                return holder;
-            }
-
-            @Override
-            public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
-                Category category = items.get(position);
-                holder.nameCategory.setText(category.getName());
-                holder.backCategory.setImageResource(category.getBackground());
-
-                Blur.blurImage(holder.backCategory, 5, context);
-            }
-        });
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        // Exemplo de instanciação do ListFragment
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(listGenericAdapter);
-                lista.setLayoutManager(layout);
-
-                return lista;
-            }
-        });
-
-        fragmentTransaction.add(R.id.constraint_layout_main, listFragment);
-        fragmentTransaction.commit();
     }
 
     private void saveRecentQueries(List<Item> recent) {
@@ -303,5 +377,58 @@ public class MainActivity extends AppCompatActivity implements OnSearchActionLis
         }
 
         return recent;
+    }
+
+    private void setCategoryList(final Context context) {
+        ArrayList<Category> categories = new ArrayList<Category>();
+        categories.add(new Category("Alimentos", R.drawable.food));
+        categories.add(new Category("Limpeza", R.drawable.cleaning2));
+        categories.add(new Category("Farmácia", R.drawable.farmacia));
+        categories.add(new Category("Zoológico", R.drawable.food));
+
+        final RecyclerView.LayoutManager layout = new LinearLayoutManager(this,
+                LinearLayoutManager.VERTICAL, false);
+
+        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<Category, Category.MainHolder>(
+                context,
+                categories,
+                new ListAdapter<Category, Category.MainHolder>() {
+                    @Override
+                    public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
+
+                        Category.MainHolder holder = new Category.MainHolder(view, MainActivity.this);
+
+                        return holder;
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
+                        Category category = items.get(position);
+                        holder.name.setText(category.getName());
+                        holder.background.setImageResource(category.getBackground());
+
+                        Blur.blurImage(holder.background, 5, context);
+                    }
+                });
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Exemplo de instanciação do ListFragment
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(listGenericAdapter);
+                lista.setLayoutManager(layout);
+
+                return lista;
+            }
+        });
+    }
+
+    @Override
+    public void onCategoryClick(Category category) {
+
     }
 }
