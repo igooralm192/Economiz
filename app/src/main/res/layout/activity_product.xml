@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/product_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
@@ -74,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:layout_marginTop="14dp"
+                app:cardBackgroundColor="@color/transparent"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="3dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -86,7 +88,6 @@
                     android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:autoText="true"
                     android:text="R$ 99,99"
                     android:textAllCaps="false"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display1"
@@ -133,5 +134,20 @@
 
         </com.mancj.materialsearchbar.MaterialSearchBar>
     </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="add_feedback"
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="8dp"
+        app:layout_anchor="@+id/black_bar"
+        app:layout_anchorGravity="right|bottom"
+        app:srcCompat="@drawable/ic_add_white_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,8 +1,10 @@
 package com.example.igor.projetopoo.activity.product;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,6 +36,7 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.fragment.CustomDialog;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -283,5 +286,10 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         }
 
         return recent;
+    }
+    public void add_feedback(View v){
+        CustomDialog dialog= new CustomDialog(this);
+        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+        dialog.show();
     }
 }
