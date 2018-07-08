@@ -36,8 +36,8 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 
 import com.example.igor.projetopoo.entities.Item;
-import com.example.igor.projetopoo.fragment.CustomDialog;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
@@ -55,7 +55,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
-
+    private CustomDialog dialog;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
@@ -71,6 +71,7 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
+        dialog= new CustomDialog(this, R.layout.dialog);
         searchBar = findViewById(R.id.product_search_bar);
         searchBar.setOnSearchActionListener(this);
         blackBar = findViewById(R.id.black_bar);
@@ -287,9 +288,14 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
         return recent;
     }
-    public void add_feedback(View v){
-        CustomDialog dialog= new CustomDialog(this);
+    public void showFeedback(View v){
         dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
         dialog.show();
+    }
+    public void cancelDialog(View v){
+        dialog.dismiss();
+    }
+    public void addFeedback(View v){
+        dialog.dismiss();
     }
 }

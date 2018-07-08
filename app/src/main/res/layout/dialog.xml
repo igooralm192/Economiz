@@ -36,58 +36,44 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/dialog_subtitle_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/robotoe"
-                android:text="Preço"
-                android:textColor="@android:color/darker_gray"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
-
-            <EditText
-                android:id="@+id/dialog_input_price"
-                android:layout_width="0dp"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/price_feedback"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
                 android:layout_marginStart="24dp"
-                android:ems="10"
-                android:inputType="numberDecimal"
-                android:singleLine="true"
-                android:textAlignment="center"
-                android:textSize="18sp"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialog_subtitle_1" />
+                app:layout_constraintTop_toBottomOf="@+id/dialog_title">
 
-            <TextView
-                android:id="@+id/dialog_subtitle_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/robotoe"
-                android:text="Local"
-                android:textColor="@android:color/darker_gray"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialog_input_price" />
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Preço"
+                    android:inputType="numberDecimal"
+                    android:textAlignment="center" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/dialog_input_location"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/location_feedback"
+                android:layout_width="match_parent"
+                android:layout_height="57dp"
+                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginStart="24dp"
-                android:ems="10"
-                android:inputType="text"
-                android:singleLine="true"
-                android:textSize="18sp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/product_dialog_no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialog_subtitle_2" />
+                app:layout_constraintTop_toBottomOf="@+id/price_feedback">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Local"
+                    android:inputType="textCapSentences" />
+            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/product_dialog_yes"
@@ -95,15 +81,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif"
+                android:onClick="addFeedback"
                 android:text="OK"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dialog_input_location" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <Button
                 android:id="@+id/product_dialog_no"
@@ -112,6 +97,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif"
+                android:onClick="cancelDialog"
                 android:text="CANCELAR"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"

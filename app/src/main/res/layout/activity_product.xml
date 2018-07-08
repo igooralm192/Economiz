@@ -143,7 +143,7 @@
         android:layout_marginEnd="8dp"
         android:clickable="true"
         android:focusable="true"
-        android:onClick="add_feedback"
+        android:onClick="showFeedback"
         app:backgroundTint="@color/colorPrimary"
         app:elevation="8dp"
         app:layout_anchor="@+id/black_bar"
