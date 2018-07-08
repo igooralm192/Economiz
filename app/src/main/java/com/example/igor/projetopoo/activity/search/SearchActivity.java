@@ -1,12 +1,18 @@
 package com.example.igor.projetopoo.activity.search;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,8 +26,12 @@ import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.main.MainActivity;
+import com.example.igor.projetopoo.adapter.ListAdapter;
+import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Result;
+import com.example.igor.projetopoo.fragment.ListFragment;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
@@ -238,4 +248,53 @@ public class SearchActivity extends AppCompatActivity implements
         intent.putExtra(keyMessage, text);
         startActivity(intent);
     }
+
+    private  void setResultList(final Context context){
+        ArrayList<Result> result = new ArrayList<>();
+        /**result.add(new Result("alimentos"));
+         result.add(new Result("pao", 1.2d));
+         result.add(new Result("manteiga", 2.3d) );
+         result.add(new Result("limpeza"));**/
+
+
+        final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL, false);
+
+        final ListGenericAdapter<Result, Result.Holder> listGenericAdapter = new ListGenericAdapter<>(this, result, new ListAdapter<Result, Result.Holder>() {
+            @Override
+            public Result.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(context).inflate(R.layout.item_list_result, parent, false);
+                return new Result.Holder(view);
+            }
+
+            @Override
+            public void onBindViewHolder(List<Result> items, @NonNull Result.Holder holder, int position) {
+                Result result = items.get(position);
+                holder.iconResult.setImageResource(result.getIcon());
+                holder.nameResult.setText(result.getName());
+                if (result.getPrice() != null)
+                    holder.priceResult.setText(result.getPrice().toString());
+
+
+            }
+        });
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Exemplo de instanciação do ListFragment
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(listGenericAdapter);
+                lista.setLayoutManager(layout);
+
+                return lista;
+            }
+        });
+
+        fragmentTransaction.add(R.id.search_container, listFragment);
+        fragmentTransaction.commit();
+    }
+
 }
