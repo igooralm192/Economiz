@@ -288,10 +288,12 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
         return recent;
     }
-    public void showFeedback(View v){
+
+    public void showDialog(View v){
         dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
         dialog.show();
     }
+
     public void cancelDialog(View v){
         dialog.dismiss();
     }

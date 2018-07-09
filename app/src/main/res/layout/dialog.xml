@@ -51,8 +51,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Preço"
-                    android:inputType="numberDecimal"
-                    android:textAlignment="center" />
+                    android:inputType="numberDecimal" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -72,7 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Local"
-                    android:inputType="textCapSentences" />
+                    android:inputType="textCapSentences"
+                    android:textAlignment="textStart" />
             </android.support.design.widget.TextInputLayout>
 
             <Button
