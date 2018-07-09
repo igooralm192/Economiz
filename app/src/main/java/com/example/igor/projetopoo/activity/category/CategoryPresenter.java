@@ -62,4 +62,27 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
             reqViewOps.showProducts(products);
         }
     }
+
+    @Override
+    public void getAllSuggestions() {
+        modelOps.suggestionsRequest();
+    }
+
+    @Override
+    public void onReturnedAllSuggestions(List<Object> objects) {
+        List<Category> categories = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+
+        for (Object object: objects) {
+            if (object instanceof Category) {
+                Category category = (Category) object;
+                categories.add(category);
+            } else {
+                Product product = (Product) object;
+                products.add(product);
+            }
+        }
+
+        reqViewOps.saveAllSuggestions(categories, products);
+    }
 }

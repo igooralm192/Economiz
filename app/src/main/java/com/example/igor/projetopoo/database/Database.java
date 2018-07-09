@@ -23,152 +23,94 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database implements DatabaseRequests {
-    private Query query;
-    private QuerySnapshot querySnapshot;
     private FirebaseFirestore firestore;
-    private DocumentSnapshot documentSnapshot;
-    private DocumentReference documentReference;
 
     public Database(FirebaseFirestore firestore) { this.firestore = firestore; }
     
     public FirebaseFirestore getFirestore() { return this.firestore; }
 
-    public DocumentSnapshot getDocument(DocumentReference documentReference) {
-        Task task = documentReference.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Database.this.documentSnapshot = documentSnapshot;
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
+    public Task<DocumentSnapshot> getDocument(DocumentReference documentReference) {
+        Task<DocumentSnapshot> task = documentReference.get();
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        return documentSnapshot;
+        return task;
     }
 
-    public QuerySnapshot getDocuments(CollectionReference collectionReference) {
-        Task task = collectionReference.get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        querySnapshot = queryDocumentSnapshots;
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
+    public Task<QuerySnapshot> getDocuments(CollectionReference collectionReference) {
+        Task<QuerySnapshot> task = collectionReference.get();
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        return querySnapshot;
+        return task;
     }
 
-    public QuerySnapshot getDocuments(Query query) {
-        Task task = query.get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        querySnapshot = queryDocumentSnapshots;
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
+    public Task<QuerySnapshot> getDocuments(Query query) {
+        Task<QuerySnapshot> task = query.get();
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        return querySnapshot;
+        return task;
     }
 
-    public DocumentReference addDocument(CollectionReference collectionReference, Object object) {
-        Task task = collectionReference.add(object)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Database.this.documentReference = documentReference;
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
+    public Task<DocumentReference> addDocument(CollectionReference collectionReference, Object object) {
+        Task<DocumentReference> task = collectionReference.add(object);
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        return documentReference;
+        return task;
     }
 
-    public void updateDocument(DocumentReference documentReference, Object object) {
-        Task task = documentReference.set(object).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+    public Task<Void> updateDocument(DocumentReference documentReference, Object object) {
+        Task<Void> task = documentReference.set(object);
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
+        return task;
     }
 
-    public void deleteDocument(DocumentReference documentReference) {
-        Task task = documentReference.delete().addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-            }
-        });
+    public Task<Void> deleteDocument(DocumentReference documentReference) {
+        Task<Void> task = documentReference.delete();
 
         while (!task.isSuccessful()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
+        return task;
     }
 
 }

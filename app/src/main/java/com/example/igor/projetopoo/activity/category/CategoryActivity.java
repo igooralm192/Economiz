@@ -64,6 +64,8 @@ public class CategoryActivity extends AppCompatActivity implements
     private MaterialSearchBar searchBar;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
+    private List<Category> categoriesSuggestions;
+    private List<Product> productsSuggestions;
     private SharedPreferences sharedPreferences;
 
     private CategoryMVP.PresenterOps presenterOps;
@@ -107,6 +109,14 @@ public class CategoryActivity extends AppCompatActivity implements
                 presenterOps.getCategory(currentCategory);
             }
         });
+
+        searchBar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                configSuggestions();
+            }
+        }, 1000);
+
     }
 
     private void createSearchBar() {
@@ -130,20 +140,10 @@ public class CategoryActivity extends AppCompatActivity implements
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
-                s = s.trim();
-                if (s.length() > 0) {
-                    List<Item> recent = new ArrayList<>();
-                    for (Item item: recentQueries) {
-                        if (recent.size() >= 2) break;
-                        if (item.getName().toLowerCase().startsWith( s.toLowerCase() ))
-                            recent.add(item);
-                    }
+                String query = editable.toString().trim();
 
-                    // recent.addAll(getFilteredProducts());
-                    // recent.addAll(getFilteredCategories());
-
-                    searchBar.updateLastSuggestions(recent);
+                if (query.length() > 0) {
+                    filterSuggestions(query);
                 } else {
                     if (searchBar.isSearchEnabled())
                         searchBar.updateLastSuggestions(recentQueriesClone);
@@ -191,7 +191,6 @@ public class CategoryActivity extends AppCompatActivity implements
 
             getSupportFragmentManager().popBackStack();
         }
-
     }
 
     @Override
@@ -467,5 +466,122 @@ public class CategoryActivity extends AppCompatActivity implements
         //String json = product.toJSON().toString();
 
         //startActivity(json, ProductActivity.class, SELECTED_PRODUCT);
+    }
+
+    @Override
+    public void saveAllSuggestions(List<Category> categories, List<Product> products) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        try {
+            JSONObject suggestions = new JSONObject();
+
+            JSONArray arrCategories = new JSONArray();
+            JSONArray arrProducts = new JSONArray();
+
+            for (Category category: categories)
+                arrCategories.put(category.toJSON());
+
+
+            suggestions.put("categories", arrCategories);
+
+            for (Product product: products)
+                arrProducts.put(product.toJSON());
+
+
+            suggestions.put("products", arrProducts);
+
+            editor.putString("suggestions", suggestions.toString());
+            editor.apply();
+
+            setAllSuggestions();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void configSuggestions() {
+        String sug = sharedPreferences.getString("suggestions", null);
+
+        if (sug == null) presenterOps.getAllSuggestions();
+        else setAllSuggestions();
+    }
+
+    private void filterSuggestions(String query) {
+        List<Category> categories = categoriesSuggestions;
+        List<Product> products = productsSuggestions;
+        List<Item> newSuggestions = new ArrayList<>();
+
+        int countRecent = 0, countProduct = 0;
+
+        for (Item item: recentQueries) {
+            if (countRecent >= 2) break;
+            if (item.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                newSuggestions.add(item);
+                countRecent++;
+            }
+        }
+
+        for (Product product: products) {
+            if (products.size() >= 4 - countRecent) break;
+
+            if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                Item item = new Item(
+                        R.drawable.ic_shopping_cart_red_32dp,
+                        product.getName(),
+                        "product",
+                        String.format("R$ %.2f", product.getAveragePrice()));
+
+                newSuggestions.add(item);
+                countProduct++;
+            }
+        }
+
+        for (Category category: categories) {
+            if (categories.size() >= 6 - (countRecent + countProduct)) break;
+
+            if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                Item item = new Item(
+                        R.drawable.ic_search_black_24dp,
+                        category.getName(),
+                        "category"
+                );
+
+                newSuggestions.add(item);
+            }
+        }
+
+        searchBar.updateLastSuggestions(newSuggestions);
+    }
+
+    private void setAllSuggestions() {
+        List<Category> categories = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+
+        String json = sharedPreferences.getString("suggestions", null);
+
+        if (json != null) {
+            try {
+                JSONObject suggestions = new JSONObject(json);
+
+                JSONArray arrCategories = suggestions.getJSONArray("categories");
+                JSONArray arrProducts = suggestions.getJSONArray("products");
+
+                for (int i=0; i<arrCategories.length(); i++) {
+                    Category category = Category.toObject(arrCategories.getJSONObject(i));
+                    categories.add(category);
+                }
+
+                for (int i=0; i<arrProducts.length(); i++) {
+                    Product product = Product.toObject(arrProducts.getJSONObject(i));
+                    products.add(product);
+                }
+
+                this.categoriesSuggestions = categories;
+                this.productsSuggestions = products;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

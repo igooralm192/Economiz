@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,9 +36,9 @@ public class CategoryModel implements CategoryMVP.ModelOps {
         else collectionReference = firestore.collection("products");
 
         Query query = collectionReference.whereEqualTo("parent_category", category.getName());
-        QuerySnapshot querySnapshot = database.getDocuments(query);
+        Task<QuerySnapshot> task = database.getDocuments(query);
 
-        for (DocumentSnapshot documentSnapshot: querySnapshot) {
+        for (DocumentSnapshot documentSnapshot: task.getResult()) {
             Map<String, Object> data = documentSnapshot.getData();
 
             if (collectionReference.getId().equals("categories")) {
@@ -54,5 +55,48 @@ public class CategoryModel implements CategoryMVP.ModelOps {
         }
 
         reqPresenterOps.onReturnedCategory(collectionReference.getId(), objects);
+    }
+
+    @Override
+    public void suggestionsRequest() {
+        List<Object> objects = new ArrayList<>();
+        final List<QuerySnapshot> querySnapshotList = new ArrayList<>();
+        final FirebaseFirestore firestore = database.getFirestore();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Query categoryQuery = firestore.collection("categories").orderBy("name");
+                Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
+                querySnapshotList.add(categoryTask.getResult());
+            }
+        }).start();
+
+        Query productQuery = firestore.collection("products").orderBy("name");
+        Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
+        querySnapshotList.add(productTask.getResult());
+
+        while (querySnapshotList.size() != 2);
+
+        for (QuerySnapshot querySnapshot: querySnapshotList) {
+            for (DocumentSnapshot documentSnapshot: querySnapshot) {
+                String path = documentSnapshot.getReference().getPath().split("/")[0];
+                Map<String, Object> data = documentSnapshot.getData();
+
+                if (path.equals("categories")) {
+                    if (data != null) {
+                        Category subcategory = new Category(data);
+                        objects.add(subcategory);
+                    }
+                } else {
+                    if (data != null) {
+                        Product product = new Product(data);
+                        objects.add(product);
+                    }
+                }
+            }
+        }
+
+        reqPresenterOps.onReturnedAllSuggestions(objects);
     }
 }
