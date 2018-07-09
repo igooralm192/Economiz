@@ -7,18 +7,26 @@ import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 
 public class Result {
-
+    private int icon;
     private String name;
     private Double price;
-    private int icon;
 
-    public Result(String name, Double price) {
+    public Result(int icon, String name, Double price) {
+        this.icon = icon;
         this.name = name;
         this.price = price;
     }
 
-    public Result(String name) {
-        this(name, new Double(null));
+    public Result(int icon, String name) {
+        this(icon, name, Double.valueOf(-1f));
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
     }
 
     public String getName() {
@@ -35,14 +43,6 @@ public class Result {
 
     public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public int getIcon() {
-        return icon;
-    }
-
-    public void setIcon(int icon) {
-        this.icon = icon;
     }
 
     public static class Holder extends RecyclerView.ViewHolder {

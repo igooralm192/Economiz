@@ -122,6 +122,7 @@ public class SearchActivity extends AppCompatActivity implements
         });
 
         searchBar.setOnSearchActionListener(this);
+        setResultList(this);
 
     }
 
@@ -249,13 +250,10 @@ public class SearchActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    private  void setResultList(final Context context){
+    private void setResultList(final Context context){
         ArrayList<Result> result = new ArrayList<>();
-        /**result.add(new Result("alimentos"));
-         result.add(new Result("pao", 1.2d));
-         result.add(new Result("manteiga", 2.3d) );
-         result.add(new Result("limpeza"));**/
-
+        result.add(new Result(R.drawable.ic_search_black_24dp, "Alimentos"));
+        result.add(new Result(R.drawable.ic_shopping_cart_red_24dp, "Pao", 1.2d));
 
         final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
                 LinearLayoutManager.VERTICAL, false);
@@ -272,8 +270,10 @@ public class SearchActivity extends AppCompatActivity implements
                 Result result = items.get(position);
                 holder.iconResult.setImageResource(result.getIcon());
                 holder.nameResult.setText(result.getName());
-                if (result.getPrice() != null)
-                    holder.priceResult.setText(result.getPrice().toString());
+                if (result.getPrice() != -1)
+                    holder.priceResult.setText("R$ "+result.getPrice().toString());
+                else
+                    holder.priceResult.setText("");
 
 
             }
