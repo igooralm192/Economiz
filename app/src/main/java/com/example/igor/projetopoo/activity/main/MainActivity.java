@@ -432,6 +432,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onProductClick(Product product) {
+
+    }
+
+    @Override
     public void saveAllSuggestions(List<Category> categories, List<Product> products) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
