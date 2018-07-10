@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Product;
 
 import java.util.List;
 
@@ -39,6 +40,6 @@ public class ListGenericAdapter<T, VH extends RecyclerView.ViewHolder> extends R
 
     public interface OnItemViewClickListener {
         void onCategoryClick(Category category);
-        //void onProductClick(Product product);
+        void onProductClick(Product product);
     }
 }

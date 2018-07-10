@@ -30,7 +30,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
@@ -151,20 +153,21 @@ public class SearchActivity extends AppCompatActivity implements
         try {
             String arrayStr = sharedPreferences.getString("recent", null);
 
-            JSONArray array = new JSONArray(arrayStr);
+            if (arrayStr != null) {
+                JSONArray array = new JSONArray(arrayStr);
 
-            for (int i=0; i<array.length(); i++) {
-                JSONObject object = new JSONObject((String) array.get(i));
+                for (int i=0; i<array.length(); i++) {
+                    JSONObject object = new JSONObject((String) array.get(i));
 
-                Item item = new Item(
-                        object.getInt("idIcon"),
-                        object.getString("name"),
-                        object.getString("type")
-                );
+                    Item item = new Item(
+                            object.getInt("idIcon"),
+                            object.getString("name"),
+                            object.getString("type")
+                    );
 
-                recent.add(item);
+                    recent.add(item);
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -183,10 +186,11 @@ public class SearchActivity extends AppCompatActivity implements
     @Override
     public void onSearchConfirmed(CharSequence text) {
         String newText = text.toString();
+        newText = newText.trim();
         searchBar.setPlaceHolder(newText);
 
         Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
-        if (text.length() != 0)
+        if (newText.length() != 0)
             if (!recentQueriesClone.contains(item)) {
                 if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
 
@@ -210,6 +214,29 @@ public class SearchActivity extends AppCompatActivity implements
         TextView query = view.findViewById(R.id.name_suggestion);
 
         searchBar.disableSearch();
-        searchBar.setPlaceHolder(query.getText());
+
+        Map<String, Class> index = new HashMap<>();
+        index.put("recent", SearchActivity.class);
+        //index.put("product", );
+        //index.put("category", );
+
+        for (String type : index.keySet()) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
+            int indItem = recentQueries.indexOf(item);
+
+            if (indItem != -1) {
+                if (type.equals("recent")) {
+                    searchBar.setPlaceHolder(item.getName());
+                } else {
+                    //this.startActivity(query.getText().toString(), index.get(type), MainActivity.RECENT_MESSAGE);
+                }
+            }
+        }
+    }
+
+    private void startActivity(String text, Class activity, String keyMessage) {
+        Intent intent = new Intent(this, activity);
+        intent.putExtra(keyMessage, text);
+        startActivity(intent);
     }
 }

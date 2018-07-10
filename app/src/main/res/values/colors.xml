@@ -2,6 +2,5 @@
 <resources>
     <color name="colorPrimary">#ff4949</color>
     <color name="colorPrimaryDark">#991a1a</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorGreen">#33c641</color>
+    <color name="colorAccent">@android:color/holo_green_light</color>
 </resources>
