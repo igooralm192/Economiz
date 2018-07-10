@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements
         //setCategoryList(this);
         configSuggestions();
         if (suggestionsStatus) presenterOps.getCategoryList();
-        
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -162,24 +162,24 @@ public class MainActivity extends AppCompatActivity implements
                 context,
                 categories,
                 new ListAdapter<Category, Category.MainHolder>() {
-            @Override
-            public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
+                    @Override
+                    public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
 
-                Category.MainHolder holder = new Category.MainHolder(view, MainActivity.this);
+                        Category.MainHolder holder = new Category.MainHolder(view, MainActivity.this);
 
-                return holder;
-            }
+                        return holder;
+                    }
 
-            @Override
-            public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
-                Category category = items.get(position);
-                holder.name.setText(category.getName());
-                holder.background.setImageResource(category.getBackground());
+                    @Override
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
+                        Category category = items.get(position);
+                        holder.name.setText(category.getName());
+                        holder.background.setImageResource(category.getBackground());
 
-                Blur.blurImage(holder.background, 5, context);
-            }
-        });
+                        Blur.blurImage(holder.background, 5, context);
+                    }
+                });
 
         ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
             @Override
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements
 
         searchBar.setLastSuggestions(recentQueriesClone);
         searchBar.disableSearch();
-        
+
         index = new HashMap<String, Class>();
         index.put("recent", SearchActivity.class);
         //index.put("product", );
