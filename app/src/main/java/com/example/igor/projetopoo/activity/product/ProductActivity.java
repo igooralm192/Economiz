@@ -1,10 +1,9 @@
 package com.example.igor.projetopoo.activity.product;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +35,7 @@ import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 
+import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.CustomDialog;
@@ -45,13 +46,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class ProductActivity extends AppCompatActivity implements MaterialSearchBar.OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener {
+public class ProductActivity extends AppCompatActivity implements
+        MaterialSearchBar.OnSearchActionListener,
+        SuggestionAdapter.OnItemViewClickListener {
+
+    Map<String, Class> index;
+
+    List<Feedback> list = new ArrayList<>();
 
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
@@ -62,14 +70,54 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
-    Map<String, Class> index;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
+
+
+        for(int i = 0; i < 51; i++){
+            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
+        }
+
+        final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
+                this,
+                list,
+                new ListAdapter<Feedback, Feedback.Holder>() {
+                    @Override
+                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
+                        return new Feedback.Holder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
+                        holder.location.setText(items.get(position).getLocation());
+                        holder.day.setText(items.get(position).getDate().toUpperCase());
+                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
+                        s = s.replace('.',',');
+                        holder.price.setText(s);
+                    }
+
+                }
+        );
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        final ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setLayoutManager(new LinearLayoutManager(ProductActivity.this));
+                lista.addItemDecoration(new DividerItemDecoration(ProductActivity.this, DividerItemDecoration.VERTICAL));
+                lista.setAdapter(adapter);
+                lista.setPadding(0, 220, 0, 0);
+
+                return lista;
+            }
+        });
+
+        getSupportFragmentManager().beginTransaction().add(R.id.timeline_container, listFragment).commit();
 
         dialog= new CustomDialog(this, R.layout.dialog);
         searchBar = findViewById(R.id.product_search_bar);
@@ -81,16 +129,28 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        AppBarLayout apbar = findViewById(R.id.appbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        AppBarLayout apbar = findViewById(R.id.appbar);
         apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 CardView card = findViewById(R.id.ProductCard);
+                RecyclerView re = listFragment.getList();
+                TextView a = findViewById(R.id.toolbar_name);
+                TextView b = findViewById(R.id.toolbar_price);
+                a.setAlpha((float)(-verticalOffset/400.0));
+                b.setAlpha((float)(-verticalOffset/400.0));
                 card.setAlpha((float)(1+(verticalOffset/400.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 card.setTranslationY(verticalOffset);
+//                try {
+                re.setPadding(0,220+verticalOffset*220/400,0,0);
+//                }catch (java.lang.ArithmeticException oe){
+//                    re.setPadding(0,72,0,0);
+//                }
                 return;
             }
         });
@@ -169,7 +229,6 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         if(id == R.id.app_bar_search){
             Animation.openSearch(searchBar, getSupportActionBar(), blackBar);
         }
-
         return super.onOptionsItemSelected(item);
     }
 
