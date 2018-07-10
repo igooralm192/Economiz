@@ -1,12 +1,19 @@
 package com.example.igor.projetopoo.activity.search;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,8 +27,12 @@ import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.main.MainActivity;
+import com.example.igor.projetopoo.adapter.ListAdapter;
+import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Result;
+import com.example.igor.projetopoo.fragment.ListFragment;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
@@ -66,6 +77,7 @@ public class SearchActivity extends AppCompatActivity implements
             }
         });
 
+        searchBar.setCardViewElevation(8);
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
 
@@ -112,6 +124,7 @@ public class SearchActivity extends AppCompatActivity implements
         });
 
         searchBar.setOnSearchActionListener(this);
+        setResultList(this);
 
     }
 
@@ -178,8 +191,20 @@ public class SearchActivity extends AppCompatActivity implements
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) blackBackground.getBackground();
 
-        if (enabled) background.startTransition(300);
-        else background.reverseTransition(300);
+
+        if (enabled) {
+            blackBackground.setVisibility(View.VISIBLE);
+            background.startTransition(300);
+        } else {
+            background.reverseTransition(300);
+            blackBackground.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    blackBackground.setVisibility(View.GONE);
+                }
+            }, 300);
+
+        }
     }
 
     @Override
@@ -238,4 +263,53 @@ public class SearchActivity extends AppCompatActivity implements
         intent.putExtra(keyMessage, text);
         startActivity(intent);
     }
+
+    private void setResultList(final Context context){
+        List<Result> result = new ArrayList<>();
+        for (int i=1; i<51; i++) {
+            result.add(new Result(R.drawable.ic_search_black_24dp, "Alimentos " + i));
+        }
+
+        final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL, false);
+
+        final ListGenericAdapter<Result, Result.Holder> listGenericAdapter = new ListGenericAdapter<>(this, result, new ListAdapter<Result, Result.Holder>() {
+            @Override
+            public Result.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(context).inflate(R.layout.item_list_result, parent, false);
+                return new Result.Holder(view);
+            }
+
+            @Override
+            public void onBindViewHolder(List<Result> items, @NonNull Result.Holder holder, int position) {
+                Result result = items.get(position);
+                holder.iconResult.setImageResource(result.getIcon());
+                holder.nameResult.setText(result.getName());
+                if (result.getPrice() != -1)
+                    holder.priceResult.setText(String.format("R$ %.2f", result.getPrice()));
+                else
+                    holder.priceResult.setText("");
+
+
+            }
+        });
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Exemplo de instanciação do ListFragment
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setAdapter(listGenericAdapter);
+                lista.setLayoutManager(layout);
+
+                return lista;
+            }
+        });
+
+        fragmentTransaction.add(R.id.search_container, listFragment);
+        fragmentTransaction.commit();
+    }
+
 }
