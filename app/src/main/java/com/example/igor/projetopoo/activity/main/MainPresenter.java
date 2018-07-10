@@ -1,10 +1,15 @@
 package com.example.igor.projetopoo.activity.main;
 
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.util.Log;
+
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.helper.AsyncDownload;
+import com.example.igor.projetopoo.helper.CustomDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +65,30 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
     }
 
     @Override
-    public void getAllSuggestions() {
-        modelOps.suggestionsRequest();
+    public void getAllSuggestions(Activity activity) {
+        final CustomDialog loadSuggestions = new CustomDialog(activity, R.layout.load_suggestions);
+        loadSuggestions.getWindow().setBackgroundDrawableResource(R.drawable.load_suggestions_background);
+        loadSuggestions.setCanceledOnTouchOutside(false);
+
+        AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public synchronized void onPreExecute() {
+                loadSuggestions.show();
+            }
+
+            @Override
+            public Object doInBackground(Object... objects) {
+                modelOps.suggestionsRequest();
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                loadSuggestions.dismiss();
+            }
+        });
+
+        asyncDownload.execute();
     }
 
     @Override

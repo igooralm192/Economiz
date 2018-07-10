@@ -1,5 +1,7 @@
 package com.example.igor.projetopoo.activity.main;
 
+import android.app.Activity;
+
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 
@@ -9,7 +11,7 @@ public interface MainMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
         void getCategoryList();
-        void getAllSuggestions();
+        void getAllSuggestions(Activity activity);
     }
 
     public interface ModelOps {

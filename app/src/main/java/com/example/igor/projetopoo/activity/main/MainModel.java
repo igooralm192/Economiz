@@ -51,20 +51,13 @@ public class MainModel implements MainMVP.ModelOps {
         final List<QuerySnapshot> querySnapshotList = new ArrayList<>();
         final FirebaseFirestore firestore = database.getFirestore();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Query categoryQuery = firestore.collection("categories").orderBy("name");
-                Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
-                querySnapshotList.add(categoryTask.getResult());
-            }
-        }).start();
+        Query categoryQuery = firestore.collection("categories").orderBy("name");
+        Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
+        querySnapshotList.add(categoryTask.getResult());
 
         Query productQuery = firestore.collection("products").orderBy("name");
         Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
         querySnapshotList.add(productTask.getResult());
-
-        while (querySnapshotList.size() != 2);
 
         for (QuerySnapshot querySnapshot: querySnapshotList) {
             for (DocumentSnapshot documentSnapshot: querySnapshot) {

@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements
     private FrameLayout blackBar;
     private RelativeLayout appBar;
 
+    private Boolean suggestionsStatus = false;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MaterialSearchBar searchBar;
     private List<Item> recentQueries;
@@ -95,7 +96,9 @@ public class MainActivity extends AppCompatActivity implements
         makeSearchBar();
 
         //setCategoryList(this);
-        presenterOps.getCategoryList();
+        configSuggestions();
+        if (suggestionsStatus) presenterOps.getCategoryList();
+        
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -103,12 +106,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        searchBar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                configSuggestions();
-            }
-        }, 1000);
+
     }
 
     private void makeSearchBar() {
@@ -242,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements
         transaction.replace(R.id.constraint_layout_main, newFragment);
         //if (oldcategory != null) transaction.addToBackStack(null);
         transaction.commit();
+
     }
 
     @Override
@@ -457,6 +456,14 @@ public class MainActivity extends AppCompatActivity implements
             editor.putString("suggestions", suggestions.toString());
             editor.apply();
 
+            suggestionsStatus = true;
+            searchBar.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    presenterOps.getCategoryList();
+                }
+            }, 1000);
+
             setAllSuggestions();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -466,8 +473,10 @@ public class MainActivity extends AppCompatActivity implements
     private void configSuggestions() {
         String sug = sharedPreferences.getString("suggestions", null);
 
-        if (sug == null) presenterOps.getAllSuggestions();
-        else setAllSuggestions();
+        if (sug != null) {
+            suggestionsStatus = true;
+            setAllSuggestions();
+        } else presenterOps.getAllSuggestions(this);
     }
 
     private void filterSuggestions(String query) {
@@ -475,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements
         List<Product> products = productsSuggestions;
         List<Item> newSuggestions = new ArrayList<>();
 
-        int countRecent = 0, countProduct = 0;
+        int countRecent = 0, countProduct = 0, countCategories = 0;
 
         for (Item item: recentQueries) {
             if (countRecent >= 2) break;
@@ -486,7 +495,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         for (Product product: products) {
-            if (products.size() >= 4 - countRecent) break;
+            if (countProduct >= 4 - countRecent) break;
 
             if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
                 Item item = new Item(
@@ -501,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         for (Category category: categories) {
-            if (categories.size() >= 6 - (countRecent + countProduct)) break;
+            if (countCategories >= 6 - (countRecent + countProduct)) break;
 
             if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
                 Item item = new Item(
@@ -511,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements
                 );
 
                 newSuggestions.add(item);
+                countCategories++;
             }
         }
 
