@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "532120804286",
+    "firebase_url": "https://poo-ufba.firebaseio.com",
+    "project_id": "poo-ufba",
+    "storage_bucket": "poo-ufba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532120804286:android:0e53b51433e53486",
+        "android_client_info": {
+          "package_name": "com.example.igor.projetopoo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "532120804286-09e7kibkjbsj90gf7unciogiku3qvs1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJn5rJcWRuJTa3EP_SX3qphTyr7I-tnTU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532120804286:android:bb09b2726efa35d5",
+        "android_client_info": {
+          "package_name": "poo.br.com.marketprice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "532120804286-09e7kibkjbsj90gf7unciogiku3qvs1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJn5rJcWRuJTa3EP_SX3qphTyr7I-tnTU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
