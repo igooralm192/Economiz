@@ -26,7 +26,7 @@ public class Database implements DatabaseRequests {
     private FirebaseFirestore firestore;
 
     public Database(FirebaseFirestore firestore) { this.firestore = firestore; }
-    
+
     public FirebaseFirestore getFirestore() { return this.firestore; }
 
     public Task<DocumentSnapshot> getDocument(DocumentReference documentReference) {

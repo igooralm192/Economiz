@@ -50,13 +50,12 @@ public class SearchActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        Intent intent = getIntent();
+        String mainMessage = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
+
         searchBar = findViewById(R.id.search_searchbar);
         blackBackground = findViewById(R.id.black_search);
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-
-        //Intent intent = getIntent();
-        //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
-        //searchBar.setPlaceHolder(query);
 
         blackBackground.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +72,8 @@ public class SearchActivity extends AppCompatActivity implements
         customSuggestionsAdapter.setOnItemViewClickListener(this);
         customSuggestionsAdapter.setSuggestions(recentQueries);
         searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+
+        searchBar.setPlaceHolder(mainMessage);
 
         searchBar.addTextChangeListener(new TextWatcher() {
             @Override

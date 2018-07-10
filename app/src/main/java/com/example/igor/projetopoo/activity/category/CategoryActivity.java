@@ -269,19 +269,19 @@ public class CategoryActivity extends AppCompatActivity implements
 
     @Override
     public void showSubcategories(List<Category> subcategories) {
-        final ListGenericAdapter<Category, Category.Holder> adapter = new ListGenericAdapter<>(
+        final ListGenericAdapter<Category, Category.CategoryHolder> adapter = new ListGenericAdapter<>(
                 context,
                 subcategories,
-                new ListAdapter<Category, Category.Holder>() {
+                new ListAdapter<Category, Category.CategoryHolder>() {
                     @Override
-                    public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                    public Category.CategoryHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
                         View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
 
-                        return new Category.Holder(view, CategoryActivity.this);
+                        return new Category.CategoryHolder(view, CategoryActivity.this);
                     }
 
                     @Override
-                    public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.CategoryHolder holder, int position) {
                         holder.setCategory(items.get(position));
                         holder.name.setText(items.get(position).getName());
                     }
