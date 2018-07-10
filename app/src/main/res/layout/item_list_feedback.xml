@@ -6,6 +6,22 @@
     android:layout_height="72dp"
     tools:layout_editor_absoluteY="25dp">
 
+    <ImageView
+        android:id="@+id/shop_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/local_feedback"
+        android:paddingBottom="3dp"
+        android:paddingEnd="3dp"
+        android:paddingStart="4dp"
+        android:paddingTop="4dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_local_offer_white_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
         android:id="@+id/feedback_location"
         android:layout_width="wrap_content"
@@ -22,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:text="TextView"
         android:textAppearance="@android:style/TextAppearance.Material.Widget.ActionBar.Subtitle"
@@ -30,22 +46,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="R$ 6,50" />
-
-    <ImageView
-        android:id="@+id/shop_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/color_cursor"
-        android:backgroundTint="@color/colorPrimary"
-        android:paddingBottom="3dp"
-        android:paddingEnd="3dp"
-        android:paddingStart="4dp"
-        android:paddingTop="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_local_offer_white_24dp" />
 
     <TextView
         android:id="@+id/feedback_date"
