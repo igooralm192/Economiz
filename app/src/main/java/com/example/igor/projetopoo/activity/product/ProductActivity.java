@@ -3,6 +3,7 @@ package com.example.igor.projetopoo.activity.product;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +36,7 @@ import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 
+import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.utils.Animation;
@@ -42,6 +46,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,20 +58,59 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
 
+    private RecyclerView recyclerView;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
+
     Map<String, Class> index;
 
+
+    List<Feedback> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
+
+
+        for(int i = 0; i < 51; i++){
+            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
+        }
+
+        final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
+                this,
+                list,
+                new ListAdapter<Feedback, Feedback.Holder>() {
+                    @Override
+                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
+                        return new Feedback.Holder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
+                        holder.location.setText(items.get(position).getLocation());
+                        holder.day.setText(items.get(position).getDate().toUpperCase());
+                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
+                        s = s.replace('.',',');
+                        holder.price.setText(s);
+                    }
+
+                }
+        );
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        recyclerView =findViewById(R.id.feedback_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(adapter);
 
         searchBar = findViewById(R.id.product_search_bar);
         searchBar.setOnSearchActionListener(this);
@@ -84,9 +128,19 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 CardView card = findViewById(R.id.ProductCard);
+                RecyclerView re = findViewById(R.id.feedback_recycler);
+                TextView a = findViewById(R.id.toolbar_name);
+                TextView b = findViewById(R.id.toolbar_price);
+                a.setAlpha((float)(-verticalOffset/400.0));
+                b.setAlpha((float)(-verticalOffset/400.0));
                 card.setAlpha((float)(1+(verticalOffset/400.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 card.setTranslationY(verticalOffset);
+//                try {
+                re.setPadding(0,220+verticalOffset*220/400,0,0);
+//                }catch (java.lang.ArithmeticException oe){
+//                    re.setPadding(0,72,0,0);
+//                }
                 return;
             }
         });

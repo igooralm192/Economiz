@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteY="25dp">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -13,4 +15,40 @@
         app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title=" " />
+
+    <TextView
+        android:id="@+id/toolbar_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="NomeProduto"
+        android:textAppearance="@android:style/TextAppearance.Material.Title"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar_price"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <TextView
+        android:id="@+id/toolbar_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/roboto"
+        android:text="R$ 99,99"
+        android:textAppearance="@android:style/TextAppearance.Material.Title"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_name" />
+
 </android.support.constraint.ConstraintLayout>
