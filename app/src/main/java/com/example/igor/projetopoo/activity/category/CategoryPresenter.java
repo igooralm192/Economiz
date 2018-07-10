@@ -1,11 +1,16 @@
 package com.example.igor.projetopoo.activity.category;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
 
+import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.helper.AsyncDownload;
+import com.example.igor.projetopoo.helper.CustomDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,28 +66,5 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
             reqViewOps.showProducts(products);
         }
-    }
-
-    @Override
-    public void getAllSuggestions() {
-        modelOps.suggestionsRequest();
-    }
-
-    @Override
-    public void onReturnedAllSuggestions(List<Object> objects) {
-        List<Category> categories = new ArrayList<>();
-        List<Product> products = new ArrayList<>();
-
-        for (Object object: objects) {
-            if (object instanceof Category) {
-                Category category = (Category) object;
-                categories.add(category);
-            } else {
-                Product product = (Product) object;
-                products.add(product);
-            }
-        }
-
-        reqViewOps.saveAllSuggestions(categories, products);
     }
 }

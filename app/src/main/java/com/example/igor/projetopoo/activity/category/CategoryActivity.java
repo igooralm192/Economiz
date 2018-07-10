@@ -38,6 +38,7 @@ import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -101,7 +102,9 @@ public class CategoryActivity extends AppCompatActivity implements
         getSupportActionBar().setTitle(currentCategory.getName());
         categoryLinks.put(category, null);
 
-        presenterOps.getCategory(category);
+        configSuggestions();
+
+        presenterOps.getCategory(currentCategory);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -109,13 +112,6 @@ public class CategoryActivity extends AppCompatActivity implements
                 presenterOps.getCategory(currentCategory);
             }
         });
-
-        searchBar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                configSuggestions();
-            }
-        }, 1000);
 
     }
 
@@ -468,50 +464,21 @@ public class CategoryActivity extends AppCompatActivity implements
         //startActivity(json, ProductActivity.class, SELECTED_PRODUCT);
     }
 
-    @Override
-    public void saveAllSuggestions(List<Category> categories, List<Product> products) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        try {
-            JSONObject suggestions = new JSONObject();
-
-            JSONArray arrCategories = new JSONArray();
-            JSONArray arrProducts = new JSONArray();
-
-            for (Category category: categories)
-                arrCategories.put(category.toJSON());
-
-
-            suggestions.put("categories", arrCategories);
-
-            for (Product product: products)
-                arrProducts.put(product.toJSON());
-
-
-            suggestions.put("products", arrProducts);
-
-            editor.putString("suggestions", suggestions.toString());
-            editor.apply();
-
-            setAllSuggestions();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void configSuggestions() {
         String sug = sharedPreferences.getString("suggestions", null);
 
-        if (sug == null) presenterOps.getAllSuggestions();
-        else setAllSuggestions();
+        if (sug != null) {
+            setAllSuggestions();
+        }
     }
 
     private void filterSuggestions(String query) {
         List<Category> categories = categoriesSuggestions;
         List<Product> products = productsSuggestions;
+
         List<Item> newSuggestions = new ArrayList<>();
 
-        int countRecent = 0, countProduct = 0;
+        int countRecent = 0, countProduct = 0, countCategories = 0;
 
         for (Item item: recentQueries) {
             if (countRecent >= 2) break;
@@ -522,7 +489,7 @@ public class CategoryActivity extends AppCompatActivity implements
         }
 
         for (Product product: products) {
-            if (products.size() >= 4 - countRecent) break;
+            if (countProduct >= 4 - countRecent) break;
 
             if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
                 Item item = new Item(
@@ -537,7 +504,7 @@ public class CategoryActivity extends AppCompatActivity implements
         }
 
         for (Category category: categories) {
-            if (categories.size() >= 6 - (countRecent + countProduct)) break;
+            if (countCategories >= 6 - (countRecent + countProduct)) break;
 
             if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
                 Item item = new Item(
@@ -547,6 +514,7 @@ public class CategoryActivity extends AppCompatActivity implements
                 );
 
                 newSuggestions.add(item);
+                countCategories++;
             }
         }
 
