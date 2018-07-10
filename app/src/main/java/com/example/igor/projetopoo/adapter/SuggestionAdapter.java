@@ -32,7 +32,7 @@ public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapte
 
     @Override
     public void onBindSuggestionHolder(Item suggestion, Holder holder, int position) {
-        //holder.icon.setImageResource(suggestion.getIdIcon());
+        holder.icon.setImageResource(suggestion.getIdIcon());
         holder.name.setText(suggestion.getName());
         holder.price.setText(suggestion.getPrice());
     }

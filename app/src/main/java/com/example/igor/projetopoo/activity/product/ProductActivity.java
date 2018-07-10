@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +38,7 @@ import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
@@ -53,27 +53,25 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ProductActivity extends AppCompatActivity implements MaterialSearchBar.OnSearchActionListener, SuggestionAdapter.OnItemViewClickListener {
+public class ProductActivity extends AppCompatActivity implements
+        MaterialSearchBar.OnSearchActionListener,
+        SuggestionAdapter.OnItemViewClickListener {
+
+    Map<String, Class> index;
+
+    List<Feedback> list = new ArrayList<>();
 
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
-
-    private RecyclerView recyclerView;
+    private CustomDialog dialog;
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
-
-    Map<String, Class> index;
-
-
-    List<Feedback> list = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
@@ -107,11 +105,21 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         Point size = new Point();
         display.getSize(size);
 
-        recyclerView =findViewById(R.id.feedback_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(adapter);
+        final ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+            @Override
+            public RecyclerView setList(RecyclerView lista) {
+                lista.setLayoutManager(new LinearLayoutManager(ProductActivity.this));
+                lista.addItemDecoration(new DividerItemDecoration(ProductActivity.this, DividerItemDecoration.VERTICAL));
+                lista.setAdapter(adapter);
+                lista.setPadding(0, 220, 0, 0);
 
+                return lista;
+            }
+        });
+
+        getSupportFragmentManager().beginTransaction().add(R.id.timeline_container, listFragment).commit();
+
+        dialog= new CustomDialog(this, R.layout.dialog);
         searchBar = findViewById(R.id.product_search_bar);
         searchBar.setOnSearchActionListener(this);
         blackBar = findViewById(R.id.black_bar);
@@ -121,14 +129,16 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        AppBarLayout apbar = findViewById(R.id.appbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        AppBarLayout apbar = findViewById(R.id.appbar);
         apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 CardView card = findViewById(R.id.ProductCard);
-                RecyclerView re = findViewById(R.id.feedback_recycler);
+                RecyclerView re = listFragment.getList();
                 TextView a = findViewById(R.id.toolbar_name);
                 TextView b = findViewById(R.id.toolbar_price);
                 a.setAlpha((float)(-verticalOffset/400.0));
@@ -219,7 +229,6 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         if(id == R.id.app_bar_search){
             Animation.openSearch(searchBar, getSupportActionBar(), blackBar);
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -337,5 +346,17 @@ public class ProductActivity extends AppCompatActivity implements MaterialSearch
         }
 
         return recent;
+    }
+
+    public void showDialog(View v){
+        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+        dialog.show();
+    }
+
+    public void cancelDialog(View v){
+        dialog.dismiss();
+    }
+    public void addFeedback(View v){
+        dialog.dismiss();
     }
 }
