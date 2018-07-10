@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -76,6 +77,7 @@ public class SearchActivity extends AppCompatActivity implements
             }
         });
 
+        searchBar.setCardViewElevation(8);
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
 
@@ -189,8 +191,20 @@ public class SearchActivity extends AppCompatActivity implements
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) blackBackground.getBackground();
 
-        if (enabled) background.startTransition(300);
-        else background.reverseTransition(300);
+
+        if (enabled) {
+            blackBackground.setVisibility(View.VISIBLE);
+            background.startTransition(300);
+        } else {
+            background.reverseTransition(300);
+            blackBackground.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    blackBackground.setVisibility(View.GONE);
+                }
+            }, 300);
+
+        }
     }
 
     @Override
@@ -251,9 +265,10 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void setResultList(final Context context){
-        ArrayList<Result> result = new ArrayList<>();
-        result.add(new Result(R.drawable.ic_search_black_24dp, "Alimentos"));
-        result.add(new Result(R.drawable.ic_shopping_cart_red_24dp, "Pao", 1.2d));
+        List<Result> result = new ArrayList<>();
+        for (int i=1; i<51; i++) {
+            result.add(new Result(R.drawable.ic_search_black_24dp, "Alimentos " + i));
+        }
 
         final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
                 LinearLayoutManager.VERTICAL, false);
@@ -271,7 +286,7 @@ public class SearchActivity extends AppCompatActivity implements
                 holder.iconResult.setImageResource(result.getIcon());
                 holder.nameResult.setText(result.getName());
                 if (result.getPrice() != -1)
-                    holder.priceResult.setText("R$ "+result.getPrice().toString());
+                    holder.priceResult.setText(String.format("R$ %.2f", result.getPrice()));
                 else
                     holder.priceResult.setText("");
 
