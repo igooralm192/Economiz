@@ -37,6 +37,7 @@ import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Blur;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
+    private List<Category> categoriesSuggestions;
+    private List<Product> productsSuggestions;
 
     Map<String, Class> index;
 
@@ -99,6 +102,13 @@ public class MainActivity extends AppCompatActivity implements
                 presenterOps.getCategoryList();
             }
         });
+
+        searchBar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                configSuggestions();
+            }
+        }, 1000);
     }
 
     private void makeSearchBar() {
@@ -132,20 +142,10 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
+                String query = editable.toString().trim();
 
-                if (s.length() > 0) {
-                    List<Item> recent = new ArrayList<>();
-                    for (Item item: recentQueries) {
-                        if (recent.size() >= 2) break;
-                        if (item.getName().toLowerCase().startsWith( s.toLowerCase() ))
-                            recent.add(item);
-                    }
-
-                    // recent.addAll(getFilteredProducts());
-                    // recent.addAll(getFilteredCategories());
-
-                    searchBar.updateLastSuggestions(recent);
+                if (query.length() > 0) {
+                    filterSuggestions(query);
                 } else {
                     if (searchBar.isSearchEnabled())
                         searchBar.updateLastSuggestions(recentQueriesClone);
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements
             JSONObject object = item.toJson();
             array.put(object.toString());
         }
-        Log.i("TAG", array.toString());
+
         editor.putString("recent", array.toString());
         editor.apply();
     }
@@ -430,5 +430,122 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onCategoryClick(Category category) {
 
+    }
+
+    @Override
+    public void saveAllSuggestions(List<Category> categories, List<Product> products) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        try {
+            JSONObject suggestions = new JSONObject();
+
+            JSONArray arrCategories = new JSONArray();
+            JSONArray arrProducts = new JSONArray();
+
+            for (Category category: categories)
+                arrCategories.put(category.toJSON());
+
+
+            suggestions.put("categories", arrCategories);
+
+            for (Product product: products)
+                arrProducts.put(product.toJSON());
+
+
+            suggestions.put("products", arrProducts);
+
+            editor.putString("suggestions", suggestions.toString());
+            editor.apply();
+
+            setAllSuggestions();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void configSuggestions() {
+        String sug = sharedPreferences.getString("suggestions", null);
+
+        if (sug == null) presenterOps.getAllSuggestions();
+        else setAllSuggestions();
+    }
+
+    private void filterSuggestions(String query) {
+        List<Category> categories = categoriesSuggestions;
+        List<Product> products = productsSuggestions;
+        List<Item> newSuggestions = new ArrayList<>();
+
+        int countRecent = 0, countProduct = 0;
+
+        for (Item item: recentQueries) {
+            if (countRecent >= 2) break;
+            if (item.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                newSuggestions.add(item);
+                countRecent++;
+            }
+        }
+
+        for (Product product: products) {
+            if (products.size() >= 4 - countRecent) break;
+
+            if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                Item item = new Item(
+                        R.drawable.ic_shopping_cart_red_32dp,
+                        product.getName(),
+                        "product",
+                        String.format("R$ %.2f", product.getAveragePrice()));
+
+                newSuggestions.add(item);
+                countProduct++;
+            }
+        }
+
+        for (Category category: categories) {
+            if (categories.size() >= 6 - (countRecent + countProduct)) break;
+
+            if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                Item item = new Item(
+                        R.drawable.ic_search_black_24dp,
+                        category.getName(),
+                        "category"
+                );
+
+                newSuggestions.add(item);
+            }
+        }
+
+        searchBar.updateLastSuggestions(newSuggestions);
+    }
+
+    private void setAllSuggestions() {
+        List<Category> categories = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+
+        String json = sharedPreferences.getString("suggestions", null);
+
+        if (json != null) {
+            try {
+                JSONObject suggestions = new JSONObject(json);
+
+                JSONArray arrCategories = suggestions.getJSONArray("categories");
+                JSONArray arrProducts = suggestions.getJSONArray("products");
+
+                for (int i=0; i<arrCategories.length(); i++) {
+                    Category category = Category.toObject(arrCategories.getJSONObject(i));
+                    categories.add(category);
+                }
+
+                for (int i=0; i<arrProducts.length(); i++) {
+                    Product product = Product.toObject(arrProducts.getJSONObject(i));
+                    products.add(product);
+                }
+
+                this.categoriesSuggestions = categories;
+                this.productsSuggestions = products;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

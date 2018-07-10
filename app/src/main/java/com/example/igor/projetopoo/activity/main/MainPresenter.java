@@ -3,6 +3,7 @@ package com.example.igor.projetopoo.activity.main;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 
 import java.util.ArrayList;
@@ -56,5 +57,28 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
         Collections.sort(categories);
 
         reqViewOps.showCategories(categories);
+    }
+
+    @Override
+    public void getAllSuggestions() {
+        modelOps.suggestionsRequest();
+    }
+
+    @Override
+    public void onReturnedAllSuggestions(List<Object> objects) {
+        List<Category> categories = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
+
+        for (Object object: objects) {
+            if (object instanceof Category) {
+                Category category = (Category) object;
+                categories.add(category);
+            } else {
+                Product product = (Product) object;
+                products.add(product);
+            }
+        }
+
+        reqViewOps.saveAllSuggestions(categories, products);
     }
 }
