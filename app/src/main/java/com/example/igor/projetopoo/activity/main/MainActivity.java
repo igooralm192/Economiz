@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements
                 presenterOps.getCategoryList();
             }
         });
-
 
     }
 
@@ -562,5 +563,15 @@ public class MainActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
         }
+    }
+
+    private boolean checkConnection() {
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = null;
+        if (cm != null) {
+            activeNetwork = cm.getActiveNetworkInfo();
+        }
+
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }
