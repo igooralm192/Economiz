@@ -16,6 +16,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.category.CategoryActivity">
+
+        </activity>
+        <activity
+            android:name=".activity.search.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme" >
+
+        </activity>
     </application>
 
 </manifest>
