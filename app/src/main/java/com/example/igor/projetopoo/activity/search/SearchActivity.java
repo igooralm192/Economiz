@@ -22,6 +22,7 @@ import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.helper.Constant;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
@@ -51,11 +52,11 @@ public class SearchActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_search);
 
         Intent intent = getIntent();
-        String mainMessage = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
+        String mainMessage = intent.getStringExtra(Constant.LAST_QUERY);
 
         searchBar = findViewById(R.id.search_searchbar);
         blackBackground = findViewById(R.id.black_search);
-        sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
+        sharedPreferences = getSharedPreferences(Constant.SHARED_PREFERENCES, 0);
 
         blackBackground.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +144,7 @@ public class SearchActivity extends AppCompatActivity implements
             array.put(object.toString());
         }
         Log.i("TAG", array.toString());
-        editor.putString("recent", array.toString());
+        editor.putString(Constant.RECENT_QUERIES, array.toString());
         editor.apply();
     }
 
@@ -151,7 +152,7 @@ public class SearchActivity extends AppCompatActivity implements
         List<Item> recent = new ArrayList<>();
 
         try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+            String arrayStr = sharedPreferences.getString(Constant.RECENT_QUERIES, null);
 
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);

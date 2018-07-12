@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
@@ -42,6 +43,7 @@ import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Blur;
+import com.example.igor.projetopoo.helper.Constant;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.MaterialSearchBar.OnSearchActionListener;
@@ -73,12 +75,8 @@ public class MainActivity extends AppCompatActivity implements
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
-    private static final String RECENT_QUERY = "Recent Queries";
-    public static final String RECENT_MESSAGE = "search.name.recent";
     private List<Category> categoriesSuggestions;
     private List<Product> productsSuggestions;
-
-    Map<String, Class> index;
 
     private MainMVP.PresenterOps presenterOps;
 
@@ -115,13 +113,7 @@ public class MainActivity extends AppCompatActivity implements
 
         final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
 
-        /*List<Item> suggestions = new ArrayList<Item>();
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Abacaxi", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Banana", "recent"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Carne", "product"));
-        suggestions.add(new Item(R.mipmap.ic_launcher_round, "Amendoim", "category"));*/
-
-        sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
+        sharedPreferences = getSharedPreferences(Constant.SHARED_PREFERENCES, 0);
 
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
@@ -198,34 +190,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void changeListFragment(ListFragment newFragment) {
         FragmentManager manager = getSupportFragmentManager();
-        //final Category oldcategory = categoryLinks.get( currentCategory );
-        Fragment oldFragment;
-
-        /*if (oldcategory != null) {
-            oldFragment = manager.findFragmentByTag(oldcategory.getName());
-
-            Slide slide = new Slide();
-            slide.setDuration(500);
-
-            slide.setSlideEdge(Gravity.END);
-            oldFragment.setEnterTransition(slide);
-
-            slide.setSlideEdge(Gravity.START);
-            oldFragment.setExitTransition(slide);
-        } else {
-            Integer count = manager.getBackStackEntryCount();
-
-            if (count == 0) {
-                oldFragment = manager.findFragmentByTag(currentCategory.getName());
-                if (oldFragment != null) {
-                    Slide slide = new Slide();
-                    slide.setDuration(500);
-
-                    slide.setSlideEdge(Gravity.START);
-                    oldFragment.setExitTransition(slide);
-                }
-            }
-        }*/
 
         Slide slide2 = new Slide();
         slide2.setDuration(500);
@@ -239,9 +203,7 @@ public class MainActivity extends AppCompatActivity implements
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.constraint_layout_main, newFragment);
-        //if (oldcategory != null) transaction.addToBackStack(null);
         transaction.commit();
-
     }
 
     @Override
@@ -258,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
         for (Object object: searchBar.getLastSuggestions()) {
             Item item = (Item) object;
 
-            if (item.getType().equals("recent")) {
+            if (item.getType().equals(Constant.Entities.Item.TYPE_RECENT)) {
                 recent.add(item);
             }
         }
@@ -284,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements
         newText = newText.trim();
 
         if (newText.length() != 0) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
+            Item item = new Item(R.drawable.ic_history_black_24dp, newText, Constant.Entities.Item.TYPE_RECENT);
             if (text.length() != 0)
                 if (!recentQueriesClone.contains(item)) {
                     if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
@@ -297,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements
 
             this.saveRecentQueries(recentQueriesClone);
 
-            this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
+            this.startActivity(newText, SearchActivity.class, Constant.LAST_QUERY);
 
             searchBar.disableSearch();
         }
@@ -313,21 +275,22 @@ public class MainActivity extends AppCompatActivity implements
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
 
-        searchBar.setLastSuggestions(recentQueriesClone);
-        searchBar.disableSearch();
+        Map<String, Class> index = new HashMap<>();
 
-        index = new HashMap<String, Class>();
-        index.put("recent", SearchActivity.class);
-        //index.put("product", );
-        //index.put("category", );
+        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
+        //index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
 
         for (String type : index.keySet()) {
             Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
-            int indItem = recentQueries.indexOf(item);
+            int indItem = searchBar.getLastSuggestions().indexOf(item);
 
             if (indItem != -1) {
-                this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
+                searchBar.setLastSuggestions(recentQueriesClone);
+                searchBar.disableSearch();
+                this.startActivity(query.getText().toString(), index.get(type), Constant.LAST_QUERY);
             }
+
         }
     }
 
@@ -347,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
             array.put(object.toString());
         }
 
-        editor.putString("recent", array.toString());
+        editor.putString(Constant.RECENT_QUERIES, array.toString());
         editor.apply();
     }
 
@@ -355,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements
         List<Item> recent = new ArrayList<>();
 
         try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+            String arrayStr = sharedPreferences.getString(Constant.RECENT_QUERIES, null);
 
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);
@@ -377,54 +340,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return recent;
-    }
-
-    private void setCategoryList(final Context context) {
-        ArrayList<Category> categories = new ArrayList<Category>();
-        categories.add(new Category("Alimentos", R.drawable.food));
-        categories.add(new Category("Limpeza", R.drawable.cleaning2));
-        categories.add(new Category("Farmácia", R.drawable.farmacia));
-        categories.add(new Category("Zoológico", R.drawable.food));
-
-        final RecyclerView.LayoutManager layout = new LinearLayoutManager(this,
-                LinearLayoutManager.VERTICAL, false);
-
-        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<Category, Category.MainHolder>(
-                context,
-                categories,
-                new ListAdapter<Category, Category.MainHolder>() {
-                    @Override
-                    public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
-
-                        Category.MainHolder holder = new Category.MainHolder(view, MainActivity.this);
-
-                        return holder;
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
-                        Category category = items.get(position);
-                        holder.name.setText(category.getName());
-                        holder.background.setImageResource(category.getBackground());
-
-                        Blur.blurImage(holder.background, 5, context);
-                    }
-                });
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        // Exemplo de instanciação do ListFragment
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(listGenericAdapter);
-                lista.setLayoutManager(layout);
-
-                return lista;
-            }
-        });
     }
 
     @Override
@@ -451,15 +366,15 @@ public class MainActivity extends AppCompatActivity implements
                 arrCategories.put(category.toJSON());
 
 
-            suggestions.put("categories", arrCategories);
+            suggestions.put(Constant.Entities.CATEGORIES, arrCategories);
 
             for (Product product: products)
                 arrProducts.put(product.toJSON());
 
 
-            suggestions.put("products", arrProducts);
+            suggestions.put(Constant.Entities.PRODUCTS, arrProducts);
 
-            editor.putString("suggestions", suggestions.toString());
+            editor.putString(Constant.ALL_SUGGESTIONS, suggestions.toString());
             editor.apply();
 
             suggestionsStatus = true;
@@ -477,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void configSuggestions() {
-        String sug = sharedPreferences.getString("suggestions", null);
+        String sug = sharedPreferences.getString(Constant.ALL_SUGGESTIONS, null);
 
         if (sug != null) {
             suggestionsStatus = true;
@@ -507,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements
                 Item item = new Item(
                         R.drawable.ic_shopping_cart_red_32dp,
                         product.getName(),
-                        "product",
+                        Constant.Entities.Item.TYPE_PRODUCT,
                         String.format("R$ %.2f", product.getAveragePrice()));
 
                 newSuggestions.add(item);
@@ -522,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements
                 Item item = new Item(
                         R.drawable.ic_search_black_24dp,
                         category.getName(),
-                        "category"
+                        Constant.Entities.Item.TYPE_CATEGORY
                 );
 
                 newSuggestions.add(item);
@@ -537,14 +452,14 @@ public class MainActivity extends AppCompatActivity implements
         List<Category> categories = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
-        String json = sharedPreferences.getString("suggestions", null);
+        String json = sharedPreferences.getString(Constant.ALL_SUGGESTIONS, null);
 
         if (json != null) {
             try {
                 JSONObject suggestions = new JSONObject(json);
 
-                JSONArray arrCategories = suggestions.getJSONArray("categories");
-                JSONArray arrProducts = suggestions.getJSONArray("products");
+                JSONArray arrCategories = suggestions.getJSONArray(Constant.Entities.CATEGORIES);
+                JSONArray arrProducts = suggestions.getJSONArray(Constant.Entities.PRODUCTS);
 
                 for (int i=0; i<arrCategories.length(); i++) {
                     Category category = Category.toObject(arrCategories.getJSONObject(i));
