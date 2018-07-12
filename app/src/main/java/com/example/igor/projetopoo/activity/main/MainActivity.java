@@ -23,6 +23,7 @@ import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Visibility;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +39,12 @@ import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
+import com.example.igor.projetopoo.database.DatabaseHelper;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.Blur;
 import com.example.igor.projetopoo.helper.Constant;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<Category> categoriesSuggestions;
     private List<Product> productsSuggestions;
 
+    private Database database;
     private MainMVP.PresenterOps presenterOps;
 
     @Override
@@ -87,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements
 
         context = getApplicationContext();
 
-        presenterOps = new MainPresenter(this, new Database(FirebaseFirestore.getInstance()));
+        database = new Database(FirebaseFirestore.getInstance());
+        presenterOps = new MainPresenter(this, database);
 
         blackBar = (FrameLayout) findViewById(R.id.blackBar);
         appBar = (RelativeLayout) findViewById(R.id.appBar);
