@@ -47,7 +47,7 @@ import java.util.Map;
 
 public class SearchActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener {
+        SuggestionAdapter.OnItemViewClickListener, SearchMVP.ReqViewOps {
 
     private MaterialSearchBar searchBar;
     private FrameLayout blackBackground;
@@ -55,6 +55,8 @@ public class SearchActivity extends AppCompatActivity implements
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
+    private SearchMVP.PresenterOps presenterOps;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +70,7 @@ public class SearchActivity extends AppCompatActivity implements
         //Intent intent = getIntent();
         //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
         //searchBar.setPlaceHolder(query);
-
+        presenterOps = new SearchPresenter(this);
         blackBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
