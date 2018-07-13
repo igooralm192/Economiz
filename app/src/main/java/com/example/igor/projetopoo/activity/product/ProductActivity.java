@@ -4,12 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
@@ -20,7 +17,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,25 +24,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
-
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.mancj.materialsearchbar.MaterialSearchBar;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,7 +142,6 @@ public class ProductActivity extends AppCompatActivity implements
 //                }catch (java.lang.ArithmeticException oe){
 //                    re.setPadding(0,72,0,0);
 //                }
-                return;
             }
         });
         final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
@@ -234,11 +224,8 @@ public class ProductActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchStateChanged(boolean enabled) {
-        if(enabled){
-
-        } else{
+        if(!enabled){
             Animation.closeSearch(searchBar, getSupportActionBar(), blackBar);
-
         }
     }
 
