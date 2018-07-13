@@ -3,7 +3,11 @@ package com.example.igor.projetopoo.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Product;
 
 import java.util.List;
 
@@ -32,5 +36,10 @@ public class ListGenericAdapter<T, VH extends RecyclerView.ViewHolder> extends R
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public interface OnItemViewClickListener {
+        void onCategoryClick(Category category);
+        void onProductClick(Product product);
     }
 }

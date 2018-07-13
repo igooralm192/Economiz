@@ -120,9 +120,7 @@ public class ProductActivity extends AppCompatActivity implements
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         AppBarLayout apbar = findViewById(R.id.appbar);
         apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -137,19 +135,12 @@ public class ProductActivity extends AppCompatActivity implements
                 card.setAlpha((float)(1+(verticalOffset/400.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 card.setTranslationY(verticalOffset);
-//                try {
                 re.setPadding(0,220+verticalOffset*220/400,0,0);
-//                }catch (java.lang.ArithmeticException oe){
-//                    re.setPadding(0,72,0,0);
-//                }
             }
         });
         final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
-
-
         customSuggestionsAdapter.setOnItemViewClickListener(this);
         customSuggestionsAdapter.setSuggestions(recentQueries);
-
         searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
         searchBar.addTextChangeListener(new TextWatcher() {
             @Override
@@ -185,19 +176,7 @@ public class ProductActivity extends AppCompatActivity implements
 
         });
 
-
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Override
@@ -207,7 +186,6 @@ public class ProductActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.menu_toolbar, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -228,7 +206,6 @@ public class ProductActivity extends AppCompatActivity implements
             Animation.closeSearch(searchBar, getSupportActionBar(), blackBar);
         }
     }
-
 
     @Override
     public void onSearchConfirmed(CharSequence text) {
@@ -272,7 +249,6 @@ public class ProductActivity extends AppCompatActivity implements
         index = new HashMap<String, Class>();
         index.put("recent", SearchActivity.class);
         index.put("product", ProductActivity.class);
-//        index.put("category", );
 
         for (String type : index.keySet()) {
             Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
@@ -339,7 +315,6 @@ public class ProductActivity extends AppCompatActivity implements
         dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
         dialog.show();
     }
-
     public void cancelDialog(View v){
         dialog.dismiss();
     }
