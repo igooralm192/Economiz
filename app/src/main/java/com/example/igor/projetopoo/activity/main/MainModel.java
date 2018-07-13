@@ -38,7 +38,10 @@ public class MainModel implements MainMVP.ModelOps {
         for (DocumentSnapshot documentSnapshot: querySnapshot.getResult()) {
             Map<String, Object> data = documentSnapshot.getData();
 
-            Category category = new Category(data);
+            Category category = null;
+            if (data != null) {
+                category = new Category(data);
+            }
             objects.add(category);
         }
 

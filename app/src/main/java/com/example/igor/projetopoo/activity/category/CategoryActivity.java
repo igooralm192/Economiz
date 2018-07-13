@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
@@ -38,6 +39,7 @@ import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.Constant;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -52,61 +54,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryActivity extends AppCompatActivity implements
-        MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener,
-        CategoryMVP.ReqViewOps,
-        ListGenericAdapter.OnItemViewClickListener {
-
-    private Context context;
+public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqViewOps {
     private Toolbar toolbar;
-    private FrameLayout blackLayout;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private MaterialSearchBar searchBar;
-    private List<Item> recentQueries;
-    private List<Item> recentQueriesClone;
-    private List<Category> categoriesSuggestions;
-    private List<Product> productsSuggestions;
-    private SharedPreferences sharedPreferences;
 
     private CategoryMVP.PresenterOps presenterOps;
     private Map<Category, Category> categoryLinks = new HashMap<>();
     private Category currentCategory;
-    private static final String RECENT_QUERY = "Recent Queries";
-    public static final String RECENT_MESSAGE = "search.name.recent";
-    public static final String SELECTED_PRODUCT = "Selected Product";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        presenterOps = new CategoryPresenter(this, new Database(FirebaseFirestore.getInstance()));
-
-        blackLayout = findViewById(R.id.black_category);
-        searchBar = findViewById(R.id.search_bar_category);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-
-        sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-        context = getApplicationContext();
-
-        toolbar = findViewById(R.id.toolbar_category);
-        setSupportActionBar(toolbar);
-
+        init();
         createSearchBar();
-
-        Intent intent = getIntent();
-        //String category = intent.getStringExtra("category");
-        Category category = new Category("Alimentos", "", true);
-        currentCategory = category;
-        getSupportActionBar().setTitle(currentCategory.getName());
-        categoryLinks.put(category, null);
-
-        configSuggestions();
 
         presenterOps.getCategory(currentCategory);
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        getSwipeRefreshLayout().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 presenterOps.getCategory(currentCategory);
@@ -115,58 +80,48 @@ public class CategoryActivity extends AppCompatActivity implements
 
     }
 
-    private void createSearchBar() {
-        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
+    @Override
+    public void init() {
+        setContext(getApplicationContext());
+        setBlackLayout( (FrameLayout) findViewById(R.id.black_category));
+        setSearchBar( (MaterialSearchBar) findViewById(R.id.search_bar_category) );
+        setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_category));
 
-        recentQueries = loadRecentQueries();
-        recentQueriesClone = new ArrayList<>(recentQueries);
+        presenterOps = new CategoryPresenter(this, getDatabase());
+        toolbar = findViewById(R.id.toolbar_category);
+        setSupportActionBar(toolbar);
 
-        customSuggestionsAdapter.setOnItemViewClickListener(this);
-        customSuggestionsAdapter.setSuggestions(recentQueries);
-        searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+        try {
+            Intent intent = getIntent();
+            Category category = Category.toObject( new JSONObject( intent.getStringExtra(Constant.SELECTED_CATEGORY) ) );
+            currentCategory = category;
 
-        searchBar.addTextChangeListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            getSupportActionBar().setTitle(currentCategory.getName());
+            categoryLinks.put(category, null);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //customSuggestionsAdapter.getFilter().filter(searchBar.getText());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String query = editable.toString().trim();
-
-                if (query.length() > 0) {
-                    filterSuggestions(query);
-                } else {
-                    if (searchBar.isSearchEnabled())
-                        searchBar.updateLastSuggestions(recentQueriesClone);
-
-                }
-            }
-
-        });
-
-        searchBar.setOnSearchActionListener(this);
+        setAllSuggestions();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar_category, menu);
 
-        List<Item> recent = new ArrayList<>();
+        return super.onCreateOptionsMenu(menu);
+    }
 
-        for (Object object: searchBar.getLastSuggestions()) {
-            Item item = (Item) object;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-            if (item.getType().equals("recent")) {
-                recent.add(item);
-            }
+        if (id == android.R.id.home) this.onBackPressed();
+        else if (id == R.id.search_icon_category) {
+            Animation.openSearch(getSearchBar(), getSupportActionBar(), getBlackLayout());
         }
 
-        saveRecentQueries(recent);
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -190,87 +145,9 @@ public class CategoryActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar_category, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == android.R.id.home) this.onBackPressed();
-        else if (id == R.id.search_icon_category) {
-            Animation.openSearch(searchBar, getSupportActionBar(), blackLayout);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSearchStateChanged(boolean enabled) {
-        if (!enabled) {
-            Animation.closeSearch(searchBar, getSupportActionBar(), blackLayout);
-        }
-    }
-
-    @Override
-    public void onSearchConfirmed(CharSequence text) {
-        String newText = text.toString();
-        newText = newText.trim();
-
-        if (newText.length() != 0) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
-
-            if (!recentQueriesClone.contains(item)) {
-                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
-
-                recentQueriesClone.add(0, item);
-                recentQueries.add(item);
-            }
-
-            searchBar.setLastSuggestions(recentQueriesClone);
-
-            this.saveRecentQueries(recentQueriesClone);
-
-            this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
-
-            searchBar.disableSearch();
-        } else searchBar.showSuggestionsList();
-    }
-
-    @Override
-    public void onButtonClicked(int buttonCode) {
-
-    }
-
-    @Override
-    public void onItemClick(View view) {
-        TextView query = view.findViewById(R.id.name_suggestion);
-
-        searchBar.setLastSuggestions(recentQueriesClone);
-        searchBar.disableSearch();
-
-        Map<String, Class> index = new HashMap<>();
-        index.put("recent", SearchActivity.class);
-        //index.put("product", );
-        index.put("category", CategoryActivity.class);
-
-        for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
-            int indItem = recentQueries.indexOf(item);
-
-            if (indItem != -1) {
-                this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
-            }
-        }
-    }
-
-    @Override
     public void showSubcategories(List<Category> subcategories) {
         final ListGenericAdapter<Category, Category.CategoryHolder> adapter = new ListGenericAdapter<>(
-                context,
+                getContext(),
                 subcategories,
                 new ListAdapter<Category, Category.CategoryHolder>() {
                     @Override
@@ -292,8 +169,8 @@ public class CategoryActivity extends AppCompatActivity implements
             @Override
             public RecyclerView setList(RecyclerView lista) {
                 lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(context));
-                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                lista.setLayoutManager(new LinearLayoutManager(getContext()));
+                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                 lista.setItemAnimator(new DefaultItemAnimator());
 
                 return lista;
@@ -306,7 +183,7 @@ public class CategoryActivity extends AppCompatActivity implements
     @Override
     public void showProducts(List<Product> products) {
         final ListGenericAdapter<Product, Product.Holder> adapter = new ListGenericAdapter<>(
-                context,
+                getContext(),
                 products,
                 new ListAdapter<Product, Product.Holder>() {
                     @Override
@@ -329,8 +206,8 @@ public class CategoryActivity extends AppCompatActivity implements
             @Override
             public RecyclerView setList(RecyclerView lista) {
                 lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(context));
-                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                lista.setLayoutManager(new LinearLayoutManager(getContext()));
+                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                 lista.setItemAnimator(new DefaultItemAnimator());
 
                 return lista;
@@ -342,55 +219,29 @@ public class CategoryActivity extends AppCompatActivity implements
 
     @Override
     public void showProgressBar(Boolean enabled) {
-        swipeRefreshLayout.setRefreshing(enabled);
+        getSwipeRefreshLayout().setRefreshing(enabled);
     }
 
-    private void startActivity(String text, Class activity, String keyMessage) {
-        Intent intent = new Intent(this, activity);
-        intent.putExtra(keyMessage, text);
-        startActivity(intent);
-    }
-
-    private void saveRecentQueries(List<Item> recent) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        JSONArray array = new JSONArray();
-
-        for (Item item : recent) {
-            JSONObject object = item.toJson();
-            array.put(object.toString());
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        if (!enabled) {
+            Animation.closeSearch(getSearchBar(), getSupportActionBar(), getBlackLayout());
         }
-
-        editor.putString("recent", array.toString());
-        editor.apply();
     }
 
-    private List<Item> loadRecentQueries() {
-        List<Item> recent = new ArrayList<>();
+    @Override
+    public void onCategoryClick(Category category) {
+        categoryLinks.put(category, currentCategory);
+        currentCategory = category;
 
-        try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+        presenterOps.getCategory(category);
+    }
 
-            if (arrayStr != null) {
-                JSONArray array = new JSONArray(arrayStr);
+    @Override
+    public void onProductClick(Product product) {
+        //String json = product.toJSON().toString();
 
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject object = new JSONObject((String) array.get(i));
-
-                    Item item = new Item(
-                            object.getInt("idIcon"),
-                            object.getString("name"),
-                            object.getString("type")
-                    );
-
-                    recent.add(item);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return recent;
+        //startActivity(json, ProductActivity.class, SELECTED_PRODUCT);
     }
 
     private void changeListFragment(ListFragment newFragment) {
@@ -447,109 +298,5 @@ public class CategoryActivity extends AppCompatActivity implements
             }
         }, 500);
 
-    }
-
-    @Override
-    public void onCategoryClick(Category category) {
-        categoryLinks.put(category, currentCategory);
-        currentCategory = category;
-
-        presenterOps.getCategory(category);
-    }
-
-    @Override
-    public void onProductClick(Product product) {
-        //String json = product.toJSON().toString();
-
-        //startActivity(json, ProductActivity.class, SELECTED_PRODUCT);
-    }
-
-    private void configSuggestions() {
-        String sug = sharedPreferences.getString("suggestions", null);
-
-        if (sug != null) {
-            setAllSuggestions();
-        }
-    }
-
-    private void filterSuggestions(String query) {
-        List<Category> categories = categoriesSuggestions;
-        List<Product> products = productsSuggestions;
-
-        List<Item> newSuggestions = new ArrayList<>();
-
-        int countRecent = 0, countProduct = 0, countCategories = 0;
-
-        for (Item item: recentQueries) {
-            if (countRecent >= 2) break;
-            if (item.getName().toLowerCase().startsWith( query.toLowerCase() )) {
-                newSuggestions.add(item);
-                countRecent++;
-            }
-        }
-
-        for (Product product: products) {
-            if (countProduct >= 4 - countRecent) break;
-
-            if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
-                Item item = new Item(
-                        R.drawable.ic_shopping_cart_red_32dp,
-                        product.getName(),
-                        "product",
-                        String.format("R$ %.2f", product.getAveragePrice()));
-
-                newSuggestions.add(item);
-                countProduct++;
-            }
-        }
-
-        for (Category category: categories) {
-            if (countCategories >= 6 - (countRecent + countProduct)) break;
-
-            if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
-                Item item = new Item(
-                        R.drawable.ic_search_black_24dp,
-                        category.getName(),
-                        "category"
-                );
-
-                newSuggestions.add(item);
-                countCategories++;
-            }
-        }
-
-        searchBar.updateLastSuggestions(newSuggestions);
-    }
-
-    private void setAllSuggestions() {
-        List<Category> categories = new ArrayList<>();
-        List<Product> products = new ArrayList<>();
-
-        String json = sharedPreferences.getString("suggestions", null);
-
-        if (json != null) {
-            try {
-                JSONObject suggestions = new JSONObject(json);
-
-                JSONArray arrCategories = suggestions.getJSONArray("categories");
-                JSONArray arrProducts = suggestions.getJSONArray("products");
-
-                for (int i=0; i<arrCategories.length(); i++) {
-                    Category category = Category.toObject(arrCategories.getJSONObject(i));
-                    categories.add(category);
-                }
-
-                for (int i=0; i<arrProducts.length(); i++) {
-                    Product product = Product.toObject(arrProducts.getJSONObject(i));
-                    products.add(product);
-                }
-
-                this.categoriesSuggestions = categories;
-                this.productsSuggestions = products;
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
