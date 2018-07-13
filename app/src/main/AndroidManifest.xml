@@ -19,6 +19,15 @@
         <activity android:name=".main.MainActivity">
 
         </activity>
+        <activity
+            android:name=".activity.search.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme" >
+        </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

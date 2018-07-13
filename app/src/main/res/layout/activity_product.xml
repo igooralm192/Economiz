@@ -68,6 +68,26 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:autoText="true"
+                android:text="R$ 99,99"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="@android:color/holo_green_light"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView"
                 android:layout_width="wrap_content"
@@ -82,19 +102,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView">
 
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:autoText="true"
-                    android:text="R$ 99,99"
-                    android:textAllCaps="false"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    android:textColor="@android:color/holo_green_light"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
             </android.support.v7.widget.CardView>
 
         </android.support.constraint.ConstraintLayout>
@@ -105,24 +112,49 @@
         android:id="@+id/black_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#b2000000"
+        android:background="@drawable/background_black"
         android:elevation="20dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
     </FrameLayout>
 
-    <com.mancj.materialsearchbar.MaterialSearchBar
-        android:id="@+id/product_search_bar"
-        style="@style/MaterialSearchBarLight"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:elevation="21dp"
-        android:visibility="invisible"
-        app:layout_scrollFlags="enterAlwaysCollapsed"
-        app:mt_navIconEnabled="false"
-        app:mt_placeholder="BaratinhoVéi">
+        android:elevation="22dp">
 
-    </com.mancj.materialsearchbar.MaterialSearchBar>
+        <com.mancj.materialsearchbar.MaterialSearchBar
+            android:id="@+id/product_search_bar"
+            style="@style/MaterialSearchBarLight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:elevation="21dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_scrollFlags="enterAlwaysCollapsed"
+            app:mt_navIconEnabled="false">
+
+        </com.mancj.materialsearchbar.MaterialSearchBar>
+    </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="showDialog"
+        app:backgroundTint="@color/colorPrimary"
+        app:elevation="8dp"
+        app:layout_anchor="@+id/black_bar"
+        app:layout_anchorGravity="right|bottom"
+        app:srcCompat="@drawable/ic_add_white_24dp" />
+
 
 </android.support.design.widget.CoordinatorLayout>
