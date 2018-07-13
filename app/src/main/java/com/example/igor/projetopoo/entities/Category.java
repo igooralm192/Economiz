@@ -11,9 +11,10 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Category implements Comparable<Category>{
+public class Category implements Comparable<Category>, Serializable {
     private String name;
     private String parentCategory;
     private Boolean haveSubcategories;

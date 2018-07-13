@@ -95,7 +95,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
         String newText = text.toString().trim();
 
         if (newText.length() != 0) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
+            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
 
             if (!recentQueriesClone.contains(item)) {
                 if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
@@ -133,17 +133,31 @@ public abstract class ParentActivity extends AppCompatActivity implements
         index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
 
         for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
             int indItem = getSearchBar().getLastSuggestions().indexOf(item);
 
             if (indItem != -1) {
-                getSearchBar().setLastSuggestions(getRecentQueriesClone());
-                getSearchBar().disableSearch();
+                if (type.equals("category")) {
+                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    this.onCategoryClick((Category) list.get(indItem).getObject());
+                } else if (type.equals("product")) {
+                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    this.onProductClick((Product) list.get(indItem).getObject());
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put(Constant.LAST_QUERY, query.getText().toString());
 
-                Map<String, String> map = new HashMap<>();
-                map.put(Constant.LAST_QUERY, query.getText().toString());
+                    this.startActivity(index.get(type), map);
+                }
 
-                this.startActivity(index.get(type), map);
+                searchBar.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchBar.setLastSuggestions(getRecentQueriesClone());
+                        searchBar.disableSearch();
+                    }
+                }, 300);
+
             }
         }
     }
@@ -182,7 +196,9 @@ public abstract class ParentActivity extends AppCompatActivity implements
                         R.drawable.ic_shopping_cart_red_32dp,
                         product.getName(),
                         "product",
-                        String.format("R$ %.2f", product.getAveragePrice()));
+                        product,
+                        String.format("R$ %.2f", product.getAveragePrice())
+                );
 
                 newSuggestions.add(item);
                 countProduct++;
@@ -196,7 +212,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
                 Item item = new Item(
                         R.drawable.ic_search_black_24dp,
                         category.getName(),
-                        "category"
+                        "category",
+                        category
                 );
 
                 newSuggestions.add(item);
@@ -211,7 +228,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
         List<Category> categories = new ArrayList<>();
         List<Product> products = new ArrayList<>();
 
-        String json = sharedPreferences.getString("suggestions", null);
+        String json = sharedPreferences.getString(Constant.ALL_SUGGESTIONS, null);
 
         if (json != null) {
             try {
@@ -257,7 +274,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
         List<Item> recent = new ArrayList<>();
 
         try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+            String arrayStr = sharedPreferences.getString(Constant.RECENT_QUERIES, null);
 
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);
@@ -265,10 +282,24 @@ public abstract class ParentActivity extends AppCompatActivity implements
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject object = new JSONObject((String) array.get(i));
 
+                    Object obj = null;
+                    Category category = null;
+                    Product product = null;
+
+                    if (object.getString("type").equals("category")) {
+                        category = Category.toObject(object.getJSONObject("object"));
+                        obj = category;
+                    } else if (object.getString("type").equals("product")) {
+                        product = Product.toObject(object.getJSONObject("object"));
+                        obj = product;
+                    }
+
                     Item item = new Item(
                             object.getInt("idIcon"),
                             object.getString("name"),
-                            object.getString("type")
+                            object.getString("type"),
+                            obj,
+                            object.getString("price")
                     );
 
                     recent.add(item);

@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -176,10 +177,12 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     @Override
     public void onCategoryClick(Category category) {
+        Log.i("TAG", "Na main");
         Map<String, String> map = new HashMap<>();
         map.put(Constant.SELECTED_CATEGORY, category.toJSON().toString());
 
         startActivity(CategoryActivity.class, map);
+
     }
 
     @Override
@@ -207,7 +210,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     private void configSuggestions() {
         String sug = getSharedPreferences().getString(Constant.ALL_SUGGESTIONS, null);
-
+        sug = null;
         if (sug != null) {
             suggestionsStatus = true;
             setAllSuggestions();

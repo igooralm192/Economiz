@@ -69,8 +69,8 @@ public class MainModel implements MainMVP.ModelOps {
 
                 if (path.equals("categories")) {
                     if (data != null) {
-                        Category subcategory = new Category(data);
-                        objects.add(subcategory);
+                        Category category = new Category(data);
+                        objects.add(category);
                     }
                 } else {
                     if (data != null) {
