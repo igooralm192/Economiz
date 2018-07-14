@@ -71,6 +71,7 @@ public class SearchActivity extends AppCompatActivity implements
         //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
         //searchBar.setPlaceHolder(query);
         presenterOps = new SearchPresenter(this);
+        presenterOps.getResultList();
         blackBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -314,4 +315,9 @@ public class SearchActivity extends AppCompatActivity implements
         fragmentTransaction.commit();
     }
 
+
+    @Override
+    public void showResults(List<Result> results) {
+        // TODO: Implement this function
+    }
 }
