@@ -64,8 +64,6 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
         database = new Database(FirebaseFirestore.getInstance());
         sharedPreferences = getSharedPreferences(Constant.SHARED_PREFERENCES, 0);
-
-        Toast.makeText(this, "Conectando", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -122,45 +120,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onItemClick(View view) {
-        TextView query = view.findViewById(R.id.name_suggestion);
 
-        Map<String, Class> index = new HashMap<>();
-
-        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
-        //index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
-        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
-
-        for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
-            int indItem = getSearchBar().getLastSuggestions().indexOf(item);
-
-            if (indItem != -1) {
-                if (type.equals("category")) {
-                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
-                    this.onCategoryClick((Category) list.get(indItem).getObject());
-                } else if (type.equals("product")) {
-                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
-                    this.onProductClick((Product) list.get(indItem).getObject());
-                } else {
-                    Map<String, String> map = new HashMap<>();
-                    map.put(Constant.LAST_QUERY, query.getText().toString());
-
-                    this.startActivity(index.get(type), map);
-                }
-
-                searchBar.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        searchBar.setLastSuggestions(getRecentQueriesClone());
-                        searchBar.disableSearch();
-                    }
-                }, 300);
-
-            }
-        }
-    }
 
     @Override
     public void onCategoryClick(Category category) {

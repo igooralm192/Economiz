@@ -230,6 +230,55 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
     }
 
     @Override
+    public void onItemClick(View view) {
+        TextView query = view.findViewById(R.id.name_suggestion);
+
+        Map<String, Class> index = new HashMap<>();
+
+        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
+        //index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
+
+        for (String type : index.keySet()) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
+            int indItem = getSearchBar().getLastSuggestions().indexOf(item);
+
+            if (indItem != -1) {
+                if (type.equals("category")) {
+                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    Category category = (Category) list.get(indItem).getObject();
+
+                    if (!category.getName().equals(currentCategory.getName())) {
+                        Map<String, String> map = new HashMap<>();
+                        map.put(Constant.SELECTED_CATEGORY, category.toJSON().toString());
+
+                        startActivity(CategoryActivity.class, map);
+                    }
+                } else if (type.equals("product")) {
+
+                    //List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    //this.onProductClick((Product) list.get(indItem).getObject());
+
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put(Constant.LAST_QUERY, query.getText().toString());
+
+                    startActivity(index.get(type), map);
+                }
+
+                getSearchBar().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSearchBar().setLastSuggestions(getRecentQueriesClone());
+                        getSearchBar().disableSearch();
+                    }
+                }, 300);
+
+            }
+        }
+    }
+
+    @Override
     public void onCategoryClick(Category category) {
         categoryLinks.put(category, currentCategory);
         currentCategory = category;

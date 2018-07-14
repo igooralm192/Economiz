@@ -20,13 +20,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
+import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Blur;
@@ -168,10 +171,60 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         TransitionDrawable background = (TransitionDrawable) getBlackLayout().getBackground();
 
         if (enabled) {
-            getSearchBar().hideSuggestionsList();
+            getBlackLayout().setVisibility(View.VISIBLE);
             background.startTransition(300);
         } else {
             background.reverseTransition(300);
+            getBlackLayout().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getBlackLayout().setVisibility(View.GONE);
+                }
+            }, 300);
+        }
+    }
+
+    @Override
+    public void onItemClick(View view) {
+        TextView query = view.findViewById(R.id.name_suggestion);
+
+        Map<String, Class> index = new HashMap<>();
+
+        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
+        //index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
+
+        for (String type : index.keySet()) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
+            int indItem = getSearchBar().getLastSuggestions().indexOf(item);
+
+            if (indItem != -1) {
+                if (type.equals("category")) {
+
+                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    this.onCategoryClick((Category) list.get(indItem).getObject());
+
+                } else if (type.equals("product")) {
+
+                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
+                    this.onProductClick((Product) list.get(indItem).getObject());
+
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put(Constant.LAST_QUERY, query.getText().toString());
+
+                    this.startActivity(index.get(type), map);
+                }
+
+                /*getSearchBar().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSearchBar().setLastSuggestions(getRecentQueriesClone());
+                        getSearchBar().disableSearch();
+                    }
+                }, 300);*/
+
+            }
         }
     }
 
