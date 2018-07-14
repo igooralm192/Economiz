@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface MainMVP {
 
     public interface ModelOps {
         // Model methods => Presenter acess
-        void categoryListRequest();
+        void categoryListRequest() throws ConnectionException;
         void suggestionsRequest();
     }
 
