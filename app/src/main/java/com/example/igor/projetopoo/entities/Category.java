@@ -92,33 +92,6 @@ public class Category implements Comparable<Category>{
         return this.name.compareTo(other.name);
     }
 
-    public static class MainHolder extends RecyclerView.ViewHolder {
-        public final TextView name;
-        public final ImageView background;
-        public Category category;
-
-        public MainHolder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
-            super(view);
-
-            name = (TextView) view.findViewById(R.id.text_main_category2);
-            background = (ImageView) view.findViewById(R.id.image_main_category2);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onCategoryClick( MainHolder.this.getCategory() );
-                }
-            });
-        }
-
-        public Category getCategory() {
-            return category;
-        }
-
-        public void setCategory(Category category) {
-            this.category = category;
-        }
-    }
 
     public static class CategoryHolder extends RecyclerView.ViewHolder {
         public TextView name;
