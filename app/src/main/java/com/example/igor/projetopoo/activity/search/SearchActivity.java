@@ -30,9 +30,13 @@ import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
+import com.example.igor.projetopoo.database.Database;
+import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.entities.Result;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
@@ -56,7 +60,7 @@ public class SearchActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     private SearchMVP.PresenterOps presenterOps;
-
+    private Database database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +74,12 @@ public class SearchActivity extends AppCompatActivity implements
         //Intent intent = getIntent();
         //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
         //searchBar.setPlaceHolder(query);
-        presenterOps = new SearchPresenter(this);
-        presenterOps.getResultList();
+
+
+        database = new Database(FirebaseFirestore.getInstance());
+        presenterOps = new SearchPresenter(this, database);
+
+
         blackBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,7 +135,6 @@ public class SearchActivity extends AppCompatActivity implements
         });
 
         searchBar.setOnSearchActionListener(this);
-        setResultList(this);
 
     }
 
@@ -267,11 +274,7 @@ public class SearchActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    private void setResultList(final Context context){
-        List<Result> result = new ArrayList<>();
-        for (int i=1; i<51; i++) {
-            result.add(new Result(R.drawable.ic_search_black_24dp, "Alimentos " + i));
-        }
+    private void setResultList(final Context context, List<Result> result){
 
         final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
                 LinearLayoutManager.VERTICAL, false);
@@ -317,7 +320,20 @@ public class SearchActivity extends AppCompatActivity implements
 
 
     @Override
-    public void showResults(List<Result> results) {
-        // TODO: Implement this function
+    public void showResults(List<Category> categoryList, List<Product> productList) {
+        //TODO> Implementar essa merda aqui
+        List<Result> resultList = new ArrayList<>();
+
+        for(Category category: categoryList){
+            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName());
+            resultList.add(result);
+        }
+
+        for(Product product: productList){
+            Result result = new Result(R.drawable.ic_shopping_cart_red_24dp, product.getName(), product.getAveragePrice());
+            resultList.add(result);
+        }
+
+        setResultList(this, resultList);
     }
 }
