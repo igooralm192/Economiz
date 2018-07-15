@@ -24,7 +24,7 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
     @Override
     public void getResultList(String query) {
         char a = query.charAt(query.length()-1);
-        String upperbound = query.replace(a, a++);
+        String upperbound = query.replace(a, ++a);
 
         char uppercharquery = query.toUpperCase().charAt(0);
         query.toLowerCase();

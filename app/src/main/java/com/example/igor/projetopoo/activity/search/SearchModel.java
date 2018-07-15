@@ -1,5 +1,7 @@
 package com.example.igor.projetopoo.activity.search;
 
+import android.util.Log;
+
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
@@ -33,13 +35,12 @@ public class SearchModel implements SearchMVP.ModelOps {
         final FirebaseFirestore firestore = database.getFirestore();
         CollectionReference collectionReference;
 
-
-        Query categoryQuery = firestore.collection("categories").startAt(query).endBefore(upperbound).orderBy("name");
+        Query categoryQuery = firestore.collection("categories").orderBy("name").startAt(query).endBefore(upperbound);
         Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
         querySnapshotList.add(categoryTask.getResult());
 
-        Query productQuery = firestore.collection("products").startAt(query).endBefore(upperbound).orderBy("name");
-        Task<QuerySnapshot> productTask = database.getDocuments(categoryQuery);
+        Query productQuery = firestore.collection("products").orderBy("name").startAt(query).endBefore(upperbound);
+        Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
         querySnapshotList.add(productTask.getResult());
 
         for(QuerySnapshot queryDocumentSnapshots: querySnapshotList){

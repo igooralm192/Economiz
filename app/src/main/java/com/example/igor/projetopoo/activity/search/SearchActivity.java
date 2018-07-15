@@ -136,6 +136,7 @@ public class SearchActivity extends AppCompatActivity implements
 
         searchBar.setOnSearchActionListener(this);
 
+        presenterOps.getResultList("Al");
     }
 
     @Override
@@ -164,7 +165,7 @@ public class SearchActivity extends AppCompatActivity implements
             JSONObject object = item.toJson();
             array.put(object.toString());
         }
-        Log.i("TAG", array.toString());
+
         editor.putString("recent", array.toString());
         editor.apply();
     }
@@ -330,7 +331,7 @@ public class SearchActivity extends AppCompatActivity implements
         }
 
         for(Product product: productList){
-            Result result = new Result(R.drawable.ic_shopping_cart_red_24dp, product.getName(), product.getAveragePrice());
+            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice());
             resultList.add(result);
         }
 
