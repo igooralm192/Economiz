@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -31,6 +32,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
@@ -250,6 +252,7 @@ public class ProductActivity extends AppCompatActivity implements
                 lista.setAdapter(adapter);
                 lista.setLayoutManager(new LinearLayoutManager(context));
                 lista.setItemAnimator(new DefaultItemAnimator());
+                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
 
                 return lista;
             }
@@ -266,13 +269,16 @@ public class ProductActivity extends AppCompatActivity implements
                 TextView b = findViewById(R.id.toolbar_price);
                 a.setAlpha((float)(-verticalOffset/300.0));
                 b.setAlpha((float)(-verticalOffset/300.0));
-                card.setAlpha((float)(1+(verticalOffset/250.0)));
+                card.setAlpha((float)(1+(verticalOffset/300.0)));
                 if(card.getAlpha()==0)card.setVisibility(View.GONE);
                 else card.setVisibility(View.VISIBLE);
                 card.setTranslationY(verticalOffset);
-                swipeRefreshLayout.setPadding(0, 145 + verticalOffset*220/400, 0,0);
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) swipeRefreshLayout.getLayoutParams();
+                lp.setMargins(0, 240 + verticalOffset*220/400, 0,0);
+                swipeRefreshLayout.setLayoutParams(lp);
                 //swipeRefreshLayout.setY(145f + verticalOffset*220/400);
                 //re.setPadding(0,25+verticalOffset*145/400,0,0);
+
             }
         });
     }
