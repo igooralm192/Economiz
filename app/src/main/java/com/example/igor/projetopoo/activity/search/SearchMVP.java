@@ -26,6 +26,7 @@ public interface SearchMVP {
     interface ReqViewOps{
         // View methods => Presenter acess
         void showResults(List<Category> categoryList, List<Product> productList);
+        void showProgressBar(Boolean enabled);
     }
 
 

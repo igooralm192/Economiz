@@ -1,9 +1,9 @@
-    package com.example.igor.projetopoo.activity.search;
+package com.example.igor.projetopoo.activity.search;
 
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
-import com.example.igor.projetopoo.entities.Result;
+import com.example.igor.projetopoo.helper.AsyncDownload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +22,44 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
     }
 
     @Override
-    public void getResultList(String query) {
-        char a = query.charAt(query.length()-1);
-        String upperbound = query.replace(a, ++a);
+    public void getResultList(final String query) {
+        AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public void onPreExecute() {
+                reqViewOps.showProgressBar(true);
 
-        char uppercharquery = query.toUpperCase().charAt(0);
-        query.toLowerCase();
+            }
 
-        char upperCharUpperBound = upperbound.toUpperCase().charAt(0);
-        upperbound.toLowerCase();
+            @Override
+            public Object doInBackground(Object... objects) {
+                char lastChar = query.charAt(query.length()-1);
+                char letters[] = query.toCharArray();
 
-        modelOps.resultListRequest(query.replace(query.charAt(0), uppercharquery), upperbound.replace(upperbound.charAt(0), upperCharUpperBound));
+                for (int i =0; i < letters.length; i++){
+                    if (letters[i] == ' '){
+                        letters[i+1] = Character.toUpperCase(letters[i+1]);
+                    }
+                }
+
+                letters[0] = Character.toUpperCase(letters[0]);
+                String lowerbound = new String(letters);
+
+                letters[query.length()-1] = ++lastChar;
+                String upperbound = new String(letters);
+
+
+                modelOps.resultListRequest(lowerbound, upperbound);
+
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                reqViewOps.showProgressBar(false);
+            }
+        });
+
+        asyncDownload.execute();
     }
 
 
@@ -49,4 +76,5 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
         }
         reqViewOps.showResults(categoryList, productList);
     }
+
 }

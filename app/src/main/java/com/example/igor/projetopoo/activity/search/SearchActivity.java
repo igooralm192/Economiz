@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
@@ -61,6 +62,7 @@ public class SearchActivity extends AppCompatActivity implements
     private static final String RECENT_QUERY = "Recent Queries";
     private SearchMVP.PresenterOps presenterOps;
     private Database database;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +72,18 @@ public class SearchActivity extends AppCompatActivity implements
         searchBar = findViewById(R.id.search_searchbar);
         blackBackground = findViewById(R.id.black_search);
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-
+        //swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
         //Intent intent = getIntent();
         //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
         //searchBar.setPlaceHolder(query);
 
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenterOps.getResultList(searchBar.getText());
+            }
+        });
 
         database = new Database(FirebaseFirestore.getInstance());
         presenterOps = new SearchPresenter(this, database);
@@ -322,7 +331,6 @@ public class SearchActivity extends AppCompatActivity implements
 
     @Override
     public void showResults(List<Category> categoryList, List<Product> productList) {
-        //TODO> Implementar essa merda aqui
         List<Result> resultList = new ArrayList<>();
 
         for(Category category: categoryList){
@@ -336,5 +344,11 @@ public class SearchActivity extends AppCompatActivity implements
         }
 
         setResultList(this, resultList);
+    }
+
+
+    @Override
+    public void showProgressBar(Boolean enabled) {
+        swipeRefreshLayout.setRefreshing(enabled);
     }
 }
