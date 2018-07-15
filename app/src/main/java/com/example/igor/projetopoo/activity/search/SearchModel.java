@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SearchModel implements SearchMVP.ModelOps {
-
     private SearchMVP.ReqPresenterOps reqPresenterOps;
     private Database database;
 

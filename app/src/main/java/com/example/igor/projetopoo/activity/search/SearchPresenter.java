@@ -9,11 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPresenterOps {
-
     private SearchMVP.ReqViewOps reqViewOps;
     private SearchMVP.ModelOps modelOps;
-
-
 
     public SearchPresenter(SearchMVP.ReqViewOps reqViewOps, Database database){
         this.reqViewOps = reqViewOps;

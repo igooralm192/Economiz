@@ -72,10 +72,13 @@ public class SearchActivity extends AppCompatActivity implements
         searchBar = findViewById(R.id.search_searchbar);
         blackBackground = findViewById(R.id.black_search);
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-        //swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_search);
         //Intent intent = getIntent();
         //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
         //searchBar.setPlaceHolder(query);
+
+        database = new Database(FirebaseFirestore.getInstance());
+        presenterOps = new SearchPresenter(this, database);
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -85,8 +88,7 @@ public class SearchActivity extends AppCompatActivity implements
             }
         });
 
-        database = new Database(FirebaseFirestore.getInstance());
-        presenterOps = new SearchPresenter(this, database);
+
 
 
         blackBackground.setOnClickListener(new View.OnClickListener() {
@@ -145,7 +147,7 @@ public class SearchActivity extends AppCompatActivity implements
 
         searchBar.setOnSearchActionListener(this);
 
-        presenterOps.getResultList("Al");
+        presenterOps.getResultList("M");
     }
 
     @Override
@@ -301,7 +303,7 @@ public class SearchActivity extends AppCompatActivity implements
                 Result result = items.get(position);
                 holder.iconResult.setImageResource(result.getIcon());
                 holder.nameResult.setText(result.getName());
-                if (result.getPrice() != -1)
+                if (result.getPrice().doubleValue() != -1)
                     holder.priceResult.setText(String.format("R$ %.2f", result.getPrice()));
                 else
                     holder.priceResult.setText("");
