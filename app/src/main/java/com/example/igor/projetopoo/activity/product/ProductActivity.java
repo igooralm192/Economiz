@@ -7,6 +7,8 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
@@ -29,29 +32,38 @@ import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
+import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+
 public class ProductActivity extends AppCompatActivity implements
         MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener {
+        SuggestionAdapter.OnItemViewClickListener,
+        ProductMVP.ReqViewOps                                       {
 
     Map<String, Class> index;
 
     List<Feedback> list = new ArrayList<>();
-
+    private ProductMVP.ReqViewOps viewOps;
+    private Database db;
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
     private CustomDialog dialog;
@@ -60,56 +72,20 @@ public class ProductActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProductMVP.PresenterOps presenterOps;
+    private Feedback feedback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
-
-        for(int i = 0; i < 51; i++){
-            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
-        }
-
-        final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
-                this,
-                list,
-                new ListAdapter<Feedback, Feedback.Holder>() {
-                    @Override
-                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
-                        return new Feedback.Holder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
-                        holder.location.setText(items.get(position).getLocation());
-                        holder.day.setText(items.get(position).getDate().toUpperCase());
-                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
-                        s = s.replace('.',',');
-                        holder.price.setText(s);
-                    }
-
-                }
-        );
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-
-        final ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setLayoutManager(new LinearLayoutManager(ProductActivity.this));
-                lista.addItemDecoration(new DividerItemDecoration(ProductActivity.this, DividerItemDecoration.VERTICAL));
-                lista.setAdapter(adapter);
-                lista.setPadding(0, 220, 0, 0);
-
-                return lista;
-            }
-        });
-
-        getSupportFragmentManager().beginTransaction().add(R.id.timeline_container, listFragment).commit();
-
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_feedback);
+        db = new Database(FirebaseFirestore.getInstance());
         dialog= new CustomDialog(this, R.layout.dialog);
         searchBar = findViewById(R.id.product_search_bar);
         searchBar.setOnSearchActionListener(this);
@@ -117,25 +93,16 @@ public class ProductActivity extends AppCompatActivity implements
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
+        presenterOps = new ProductPresenter(this, new Database(FirebaseFirestore.getInstance()));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         AppBarLayout apbar = findViewById(R.id.appbar);
         apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                CardView card = findViewById(R.id.ProductCard);
-                RecyclerView re = listFragment.getList();
-                TextView a = findViewById(R.id.toolbar_name);
-                TextView b = findViewById(R.id.toolbar_price);
-                a.setAlpha((float)(-verticalOffset/400.0));
-                b.setAlpha((float)(-verticalOffset/400.0));
-                card.setAlpha((float)(1+(verticalOffset/400.0)));
-                if(card.getAlpha()==0)card.setVisibility(View.GONE);
-                card.setTranslationY(verticalOffset);
-                re.setPadding(0,220+verticalOffset*220/400,0,0);
+                HideCard(verticalOffset);
             }
         });
         final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
@@ -178,7 +145,17 @@ public class ProductActivity extends AppCompatActivity implements
 
     }
 
-
+    public void HideCard(int verticalOffset){
+        CardView card = findViewById(R.id.ProductCard);
+        TextView a = findViewById(R.id.toolbar_name);
+        TextView b = findViewById(R.id.toolbar_price);
+        a.setAlpha((float)(-verticalOffset/400.0));
+        b.setAlpha((float)(-verticalOffset/400.0));
+        card.setAlpha((float)(1+(verticalOffset/400.0)));
+        if(card.getAlpha()==0)card.setVisibility(View.GONE);
+        card.setTranslationY(verticalOffset);
+    }
+    //Menu functions
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -236,7 +213,6 @@ public class ProductActivity extends AppCompatActivity implements
 
     @Override
     public void onButtonClicked(int buttonCode) {
-
     }
 
     @Override
@@ -268,6 +244,7 @@ public class ProductActivity extends AppCompatActivity implements
     }
 
 
+    //MVP functions
     private void saveRecentQueries(List<Item> recent) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -318,7 +295,53 @@ public class ProductActivity extends AppCompatActivity implements
     public void cancelDialog(View v){
         dialog.dismiss();
     }
-    public void addFeedback(View v){
+    public void createFeedback(View v){
+        EditText location = dialog.findViewById(R.id.location_edit_text);
+        EditText price = dialog.findViewById(R.id.price_edit_text);
+        String prc = price.getText().toString();
+        String loc = location.getText().toString();
+
+
+        location.setError(null);
+        price.setError(null);
+
+        if ("".equals(loc)) {
+            loc = "Localização não informada";
+        }
+
+        if ("".equals(prc)) {
+            price.setError(getString(R.string.error_no_input));
+            return;
+        }
+        if(Double.parseDouble(prc)>100){
+            price.setError(getString(R.string.error_high_price));
+            return;
+        }
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        String str = format.format(date);
+        feedback = new Feedback(loc, str, Double.parseDouble(prc));
+        presenterOps.addFeedback(feedback);
         dialog.dismiss();
+    }
+
+    @Override
+    public void showSnackbar() {
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator),
+                R.string.feedback_added, Snackbar.LENGTH_SHORT);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenterOps.removeFeedback(feedback);
+            }
+        });
+        System.out.print(42);
+        mySnackbar.show();
+    }
+
+    @Override
+    public void showProgressBar(Boolean enabled) {
+        swipeRefreshLayout.setRefreshing(enabled);
     }
 }
