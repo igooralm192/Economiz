@@ -12,27 +12,25 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.Fade;
-import android.transition.Slide;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
@@ -42,16 +40,18 @@ import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
-import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class ProductActivity extends AppCompatActivity implements
         SuggestionAdapter.OnItemViewClickListener,
         ProductMVP.ReqViewOps {
 
-   private Map<String, Class> index;
+    Map<String, Class> index;
 
     private  MaterialSearchBar searchBar;
     private FrameLayout blackBar;
@@ -70,7 +70,7 @@ public class ProductActivity extends AppCompatActivity implements
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
     private SharedPreferences sharedPreferences;
-    private static final String RECENT_QUERY = "Recent Query";
+    private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
 
     private Context context;
@@ -361,7 +361,6 @@ public class ProductActivity extends AppCompatActivity implements
 
         for (String type : index.keySet()) {
             Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
-            //Item item = new Item(0, query.getText().toString(), type);
             int indItem = recentQueries.indexOf(item);
 
             if (indItem != -1) {
@@ -410,6 +409,7 @@ public class ProductActivity extends AppCompatActivity implements
                             object.getString("name"),
                             object.getString("type")
                     );
+
                     recent.add(item);
                 }
             }
@@ -427,7 +427,49 @@ public class ProductActivity extends AppCompatActivity implements
     public void cancelDialog(View v){
         dialog.dismiss();
     }
-    public void addFeedback(View v){
+    public void createFeedback(View v){
+        EditText location = dialog.findViewById(R.id.location_edit_text);
+        EditText price = dialog.findViewById(R.id.price_edit_text);
+        String prc = price.getText().toString();
+        String loc = location.getText().toString();
+
+
+        location.setError(null);
+        price.setError(null);
+
+        if ("".equals(loc)) {
+            loc = "Localização não informada";
+        }
+
+        if ("".equals(prc)) {
+            price.setError(getString(R.string.error_no_input));
+            return;
+        }
+        if(Double.parseDouble(prc)>100){
+            price.setError(getString(R.string.error_high_price));
+            return;
+        }
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        String str = format.format(date);
+        Feedback feedback = new Feedback(loc, str, Double.parseDouble(prc));
+        presenterOps.addFeedback(feedback);
         dialog.dismiss();
     }
+
+    @Override
+    public void showSnackbar() {
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator),
+                R.string.feedback_added, Snackbar.LENGTH_SHORT);
+        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenterOps.removeFeedback(feedback);
+            }
+        });
+        System.out.print(42);
+        mySnackbar.show();
+    }
+
 }

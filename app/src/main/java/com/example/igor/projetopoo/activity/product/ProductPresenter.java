@@ -63,4 +63,59 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
         reqViewOps.showFeedbacks(feedbacks);
     }
+
+    @Override
+    public void addFeedback(final Feedback feedback) {
+        AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public void onPreExecute() {
+                reqViewOps.showProgressBar(true);
+            }
+
+            @Override
+            public Object doInBackground(Object... objects) {
+                modelOps.insertFeedback(feedback);
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                reqViewOps.showProgressBar(false);
+            }
+        });
+        asyncDownload.execute();
+    }
+
+    @Override
+    public void removeFeedback(final Feedback feedback) {
+        AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public void onPreExecute() {
+                reqViewOps.showProgressBar(true);
+            }
+
+            @Override
+            public Object doInBackground(Object... objects) {
+                modelOps.deleteFeedback(feedback);
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                reqViewOps.showProgressBar(false);
+            }
+        });
+        asyncDownload.execute();
+    }
+
+
+    @Override
+    public void onFeedbackInserted() {
+        reqViewOps.showSnackbar();
+    }
+
+    @Override
+    public void onFeedbackDeleted() {
+        //reqViewOps.showSnackbar();
+    }
 }
