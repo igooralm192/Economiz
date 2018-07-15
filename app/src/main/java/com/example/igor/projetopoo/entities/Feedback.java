@@ -8,16 +8,21 @@ import com.example.igor.projetopoo.R;
 
 import java.lang.Double;
 import java.util.Date;
+import java.util.Map;
 
 public class Feedback {
     private String location;
     private String date;
-    private Double price;
+    private Number price;
 
-    public Feedback(String location, String date, Double price) {
+    public Feedback(String location, String date, Number price) {
         this.location = location;
         this.date = date;
         this.price = price;
+    }
+
+    public Feedback(Map<String, Object> map) {
+        this((String) map.get("location"), (String) map.get("date"), (Number) map.get("price"));
     }
 
     public String getLocation() {
@@ -28,7 +33,7 @@ public class Feedback {
         return date;
     }
 
-    public Double getPrice() {
+    public Number getPrice() {
         return price;
     }
 

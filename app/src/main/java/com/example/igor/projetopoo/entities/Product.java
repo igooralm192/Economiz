@@ -113,7 +113,7 @@ public class Product {
         }
     }
 
-    public static class Holder extends RecyclerView.ViewHolder {
+    /*public static class Holder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView averagePrice;
         public Product product;
@@ -139,5 +139,5 @@ public class Product {
         public void setProduct(Product product) {
             this.product = product;
         }
-    }
+    }*/
 }

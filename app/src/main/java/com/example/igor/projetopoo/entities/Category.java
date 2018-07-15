@@ -92,7 +92,7 @@ public class Category implements Comparable<Category>{
         return this.name.compareTo(other.name);
     }
 
-    public static class MainHolder extends RecyclerView.ViewHolder {
+    /*public static class MainHolder extends RecyclerView.ViewHolder {
         public final TextView name;
         public final ImageView background;
         public Category category;
@@ -144,5 +144,5 @@ public class Category implements Comparable<Category>{
         public void setCategory(Category category) {
             this.category = category;
         }
-    }
+    }*/
 }
