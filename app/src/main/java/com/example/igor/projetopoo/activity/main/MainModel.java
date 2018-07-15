@@ -59,7 +59,7 @@ public class MainModel implements MainMVP.ModelOps {
         Query query = collectionReference.whereEqualTo("parent_category", "");
         Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
 
-        if (!querySnapshot.isComplete()) throw new DatabaseException(context);
+        if (!querySnapshot.isSuccessful()) throw new DatabaseException(context);
 
 
         for (DocumentSnapshot documentSnapshot: querySnapshot.getResult()) {
