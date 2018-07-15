@@ -32,7 +32,7 @@ public class Database implements DatabaseRequests {
     public Task<DocumentSnapshot> getDocument(DocumentReference documentReference) {
         Task<DocumentSnapshot> task = documentReference.get();
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -46,7 +46,7 @@ public class Database implements DatabaseRequests {
     public Task<QuerySnapshot> getDocuments(CollectionReference collectionReference) {
         Task<QuerySnapshot> task = collectionReference.get();
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -60,7 +60,7 @@ public class Database implements DatabaseRequests {
     public Task<QuerySnapshot> getDocuments(Query query) {
         Task<QuerySnapshot> task = query.get();
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -74,7 +74,7 @@ public class Database implements DatabaseRequests {
     public Task<DocumentReference> addDocument(CollectionReference collectionReference, Object object) {
         Task<DocumentReference> task = collectionReference.add(object);
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -88,7 +88,7 @@ public class Database implements DatabaseRequests {
     public Task<Void> updateDocument(DocumentReference documentReference, Object object) {
         Task<Void> task = documentReference.set(object);
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -102,7 +102,7 @@ public class Database implements DatabaseRequests {
     public Task<Void> deleteDocument(DocumentReference documentReference) {
         Task<Void> task = documentReference.delete();
 
-        while (!task.isSuccessful()) {
+        while (!task.isComplete()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

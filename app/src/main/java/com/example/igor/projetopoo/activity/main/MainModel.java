@@ -2,6 +2,7 @@ package com.example.igor.projetopoo.activity.main;
 
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -9,6 +10,7 @@ import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,7 +36,7 @@ public class MainModel implements MainMVP.ModelOps {
     }
 
     @Override
-    public void categoryListRequest() throws ConnectionException {
+    public void categoryListRequest() throws ConnectionException, DatabaseException {
         MainActivity activity = (MainActivity) context;
         final ConstraintLayout layout = activity.findViewById(R.id.constraint_layout_main);
 
@@ -56,6 +58,9 @@ public class MainModel implements MainMVP.ModelOps {
 
         Query query = collectionReference.whereEqualTo("parent_category", "");
         Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
+
+        if (!querySnapshot.isComplete()) throw new DatabaseException(context);
+
 
         for (DocumentSnapshot documentSnapshot: querySnapshot.getResult()) {
             Map<String, Object> data = documentSnapshot.getData();

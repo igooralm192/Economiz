@@ -10,6 +10,7 @@ import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
@@ -43,6 +44,8 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
                     modelOps.categoryListRequest();
                 } catch (ConnectionException e) {
                     e.connectionFail(MainPresenter.this);
+                } catch (DatabaseException e) {
+                    e.failReadData();
                 }
 
                 return null;
