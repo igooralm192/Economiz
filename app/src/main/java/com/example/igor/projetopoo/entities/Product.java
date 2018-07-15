@@ -113,4 +113,31 @@ public class Product {
         }
     }
 
+    /*public static class Holder extends RecyclerView.ViewHolder {
+        public TextView name;
+        public TextView averagePrice;
+        public Product product;
+
+        public Holder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
+            super(view);
+
+            name = view.findViewById(R.id.name_product);
+            averagePrice = view.findViewById(R.id.price_product);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onProductClick( Holder.this.getProduct() );
+                }
+            });
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
+        }
+    }*/
 }

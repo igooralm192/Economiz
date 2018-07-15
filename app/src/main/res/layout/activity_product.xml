@@ -32,23 +32,17 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include
-        layout="@layout/content_product"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/ProductCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:elevation="8dp"
         android:visibility="visible"
         app:cardCornerRadius="10dp"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true"
-        app:layout_collapseParallaxMultiplier="0.3"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom"
         app:layout_constraintVertical_bias="1.0">
 
         <android.support.constraint.ConstraintLayout
@@ -107,6 +101,14 @@
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>
+
+    <include
+        layout="@layout/content_product"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <FrameLayout
         android:id="@+id/black_bar"

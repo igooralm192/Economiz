@@ -1,4 +1,4 @@
-package com.example.igor.projetopoo.activity.main;
+package com.example.igor.projetopoo.activity.product;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -9,6 +9,7 @@ import com.example.igor.projetopoo.activity.product.ProductMVP;
 import com.example.igor.projetopoo.activity.product.ProductModel;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
@@ -27,5 +28,39 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
         this.modelOps = new ProductModel(this, database);
     }
 
+    @Override
+    public void getFeedbacks(final String productName) {
+        AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public void onPreExecute() {
+                reqViewOps.showProgressBar(true);
 
+            }
+
+            @Override
+            public Object doInBackground(Object... objects) {
+                modelOps.feedbackListRequest(productName);
+
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                reqViewOps.showProgressBar(false);
+            }
+        });
+
+        asyncDownload.execute();
+    }
+
+    @Override
+    public void onReturnedFeedbackList(List<Object> objects) {
+        List<Feedback> feedbacks = new ArrayList<>();
+
+        for (Object object: objects) {
+            feedbacks.add((Feedback) object);
+        }
+
+        reqViewOps.showFeedbacks(feedbacks);
+    }
 }
