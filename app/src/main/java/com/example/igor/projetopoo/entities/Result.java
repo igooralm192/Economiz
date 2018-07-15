@@ -9,9 +9,9 @@ import com.example.igor.projetopoo.R;
 public class Result {
     private int icon;
     private String name;
-    private Double price;
+    private Number price;
 
-    public Result(int icon, String name, Double price) {
+    public Result(int icon, String name, Number price) {
         this.icon = icon;
         this.name = name;
         this.price = price;
@@ -37,11 +37,11 @@ public class Result {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public Number getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Number price) {
         this.price = price;
     }
 
