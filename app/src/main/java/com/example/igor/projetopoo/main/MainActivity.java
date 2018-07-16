@@ -1,4 +1,4 @@
-package com.example.igor.projetopoo.activity.main;
+package com.example.igor.projetopoo.main;
 
 
 import android.support.v7.app.AppCompatActivity;
