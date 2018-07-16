@@ -14,7 +14,7 @@ public class ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
         void getFeedbacks(String productName);
-        void addFeedback(Dialog dialog, String name, Pair<Double,Double> range);
+        void addFeedback(Dialog dialog, String name, Pair<Number,Number> range);
         void removeFeedback();
     }
 

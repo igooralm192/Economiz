@@ -71,7 +71,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     }
 
     @Override
-    public void addFeedback(Dialog dialog, String name, Pair<Double,Double> range) {
+    public void addFeedback(Dialog dialog, String name, Pair<Number,Number> range) {
         EditText location = dialog.findViewById(R.id.location_edit_text);
         EditText price = dialog.findViewById(R.id.price_edit_text);
         String prc = price.getText().toString();
@@ -88,12 +88,12 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             price.setError("Este campo é obrigatório");
             return;
         }
-        if(Double.parseDouble(prc) > range.second){
+        if(Double.parseDouble(prc) > range.second.doubleValue()){
             String s = "R$ "+ String.format("%.2f", range.second);
             s = s.replace('.',',');
             price.setError("O valor deve ser menor que " + s);
             return;
-        }else if(Double.parseDouble(prc) < range.first){
+        }else if(Double.parseDouble(prc) < range.first.doubleValue()){
             String s = "R$ "+ String.format("%.2f", range.first);
             s = s.replace('.',',');
             price.setError("O valor deve ser maior que "+ s);

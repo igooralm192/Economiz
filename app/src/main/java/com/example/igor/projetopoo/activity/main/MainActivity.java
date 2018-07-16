@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements
             array.put(object.toString());
         }
 
-        editor.putString("recent", array.toString());
+        editor.putString("recent2", array.toString());
         editor.apply();
     }
 
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements
         List<Item> recent = new ArrayList<>();
 
         try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+            String arrayStr = sharedPreferences.getString("recent2", null);
 
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);

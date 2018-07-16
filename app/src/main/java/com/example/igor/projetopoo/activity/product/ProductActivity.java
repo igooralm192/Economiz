@@ -114,7 +114,7 @@ public class ProductActivity extends AppCompatActivity implements
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
-        product = new Product("Maçã", "alimentos", 6.25, null, new Pair<>(3.0,8.0));
+        product = new Product("Maçã", "alimentos", 6.25, null, new Pair<>((Number) 3.0, (Number) 8.0));
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
