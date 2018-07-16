@@ -5,9 +5,7 @@
 - Limpeza
 
 #### Alimentos - Subcategorias
-- Grãos
 - Hortifruti
-- Orgânicos
 - Padaria
 - Carnes
 - Doces
