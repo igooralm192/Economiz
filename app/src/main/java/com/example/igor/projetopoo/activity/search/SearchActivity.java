@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
@@ -38,6 +39,7 @@ import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.entities.Result;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.igor.projetopoo.helper.Constant;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.SimpleOnSearchActionListener;
 
@@ -177,7 +179,7 @@ public class SearchActivity extends AppCompatActivity implements
             array.put(object.toString());
         }
 
-        editor.putString("recent", array.toString());
+        editor.putString(Constant.RECENT_QUERIES, array.toString());
         editor.apply();
     }
 
@@ -185,7 +187,7 @@ public class SearchActivity extends AppCompatActivity implements
         List<Item> recent = new ArrayList<>();
 
         try {
-            String arrayStr = sharedPreferences.getString("recent", null);
+            String arrayStr = sharedPreferences.getString(Constant.RECENT_QUERIES, null);
 
             if (arrayStr != null) {
                 JSONArray array = new JSONArray(arrayStr);
