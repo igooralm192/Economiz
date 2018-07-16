@@ -28,7 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.main.MainActivity;
+import com.example.igor.projetopoo.activity.parent.ParentActivity;
+import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
@@ -52,180 +55,93 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SearchActivity extends AppCompatActivity implements
-        MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener, SearchMVP.ReqViewOps {
+public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewOps {
+    private String lastQuery;
 
-    private MaterialSearchBar searchBar;
-    private FrameLayout blackBackground;
-    private List<Item> recentQueries;
-    private List<Item> recentQueriesClone;
-    private SharedPreferences sharedPreferences;
-    private static final String RECENT_QUERY = "Recent Queries";
     private SearchMVP.PresenterOps presenterOps;
-    private Database database;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        searchBar = findViewById(R.id.search_searchbar);
-        blackBackground = findViewById(R.id.black_search);
-        sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_search);
-        //Intent intent = getIntent();
-        //String query = intent.getStringExtra(MainActivity.RECENT_MESSAGE);
-        //searchBar.setPlaceHolder(query);
+        init();
+        createSearchBar();
 
-        database = new Database(FirebaseFirestore.getInstance());
-        presenterOps = new SearchPresenter(this, database);
+        presenterOps.getResultList(lastQuery);
 
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        getSwipeRefreshLayout().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenterOps.getResultList(searchBar.getText());
+                presenterOps.getResultList(lastQuery);
             }
         });
 
 
-
-
-        blackBackground.setOnClickListener(new View.OnClickListener() {
+        getBlackLayout().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (searchBar.isSearchEnabled())
-                    searchBar.disableSearch();
+                if (getSearchBar().isSearchEnabled())
+                    getSearchBar().disableSearch();
             }
         });
 
-        searchBar.setCardViewElevation(8);
-        recentQueries = loadRecentQueries();
-        recentQueriesClone = new ArrayList<>(recentQueries);
-
-        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
-        customSuggestionsAdapter.setOnItemViewClickListener(this);
-        customSuggestionsAdapter.setSuggestions(recentQueries);
-        searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
-
-        searchBar.addTextChangeListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
-
-                if (s.length() > 0) {
-                    List<Item> recent = new ArrayList<>();
-                    for (Item item: recentQueries) {
-                        if (recent.size() >= 2) break;
-                        if (item.getName().toLowerCase().startsWith( s.toLowerCase() ))
-                            recent.add(item);
-                    }
-
-                    // recent.addAll(getFilteredProducts());
-                    // recent.addAll(getFilteredCategories());
-
-                    searchBar.updateLastSuggestions(recent);
-                } else {
-                    if (searchBar.isSearchEnabled())
-                        searchBar.updateLastSuggestions(recentQueriesClone);
-
-                }
-
-            }
-
-        });
-
-        searchBar.setOnSearchActionListener(this);
-
-        presenterOps.getResultList("M");
+        getSearchBar().setCardViewElevation(8);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void init() {
+        setContext(this);
+        setBlackLayout( (FrameLayout) findViewById(R.id.black_search) );
+        setSearchBar( (MaterialSearchBar) findViewById(R.id.search_searchbar) );
+        setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_search) );
 
-        List<Item> recent = new ArrayList<>();
+        presenterOps = new SearchPresenter(this, getContext(), getDatabase());
 
-        for (Object object: searchBar.getLastSuggestions()) {
-            Item item = (Item) object;
+        Intent intent = getIntent();
+        lastQuery = intent.getStringExtra(Constant.LAST_QUERY);
+        getSearchBar().setPlaceHolder(lastQuery);
 
-            if (item.getType().equals("recent")) {
-                recent.add(item);
-            }
-        }
-
-        saveRecentQueries(recent);
+        setAllSuggestions();
     }
 
-    private void saveRecentQueries(List<Item> recent) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    @Override
+    public void showResults(List<Category> categoryList, List<Product> productList) {
+        List<Result> resultList = new ArrayList<>();
 
-        JSONArray array = new JSONArray();
-
-        for (Item item : recent) {
-            JSONObject object = item.toJson();
-            array.put(object.toString());
+        for(Category category: categoryList){
+            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName());
+            resultList.add(result);
         }
 
-        editor.putString(Constant.RECENT_QUERIES, array.toString());
-        editor.apply();
+        for(Product product: productList){
+            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice());
+            resultList.add(result);
+        }
+
+        setResultList(this, resultList);
     }
 
-    private List<Item> loadRecentQueries() {
-        List<Item> recent = new ArrayList<>();
 
-        try {
-            String arrayStr = sharedPreferences.getString(Constant.RECENT_QUERIES, null);
-
-            if (arrayStr != null) {
-                JSONArray array = new JSONArray(arrayStr);
-
-                for (int i=0; i<array.length(); i++) {
-                    JSONObject object = new JSONObject((String) array.get(i));
-
-                    Item item = new Item(
-                            object.getInt("idIcon"),
-                            object.getString("name"),
-                            object.getString("type"),
-                            null
-                    );
-
-                    recent.add(item);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return recent;
+    @Override
+    public void showProgressBar(Boolean enabled) {
+        getSwipeRefreshLayout().setRefreshing(enabled);
     }
 
     @Override
     public void onSearchStateChanged(boolean enabled) {
-        TransitionDrawable background = (TransitionDrawable) blackBackground.getBackground();
+        TransitionDrawable background = (TransitionDrawable) getBlackLayout().getBackground();
 
 
         if (enabled) {
-            blackBackground.setVisibility(View.VISIBLE);
+            getBlackLayout().setVisibility(View.VISIBLE);
             background.startTransition(300);
         } else {
             background.reverseTransition(300);
-            blackBackground.postDelayed(new Runnable() {
+            getBlackLayout().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    blackBackground.setVisibility(View.GONE);
+                    getBlackLayout().setVisibility(View.GONE);
                 }
             }, 300);
 
@@ -234,59 +150,74 @@ public class SearchActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchConfirmed(CharSequence text) {
-        String newText = text.toString();
-        newText = newText.trim();
-        searchBar.setPlaceHolder(newText);
+        String newText = text.toString().trim();
 
-        Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
-        if (newText.length() != 0)
-            if (!recentQueriesClone.contains(item)) {
-                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
+        if (newText.length() != 0) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
 
-                recentQueriesClone.add(0, item);
-                recentQueries.add(item);
+            if (!getRecentQueriesClone().contains(item)) {
+                if (getRecentQueriesClone().size() == 2) getRecentQueriesClone().remove(1);
+
+                getRecentQueriesClone().add(0, item);
+                getRecentQueries().add(item);
             }
 
+            getSearchBar().setLastSuggestions(getRecentQueriesClone());
 
-        searchBar.setLastSuggestions(recentQueriesClone);
-        searchBar.disableSearch();
-    }
+            this.saveRecentQueries(getRecentQueriesClone());
 
-    @Override
-    public void onButtonClicked(int buttonCode) {
+            lastQuery = newText;
 
+            getSearchBar().setPlaceHolder(lastQuery);
+            presenterOps.getResultList(lastQuery);
 
+            getSearchBar().disableSearch();
+        } else getSearchBar().showSuggestionsList();
     }
 
     @Override
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
 
-        searchBar.disableSearch();
-
         Map<String, Class> index = new HashMap<>();
-        index.put("recent", SearchActivity.class);
-        //index.put("product", );
-        //index.put("category", );
+
+        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
+        index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
 
         for (String type : index.keySet()) {
             Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
-            int indItem = recentQueries.indexOf(item);
+            int indItem = getSearchBar().getLastSuggestions().indexOf(item);
 
             if (indItem != -1) {
-                if (type.equals("recent")) {
-                    searchBar.setPlaceHolder(item.getName());
+                if (type.equals("category")) {
+
+                    List list = getSearchBar().getLastSuggestions();
+                    Item categoryItem = (Item) list.get(indItem);
+                    this.onCategoryClick((Category) categoryItem.getObject());
+
+                } else if (type.equals("product")) {
+
+                    List list = getSearchBar().getLastSuggestions();
+                    Item productItem = (Item) list.get(indItem);
+                    this.onProductClick((Product) productItem.getObject());
+
                 } else {
-                    //this.startActivity(query.getText().toString(), index.get(type), MainActivity.RECENT_MESSAGE);
+                    lastQuery = query.getText().toString();
+
+                    getSearchBar().setPlaceHolder(lastQuery);
+                    presenterOps.getResultList(lastQuery);
                 }
+
+                getSearchBar().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSearchBar().setLastSuggestions(getRecentQueriesClone());
+                        getSearchBar().disableSearch();
+                    }
+                }, 300);
             }
         }
-    }
-
-    private void startActivity(String text, Class activity, String keyMessage) {
-        Intent intent = new Intent(this, activity);
-        intent.putExtra(keyMessage, text);
-        startActivity(intent);
     }
 
     private void setResultList(final Context context, List<Result> result){
@@ -324,6 +255,7 @@ public class SearchActivity extends AppCompatActivity implements
             public RecyclerView setList(RecyclerView lista) {
                 lista.setAdapter(listGenericAdapter);
                 lista.setLayoutManager(layout);
+                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL  ));
 
                 return lista;
             }
@@ -331,29 +263,5 @@ public class SearchActivity extends AppCompatActivity implements
 
         fragmentTransaction.add(R.id.search_container, listFragment);
         fragmentTransaction.commit();
-    }
-
-
-    @Override
-    public void showResults(List<Category> categoryList, List<Product> productList) {
-        List<Result> resultList = new ArrayList<>();
-
-        for(Category category: categoryList){
-            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName());
-            resultList.add(result);
-        }
-
-        for(Product product: productList){
-            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice());
-            resultList.add(result);
-        }
-
-        setResultList(this, resultList);
-    }
-
-
-    @Override
-    public void showProgressBar(Boolean enabled) {
-        swipeRefreshLayout.setRefreshing(enabled);
     }
 }
