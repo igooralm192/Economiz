@@ -8,12 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -33,204 +31,126 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.category.CategoryActivity;
+import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
+import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.Constant;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class ProductActivity extends AppCompatActivity implements
-        MaterialSearchBar.OnSearchActionListener,
-        SuggestionAdapter.OnItemViewClickListener,
-        ProductMVP.ReqViewOps {
-
-    Map<String, Class> index;
-
-    private  MaterialSearchBar searchBar;
-    private FrameLayout blackBar;
+public class ProductActivity extends ParentActivity implements ProductMVP.ReqViewOps {
     private CustomDialog dialog;
-    private List<Item> recentQueries;
-    private List<Item> recentQueriesClone;
-    private SharedPreferences sharedPreferences;
-    private static final String RECENT_QUERY = "Recent Queries";
-    public static final String RECENT_MESSAGE = "search.name.recent";
-    private Feedback feedback;
-    private Context context;
-    private ListFragment listFragment;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private AppBarLayout appbar;
+    private TextView toolbarName;
+    private TextView toolbarPrice;
+    private TextView infoName;
+    private TextView infoPrice;
+
     private ProductMVP.PresenterOps presenterOps;
-    private AppBarLayout apbar;
-    private Product product;
+    private Product currentProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
-        context = getApplicationContext();
+        init();
+        createSearchBar();
 
-        presenterOps = new ProductPresenter(this, new Database(FirebaseFirestore.getInstance()));
+        presenterOps.getFeedbacks(currentProduct.getName());
 
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_feedback);
-
-        makeInitialFeedbackList();
-
-        presenterOps.getFeedbacks("Maçã");
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        getSwipeRefreshLayout().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenterOps.getFeedbacks("Maçã");
+                presenterOps.getFeedbacks(currentProduct.getName());
             }
         });
 
-        dialog= new CustomDialog(this, R.layout.dialog);
-        searchBar = findViewById(R.id.product_search_bar);
-        blackBar = findViewById(R.id.black_bar);
-        sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
-        recentQueries = loadRecentQueries();
-        recentQueriesClone = new ArrayList<>(recentQueries);
-        product = new Product("Maçã", "alimentos", 6.25, null, new Pair<>((Number) 3.0, (Number) 8.0));
+    }
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
+    @Override
+    public void init() {
+        setContext(this);
+        setBlackLayout( (FrameLayout) findViewById(R.id.black_product));
+        setSearchBar( (MaterialSearchBar) findViewById(R.id.product_search_bar));
+        setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_feedback));
+
+        presenterOps = new ProductPresenter(this, new Database(FirebaseFirestore.getInstance()));
+        dialog = new CustomDialog(this, R.layout.dialog);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        apbar = findViewById(R.id.appbar);
+        toolbarName = findViewById(R.id.toolbar_name);
+        toolbarPrice = findViewById(R.id.toolbar_price);
+        infoName = findViewById(R.id.name_info_product);
+        infoPrice = findViewById(R.id.price_info_product);
 
-        final SuggestionAdapter customSuggestionsAdapter = new SuggestionAdapter(getLayoutInflater());
-        customSuggestionsAdapter.setOnItemViewClickListener(this);
-        customSuggestionsAdapter.setSuggestions(recentQueries);
-        searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
-        searchBar.addTextChangeListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //customSuggestionsAdapter.getFilter().filter(searchBar.getText());
-            }
+        Intent intent = getIntent();
+        currentProduct = Product.toObject( intent.getStringExtra(Constant.SELECTED_PRODUCT) );
+        if (currentProduct != null) {
+            String name = currentProduct.getName();
+            String price = String.format("R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
+            toolbarName.setText(name);
+            toolbarPrice.setText(price);
+            infoName.setText(name);
+            infoPrice.setText(price);
+        }
 
-                if (s.length() > 0) {
-                    List<Item> recent = new ArrayList<>();
-                    for (Item item: recentQueries) {
-                        if (recent.size() >= 2) break;
-                        if (item.getName().toLowerCase().startsWith( s.trim().toLowerCase() ))
-                            recent.add(item);
-                    }
-
-                    // recent.addAll(getFilteredProducts());
-                    // recent.addAll(getFilteredCategories());
-
-                    searchBar.updateLastSuggestions(recent);
-                } else {
-                    if (searchBar.isSearchEnabled())
-                        searchBar.updateLastSuggestions(recentQueriesClone);
-
-                }
-            }
-
-        });
-
-        searchBar.setOnSearchActionListener(this);
-
+        appbar = findViewById(R.id.appbar);
+        settingsAppBar();
+        setAllSuggestions();
     }
 
-    private void makeInitialFeedbackList() {
-        List<Feedback> list = new ArrayList<>();
-
-        final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
-                this,
-                list,
-                new ListAdapter<Feedback, Feedback.Holder>() {
-                    @Override
-                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
-                        return new Feedback.Holder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
-                        holder.location.setText(items.get(position).getLocation());
-                        holder.date.setText(items.get(position).getDate().toUpperCase());
-                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
-                        s = s.replace('.',',');
-                        holder.price.setText(s);
-                    }
-
-                }
-        );
-
-        listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(context));
-                lista.setItemAnimator(new DefaultItemAnimator());
-                //lista.setPadding(0, 120, 0, 0);
-
-                return lista;
-            }
-        });
-
-        changeListFragment(listFragment);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        return true;
     }
 
-    private void changeListFragment(ListFragment newFragment) {
-        FragmentManager manager = getSupportFragmentManager();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-        Slide slide2 = new Slide();
-        slide2.setDuration(500);
-        slide2.setSlideEdge(Gravity.START);
+        if(id == android.R.id.home) finish();
 
-        newFragment.setEnterTransition(slide2);
+        if(id == R.id.app_bar_search)
+            Animation.openSearch(getSearchBar(), getBlackLayout());
 
-        Fade fade = new Fade();
-        fade.setDuration(350);
-        newFragment.setExitTransition(fade);
-
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.timeline_container, newFragment);
-        transaction.commit();
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void showFeedbacks(List<Feedback> list) {
-        for(int i = 0; i < 51; i++){
-            list.add(new Feedback("Maçã", "Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
-        }
+        final Context context = this;
 
         final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
                 this,
@@ -246,15 +166,15 @@ public class ProductActivity extends AppCompatActivity implements
                     public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
                         holder.location.setText(items.get(position).getLocation());
                         holder.date.setText(items.get(position).getDate().toUpperCase());
-                        String s = "R$ "+ String.format("%.2f", items.get(position).getPrice().floatValue());
-                        s = s.replace('.',',');
+
+                        String s = "R$ " + String.format("%.2f", items.get(position).getPrice().floatValue()).replace('.',',');
                         holder.price.setText(s);
                     }
 
                 }
         );
 
-        listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
+        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
             @Override
             public RecyclerView setList(RecyclerView lista) {
                 lista.setAdapter(adapter);
@@ -268,175 +188,11 @@ public class ProductActivity extends AppCompatActivity implements
 
         changeListFragment(listFragment);
 
-        apbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                CardView card = findViewById(R.id.ProductCard);
-                RecyclerView re = listFragment.getList();
-                TextView a = findViewById(R.id.toolbar_name);
-                TextView b = findViewById(R.id.toolbar_price);
-                a.setAlpha((float)(-verticalOffset/300.0));
-                b.setAlpha((float)(-verticalOffset/300.0));
-                card.setAlpha((float)(1+(verticalOffset/300.0)));
-                if(card.getAlpha()==0)card.setVisibility(View.GONE);
-                else card.setVisibility(View.VISIBLE);
-                card.setTranslationY(verticalOffset);
-                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) swipeRefreshLayout.getLayoutParams();
-                lp.setMargins(0, 240 + verticalOffset*220/400, 0,0);
-                swipeRefreshLayout.setLayoutParams(lp);
-                //swipeRefreshLayout.setY(145f + verticalOffset*220/400);
-                //re.setPadding(0,25+verticalOffset*145/400,0,0);
-
-            }
-        });
     }
 
     @Override
     public void showProgressBar(Boolean enabled) {
-        swipeRefreshLayout.setRefreshing(enabled);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_toolbar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if(id == android.R.id.home){
-            finish();
-        }
-        if(id == R.id.app_bar_search){
-            Animation.openSearch(searchBar, getSupportActionBar(), blackBar);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSearchStateChanged(boolean enabled) {
-        if(!enabled){
-            Animation.closeSearch(searchBar, getSupportActionBar(), blackBar);
-        }
-    }
-
-    @Override
-    public void onSearchConfirmed(CharSequence text) {
-        String newText = text.toString();
-        newText = newText.trim();
-
-        if (newText.length() != 0) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
-            if (text.length() != 0)
-                if (!recentQueriesClone.contains(item)) {
-                    if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
-
-                    recentQueriesClone.add(0, item);
-                    recentQueries.add(item);
-                }
-
-            searchBar.setLastSuggestions(recentQueriesClone);
-
-            this.saveRecentQueries(recentQueriesClone);
-
-            this.startActivity(newText, SearchActivity.class, RECENT_MESSAGE);
-
-            searchBar.disableSearch();
-        }else{
-            searchBar.showSuggestionsList();
-        }
-    }
-
-    @Override
-    public void onButtonClicked(int buttonCode) {
-
-    }
-
-    @Override
-    public void onItemClick(View view) {
-        TextView query = view.findViewById(R.id.name_suggestion);
-
-        searchBar.setLastSuggestions(recentQueriesClone);
-        searchBar.disableSearch();
-
-        index = new HashMap<String, Class>();
-        index.put("recent", SearchActivity.class);
-        index.put("product", ProductActivity.class);
-
-        for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
-            int indItem = recentQueries.indexOf(item);
-
-            if (indItem != -1) {
-                this.startActivity(query.getText().toString(), index.get(type), RECENT_MESSAGE);
-            }
-        }
-        finish();
-    }
-
-    private void startActivity(String text, Class activity, String keyMessage) {
-        Intent intent = new Intent(this, activity);
-        intent.putExtra(keyMessage, text);
-        startActivity(intent);
-    }
-
-
-    private void saveRecentQueries(List<Item> recent) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        JSONArray array = new JSONArray();
-
-        for (Item item : recent) {
-            JSONObject object = item.toJson();
-            array.put(object.toString());
-        }
-        Log.i("TAG", array.toString());
-        editor.putString("recent", array.toString());
-        editor.apply();
-    }
-
-    private List<Item> loadRecentQueries() {
-
-        List<Item> recent = new ArrayList<>();
-
-        try {
-            String arrayStr = sharedPreferences.getString("recent", null);
-
-            if (arrayStr != null) {
-                JSONArray array = new JSONArray(arrayStr);
-
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject object = new JSONObject((String) array.get(i));
-
-                    Item item = new Item(
-                            object.getInt("idIcon"),
-                            object.getString("name"),
-                            object.getString("type")
-                    );
-
-                    recent.add(item);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return recent;
-    }
-
-    public void showDialog(View v){
-        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
-        dialog.show();
-    }
-    public void cancelDialog(View v){
-        dialog.dismiss();
-    }
-    public void createFeedback(View v){
-        presenterOps.addFeedback(dialog,product.getName(),product.getPriceRange());
+        getSwipeRefreshLayout().setRefreshing(enabled);
     }
 
     @Override
@@ -458,5 +214,115 @@ public class ProductActivity extends AppCompatActivity implements
 
         mySnackbar.show();
     }
+
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        if(!enabled){
+            Animation.closeSearch(getSearchBar(), getBlackLayout());
+        }
+    }
+
+    @Override
+    public void onItemClick(View view) {
+        TextView query = view.findViewById(R.id.name_suggestion);
+
+        Map<String, Class> index = new HashMap<>();
+
+        index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
+        index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
+
+        for (String type : index.keySet()) {
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
+            int indItem = getSearchBar().getLastSuggestions().indexOf(item);
+
+            if (indItem != -1) {
+                if (type.equals("category")) {
+
+                    List list = getSearchBar().getLastSuggestions();
+                    Item categoryItem = (Item) list.get(indItem);
+                    this.onCategoryClick((Category) categoryItem.getObject());
+
+                } else if (type.equals("product")) {
+
+                    List list = getSearchBar().getLastSuggestions();
+                    Item productItem = (Item) list.get(indItem);
+                    Product product = (Product) productItem.getObject();
+
+                    if (!product.getName().equals(currentProduct.getName()))
+                        super.onProductClick((Product) productItem.getObject());
+
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put(Constant.LAST_QUERY, query.getText().toString());
+
+                    this.startActivity(index.get(type), map);
+                }
+
+                getSearchBar().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSearchBar().setLastSuggestions(getRecentQueriesClone());
+                        getSearchBar().disableSearch();
+                    }
+                }, 300);
+
+            }
+        }
+    }
+
+    private void changeListFragment(ListFragment newFragment) {
+        FragmentManager manager = getSupportFragmentManager();
+
+        Slide slide2 = new Slide();
+        slide2.setDuration(500);
+        slide2.setSlideEdge(Gravity.START);
+
+        newFragment.setEnterTransition(slide2);
+
+        Fade fade = new Fade();
+        fade.setDuration(350);
+        newFragment.setExitTransition(fade);
+
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.timeline_container, newFragment);
+        transaction.commit();
+    }
+
+    private void settingsAppBar() {
+        appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                CardView card = findViewById(R.id.info_product);
+
+                toolbarName.setAlpha((float)(-verticalOffset/400.0));
+                toolbarPrice.setAlpha((float)(-verticalOffset/400.0));
+                card.setAlpha((float)(1+(verticalOffset/400.0)));
+
+                if(card.getAlpha()==0)card.setVisibility(View.GONE);
+                else card.setVisibility(View.VISIBLE);
+
+                card.setTranslationY(verticalOffset);
+
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getSwipeRefreshLayout().getLayoutParams();
+                lp.setMargins(0, 190 + verticalOffset*220/400, 0,0);
+                getSwipeRefreshLayout().setLayoutParams(lp);
+            }
+        });
+    }
+
+    public void createFeedback(View v){
+        presenterOps.addFeedback(dialog, currentProduct.getName(), currentProduct.getPriceRange());
+    }
+
+    public void showDialog(View v){
+        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+        dialog.show();
+    }
+
+    public void cancelDialog(View v){
+        dialog.dismiss();
+    }
+
 
 }

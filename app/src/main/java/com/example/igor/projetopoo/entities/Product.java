@@ -89,8 +89,10 @@ public class Product implements Serializable {
         return object;
     }
 
-    public static Product toObject(JSONObject object) {
+    public static Product toObject(String json) {
         try {
+            JSONObject object = new JSONObject(json);
+
             JSONArray array = object.getJSONArray("feedbacks");
             List<String> feedbacks = new ArrayList<>();
 

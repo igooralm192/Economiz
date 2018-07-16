@@ -50,7 +50,6 @@ public class ProductModel implements ProductMVP.ModelOps {
 
     @Override
     public void insertFeedback(Feedback feedback) {
-
         FirebaseFirestore firestore = database.getFirestore();
         task = database.addDocument(firestore.collection("feedbacks"),feedback);
         reqPresenterOps.onFeedbackInserted();

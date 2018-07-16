@@ -71,7 +71,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     }
 
     @Override
-    public void addFeedback(Dialog dialog, String name, Pair<Number,Number> range) {
+    public void addFeedback(Dialog dialog, final String name, Pair<Number,Number> range) {
         EditText location = dialog.findViewById(R.id.location_edit_text);
         EditText price = dialog.findViewById(R.id.price_edit_text);
         String prc = price.getText().toString();
@@ -115,12 +115,13 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             @Override
             public Object doInBackground(Object... objects) {
                 modelOps.insertFeedback(feedback);
+
                 return null;
             }
 
             @Override
             public void onPostExecute(Object object) {
-                reqViewOps.showProgressBar(false);
+                ProductPresenter.this.getFeedbacks(name);
             }
         });
         asyncDownload.execute();

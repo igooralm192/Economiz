@@ -75,8 +75,10 @@ public class Category implements Comparable<Category>, Serializable {
         return object;
     }
 
-    public static Category toObject(JSONObject object) {
+    public static Category toObject(String json) {
         try {
+            JSONObject object = new JSONObject(json);
+
             return new Category(
                     (String) object.get("name"),
                     (String) object.get("parent_category"),
