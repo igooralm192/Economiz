@@ -55,14 +55,14 @@ public class Feedback {
     public static class Holder extends RecyclerView.ViewHolder {
         public TextView location;
         public TextView price;
-        public TextView day;
+        public TextView date;
 
         public Holder(View view) {
             super(view);
 
             location = view.findViewById(R.id.feedback_location);
             price = view.findViewById(R.id.feedback_price);
-            day = view.findViewById(R.id.feedback_date);
+            date = view.findViewById(R.id.feedback_date);
         }
     }
 

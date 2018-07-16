@@ -184,7 +184,7 @@ public class ProductActivity extends AppCompatActivity implements
                     @Override
                     public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
                         holder.location.setText(items.get(position).getLocation());
-                        holder.day.setText(items.get(position).getDate().toUpperCase());
+                        holder.date.setText(items.get(position).getDate().toUpperCase());
                         String s = "R$ "+ String.format("%.2f", items.get(position).getPrice());
                         s = s.replace('.',',');
                         holder.price.setText(s);
@@ -245,7 +245,7 @@ public class ProductActivity extends AppCompatActivity implements
                     @Override
                     public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
                         holder.location.setText(items.get(position).getLocation());
-                        holder.day.setText(items.get(position).getDate().toUpperCase());
+                        holder.date.setText(items.get(position).getDate().toUpperCase());
                         String s = "R$ "+ String.format("%.2f", items.get(position).getPrice().floatValue());
                         s = s.replace('.',',');
                         holder.price.setText(s);
@@ -436,26 +436,25 @@ public class ProductActivity extends AppCompatActivity implements
         dialog.dismiss();
     }
     public void createFeedback(View v){
-
         presenterOps.addFeedback(dialog,product.getName(),product.getPriceRange());
     }
 
     @Override
     public void showSnackbar(int op) {
         String str;
-        if(op == 1){
-            str = getString(R.string.feedback_removed);
-        }else {
-            str = getString(R.string.feedback_added);
-        }
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator),
-                str, Snackbar.LENGTH_SHORT);
-        if(op == 0)mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                presenterOps.removeFeedback();
-            }
-        });
+
+        if(op == 1) str = getString(R.string.feedback_removed);
+        else str = getString(R.string.feedback_added);
+
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator), str, Snackbar.LENGTH_LONG);
+
+        if(op == 0)
+            mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    presenterOps.removeFeedback();
+                }
+            });
 
         mySnackbar.show();
     }
