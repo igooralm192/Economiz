@@ -19,3 +19,5 @@
 - Analgésicos
 - Tratamentos
 - Vitaminas
+
+https://docs.google.com/document/d/1nwMlXaPCaftNVgE16YjesKJCDEhM5AKAQ7BexfZYUSE/edit?usp=sharing
