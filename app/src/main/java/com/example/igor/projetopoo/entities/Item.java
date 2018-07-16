@@ -12,17 +12,19 @@ public class Item implements Serializable {
     private int idIcon;
     private String name;
     private String type;
+    private Object object;
     private String price;
 
-    public Item(int idIcon, String name, String type){
+    public Item(int idIcon, String name, String type, Object object){
         this.idIcon = idIcon;
         this.name = name;
         this.type = type;
+        this.object = object;
         this.price = "";
     }
 
-    public Item(int idIcon, String name, String type, String price){
-        this(idIcon, name, type);
+    public Item(int idIcon, String name, String type, Object object, String price){
+        this(idIcon, name, type, object);
         this.price = price;
     }
 
@@ -46,6 +48,10 @@ public class Item implements Serializable {
 
     public void setType(String type) { this.type = type; }
 
+    public Object getObject() { return object; }
+
+    public void setObject(Object object) { this.object = object; }
+
     public String getPrice() { return price; }
 
     public void setPrice(String price) { this.price = price; }
@@ -67,13 +73,20 @@ public class Item implements Serializable {
             object.put("idIcon", this.getIdIcon());
             object.put("name", this.getName());
             object.put("type", this.getType());
+            if (this.getObject() instanceof Category) {
+                Category category = (Category) this.getObject();
+                object.put("object", category.toJSON());
+            } else if (this.getObject() instanceof Product) {
+                Product product = (Product) this.getObject();
+                object.put("object", product.toJSON());
+            } else object.put("object", null);
 
+            object.put("price", this.getPrice());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return object;
-
     }
 
 }

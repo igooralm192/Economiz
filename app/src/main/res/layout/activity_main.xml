@@ -12,10 +12,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBar"/>
+        app:layout_constraintTop_toBottomOf="@+id/app_bar"/>
 
     <RelativeLayout
-        android:id="@+id/appBar"
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/colorPrimary"
@@ -25,10 +25,11 @@
     </RelativeLayout>
 
     <FrameLayout
-        android:id="@+id/blackBar"
+        android:id="@+id/black_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background_black"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +38,7 @@
     </FrameLayout>
 
     <com.mancj.materialsearchbar.MaterialSearchBar
-        android:id="@+id/searchBar"
+        android:id="@+id/search_bar_main"
         style="@style/MaterialSearchBarLight"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -45,7 +46,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="@+id/appBar"
+        app:layout_constraintEnd_toEndOf="@+id/app_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:mt_navIconEnabled="false"

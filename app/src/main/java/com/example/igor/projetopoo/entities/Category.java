@@ -1,6 +1,5 @@
 package com.example.igor.projetopoo.entities;
 
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,9 +11,10 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Category implements Comparable<Category>{
+public class Category implements Comparable<Category>, Serializable {
     private String name;
     private String parentCategory;
     private Boolean haveSubcategories;
@@ -100,8 +100,8 @@ public class Category implements Comparable<Category>{
         public MainHolder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
             super(view);
 
-            name = (TextView) view.findViewById(R.id.text_main_category2);
-            background = (ImageView) view.findViewById(R.id.image_main_category2);
+            name = (TextView) view.findViewById(R.id.name_main_category);
+            background = (ImageView) view.findViewById(R.id.back_main_category);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -127,7 +127,7 @@ public class Category implements Comparable<Category>{
         public CategoryHolder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
             super(view);
 
-            //name = view.findViewById(R.id.name_category);
+            name = view.findViewById(R.id.name_category);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
