@@ -198,7 +198,8 @@ public class SearchActivity extends AppCompatActivity implements
                     Item item = new Item(
                             object.getInt("idIcon"),
                             object.getString("name"),
-                            object.getString("type")
+                            object.getString("type"),
+                            null
                     );
 
                     recent.add(item);
@@ -237,7 +238,7 @@ public class SearchActivity extends AppCompatActivity implements
         newText = newText.trim();
         searchBar.setPlaceHolder(newText);
 
-        Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent");
+        Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
         if (newText.length() != 0)
             if (!recentQueriesClone.contains(item)) {
                 if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
@@ -269,7 +270,7 @@ public class SearchActivity extends AppCompatActivity implements
         //index.put("category", );
 
         for (String type : index.keySet()) {
-            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type);
+            Item item = new Item(R.drawable.ic_history_black_24dp, query.getText().toString(), type, null);
             int indItem = recentQueries.indexOf(item);
 
             if (indItem != -1) {

@@ -5,6 +5,8 @@ public abstract class Constant {
     public static final String LAST_QUERY = "Last Query";
     public static final String ALL_SUGGESTIONS = "All Suggestions";
     public static final String SHARED_PREFERENCES = "Shared Preferences";
+    public static final String SELECTED_CATEGORY = "Categoria Selecionada";
+    public static final String SELECTED_PRODUCT = "Produto Selecionado";
 
     public abstract static class Entities {
         public static final String CATEGORIES = "categories";
