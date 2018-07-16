@@ -145,9 +145,6 @@ public class Animation {
             }
         }, ANIMATION_DURATION_SHORT);
 
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
-
         TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.startTransition(1000);
     }
@@ -165,9 +162,6 @@ public class Animation {
                 });
             }
         }, ANIMATION_DURATION_SHORT);
-
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
 
         final TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.reverseTransition(1000);

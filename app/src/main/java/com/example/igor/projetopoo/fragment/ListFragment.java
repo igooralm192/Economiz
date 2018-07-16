@@ -24,6 +24,10 @@ public class ListFragment extends Fragment {
         return listFragment;
     }
 
+    public RecyclerView getList() {
+        return list;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
