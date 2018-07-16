@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.activity.main;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 
@@ -8,6 +9,8 @@ import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
@@ -16,13 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenterOps {
-
+    private Context context;
     private MainMVP.ReqViewOps reqViewOps;
     private MainMVP.ModelOps modelOps;
 
-    public MainPresenter(MainMVP.ReqViewOps reqViewOps, Database database) {
+    public MainPresenter(MainMVP.ReqViewOps reqViewOps, Context context, Database database) {
         this.reqViewOps = reqViewOps;
-        this.modelOps = new MainModel(this, database);
+        this.context = context;
+        this.modelOps = new MainModel(this, context, database);
     }
 
     @Override
@@ -36,7 +40,13 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.categoryListRequest();
+                try {
+                    modelOps.categoryListRequest();
+                } catch (ConnectionException e) {
+                    e.connectionFail(MainPresenter.this);
+                } catch (DatabaseException e) {
+                    e.failReadData();
+                }
 
                 return null;
             }
