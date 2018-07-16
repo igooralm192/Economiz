@@ -314,8 +314,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    private boolean checkConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean checkConnection(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = null;
         if (cm != null) {
             activeNetwork = cm.getActiveNetworkInfo();

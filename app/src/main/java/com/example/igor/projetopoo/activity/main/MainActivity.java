@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +19,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -80,7 +82,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_main));
 
         appBar = (RelativeLayout) findViewById(R.id.app_bar);
-        presenterOps = new MainPresenter(this, getDatabase());
+        presenterOps = new MainPresenter(this, this, getDatabase());
     }
 
     @Override
