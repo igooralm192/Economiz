@@ -7,23 +7,26 @@ import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 
 import java.lang.Double;
-import java.util.Date;
 import java.util.Map;
 
 public class Feedback {
+    private String product;
     private String location;
     private String date;
     private Number price;
 
-    public Feedback(String location, String date, Number price) {
+    public Feedback(String product, String location, String date, Number price) {
+        this.product = product;
         this.location = location;
         this.date = date;
         this.price = price;
     }
 
     public Feedback(Map<String, Object> map) {
-        this((String) map.get("location"), (String) map.get("date"), (Number) map.get("price"));
+        this((String) map.get("product"), (String) map.get("location"), (String) map.get("date"), (Number) map.get("price"));
     }
+
+    public String getProduct() { return product; }
 
     public String getLocation() {
         return location;
@@ -46,6 +49,8 @@ public class Feedback {
     public void setPrice(Double price) {
         this.price = price;
     }
+
+    public void setProduct(String product) { this.product = product; }
 
     public static class Holder extends RecyclerView.ViewHolder {
         public TextView location;

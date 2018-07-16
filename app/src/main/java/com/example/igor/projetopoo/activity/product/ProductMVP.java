@@ -1,6 +1,8 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.util.Pair;
 
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
@@ -12,15 +14,15 @@ public class ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
         void getFeedbacks(String productName);
-        void addFeedback(Feedback feedback);
-        void removeFeedback(Feedback feedback);
+        void addFeedback(Dialog dialog, String name, Pair<Double,Double> range);
+        void removeFeedback();
     }
 
     public interface ModelOps {
         // Model methods => Presenter acess
         void feedbackListRequest(String productName);
         void insertFeedback(Feedback feedback);
-        void deleteFeedback(Feedback feedback);
+        void deleteFeedback();
     }
 
     public interface ReqPresenterOps {
@@ -33,7 +35,7 @@ public class ProductMVP {
     public interface ReqViewOps {
         //View methods => Presenter access
         void showFeedbacks(List<Feedback> list);
-        void showSnackbar();
+        void showSnackbar(int op);
         void showProgressBar(Boolean enabled);
     }
 }

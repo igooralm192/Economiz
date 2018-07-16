@@ -6,4 +6,5 @@
     <string name="error_high_price"> O valor é muito alto</string>
     <string name="feedback_added">Feedback inserido</string>
     <string name="undo_string">Desfazer</string>
+    <string name="feedback_removed">Feedback removido</string>
 </resources>

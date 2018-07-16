@@ -8,22 +8,26 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,9 +44,11 @@ import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Item;
+import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,12 +78,13 @@ public class ProductActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private static final String RECENT_QUERY = "Recent Queries";
     public static final String RECENT_MESSAGE = "search.name.recent";
-
+    private Feedback feedback;
     private Context context;
     private ListFragment listFragment;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProductMVP.PresenterOps presenterOps;
     private AppBarLayout apbar;
+    private Product product;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +114,7 @@ public class ProductActivity extends AppCompatActivity implements
         sharedPreferences = getSharedPreferences(RECENT_QUERY, 0);
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
+        product = new Product("Maçã", "alimentos", 6.25, null, new Pair<>(3.0,8.0));
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -221,7 +229,7 @@ public class ProductActivity extends AppCompatActivity implements
     @Override
     public void showFeedbacks(List<Feedback> list) {
         for(int i = 0; i < 51; i++){
-            list.add(new Feedback("Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
+            list.add(new Feedback("Maçã", "Mercadinho do Shaake "+ i, "10 de Fevereiro de 2018", 6.5));
         }
 
         final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
@@ -428,47 +436,27 @@ public class ProductActivity extends AppCompatActivity implements
         dialog.dismiss();
     }
     public void createFeedback(View v){
-        EditText location = dialog.findViewById(R.id.location_edit_text);
-        EditText price = dialog.findViewById(R.id.price_edit_text);
-        String prc = price.getText().toString();
-        String loc = location.getText().toString();
 
-
-        location.setError(null);
-        price.setError(null);
-
-        if ("".equals(loc)) {
-            loc = "Localização não informada";
-        }
-
-        if ("".equals(prc)) {
-            price.setError(getString(R.string.error_no_input));
-            return;
-        }
-        if(Double.parseDouble(prc)>100){
-            price.setError(getString(R.string.error_high_price));
-            return;
-        }
-
-        Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String str = format.format(date);
-        Feedback feedback = new Feedback(loc, str, Double.parseDouble(prc));
-        presenterOps.addFeedback(feedback);
-        dialog.dismiss();
+        presenterOps.addFeedback(dialog,product.getName(),product.getPriceRange());
     }
 
     @Override
-    public void showSnackbar() {
+    public void showSnackbar(int op) {
+        String str;
+        if(op == 1){
+            str = getString(R.string.feedback_removed);
+        }else {
+            str = getString(R.string.feedback_added);
+        }
         Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator),
-                R.string.feedback_added, Snackbar.LENGTH_SHORT);
-        mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                str, Snackbar.LENGTH_SHORT);
+        if(op == 0)mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenterOps.removeFeedback(feedback);
+                presenterOps.removeFeedback();
             }
         });
-        System.out.print(42);
+
         mySnackbar.show();
     }
 
