@@ -25,20 +25,19 @@ import java.util.List;
 import java.util.Map;
 
 public class SearchModel implements SearchMVP.ModelOps {
+    private SearchActivity activity;
     private SearchMVP.ReqPresenterOps reqPresenterOps;
-    private Context context;
     private Database database;
 
-    public SearchModel(SearchMVP.ReqPresenterOps reqPresenterOps, Context context, Database database){
+    public SearchModel(SearchActivity activity, SearchMVP.ReqPresenterOps reqPresenterOps, Database database){
+        this.activity = activity;
         this.reqPresenterOps = reqPresenterOps;
-        this.context = context;
         this.database = database;
     }
 
     @Override
     public void resultListRequest(String query, String upperbound) throws ConnectionException, DatabaseException {
-        SearchActivity activity = (SearchActivity) context;
-        final ConstraintLayout layout = activity.findViewById(R.id.search_container);
+        final ConstraintLayout layout = activity.findViewById(R.id.container_search);
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -47,7 +46,7 @@ public class SearchModel implements SearchMVP.ModelOps {
             }
         });
 
-        if (!ParentActivity.checkConnection(context)) throw new ConnectionException(context, layout);
+        if (!ParentActivity.checkConnection(activity)) throw new ConnectionException(activity, layout);
 
         List<Object> objects = new ArrayList<>();
 
@@ -59,12 +58,12 @@ public class SearchModel implements SearchMVP.ModelOps {
 
         Query categoryQuery = firestore.collection("categories").orderBy("name").startAt(query).endBefore(upperbound);
         Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
-        if (!categoryTask.isSuccessful()) throw new DatabaseException(context);
+        if (!categoryTask.isSuccessful()) throw new DatabaseException(activity);
         querySnapshotList.add(categoryTask.getResult());
 
         Query productQuery = firestore.collection("products").orderBy("name").startAt(query).endBefore(upperbound);
         Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
-        if (!productTask.isSuccessful()) throw new DatabaseException(context);
+        if (!productTask.isSuccessful()) throw new DatabaseException(activity);
         querySnapshotList.add(productTask.getResult());
 
 

@@ -96,7 +96,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         setSearchBar( (MaterialSearchBar) findViewById(R.id.search_searchbar) );
         setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_search) );
 
-        presenterOps = new SearchPresenter(this, getContext(), getDatabase());
+        presenterOps = new SearchPresenter(this, getDatabase());
 
         Intent intent = getIntent();
         lastQuery = intent.getStringExtra(Constant.LAST_QUERY);
@@ -261,7 +261,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
             }
         });
 
-        fragmentTransaction.add(R.id.search_container, listFragment);
+        fragmentTransaction.add(R.id.container_search, listFragment);
         fragmentTransaction.commit();
     }
 }

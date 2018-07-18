@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface CategoryMVP {
     }
 
     public interface ModelOps {
-        void categoryRequest(final Category category);
+        void categoryRequest(final Category category) throws ConnectionException, DatabaseException;
     }
 
     public interface ReqPresenterOps {

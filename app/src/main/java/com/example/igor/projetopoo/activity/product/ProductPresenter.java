@@ -14,6 +14,8 @@ import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
@@ -25,13 +27,14 @@ import java.util.Date;
 import java.util.List;
 
 public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.ReqPresenterOps {
-
+    private ProductActivity activity;
     private ProductMVP.ReqViewOps reqViewOps;
     private ProductMVP.ModelOps modelOps;
 
-    public ProductPresenter(ProductMVP.ReqViewOps reqViewOps, Database database) {
-        this.reqViewOps = reqViewOps;
-        this.modelOps = new ProductModel(this, database);
+    public ProductPresenter(ProductActivity activity, Database database) {
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new ProductModel(activity, this, database);
     }
 
     @Override
@@ -45,7 +48,13 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.feedbackListRequest(productName);
+                try {
+                    modelOps.feedbackListRequest(productName);
+                } catch (ConnectionException e) {
+                    e.connectionFail(ProductPresenter.this, productName);
+                } catch (DatabaseException e) {
+                    e.failReadData();
+                }
 
                 return null;
             }
@@ -114,7 +123,11 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.insertFeedback(feedback);
+                try {
+                    modelOps.insertFeedback(feedback);
+                } catch (DatabaseException e) {
+                    e.failWriteData();
+                }
 
                 return null;
             }
@@ -137,7 +150,11 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.deleteFeedback();
+                try {
+                    modelOps.deleteFeedback();
+                } catch (DatabaseException e) {
+                    e.failRemoveData();
+                }
                 return null;
             }
 

@@ -285,7 +285,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         newFragment.setExitTransition(fade);
 
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.timeline_container, newFragment);
+        transaction.replace(R.id.container_product, newFragment);
         transaction.commit();
     }
 

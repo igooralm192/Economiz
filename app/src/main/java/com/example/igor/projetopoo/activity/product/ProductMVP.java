@@ -7,10 +7,12 @@ import android.util.Pair;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 
 import java.util.List;
 
-public class ProductMVP {
+public interface ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
         void getFeedbacks(String productName);
@@ -20,9 +22,9 @@ public class ProductMVP {
 
     public interface ModelOps {
         // Model methods => Presenter acess
-        void feedbackListRequest(String productName);
-        void insertFeedback(Feedback feedback);
-        void deleteFeedback();
+        void feedbackListRequest(String productName) throws ConnectionException, DatabaseException;
+        void insertFeedback(Feedback feedback) throws DatabaseException;
+        void deleteFeedback() throws DatabaseException;
     }
 
     public interface ReqPresenterOps {

@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPresenterOps {
-    private Context context;
+    private SearchActivity activity;
     private SearchMVP.ReqViewOps reqViewOps;
     private SearchMVP.ModelOps modelOps;
 
-    public SearchPresenter(SearchMVP.ReqViewOps reqViewOps, Context context, Database database){
-        this.reqViewOps = reqViewOps;
-        this.context = context;
-        this.modelOps = new SearchModel(this, context, database);
+    public SearchPresenter(SearchActivity activity, Database database){
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new SearchModel(activity, this, database);
 
     }
 
@@ -56,7 +56,7 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
 
                     modelOps.resultListRequest(lowerbound, upperbound);
                 } catch (ConnectionException e) {
-                    e.connectionFail(SearchPresenter.this);
+                    e.connectionFail(SearchPresenter.this, query);
                 } catch (DatabaseException e) {
                     e.failReadData();
                 }

@@ -44,7 +44,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:mt_hint="Pesquise aqui"
+        app:mt_hint="Pesquise aí vá..."
         app:mt_placeholder="Pesquise aqui"
         app:mt_textCursorTint="@android:color/transparent" />
 

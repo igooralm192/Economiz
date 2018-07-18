@@ -129,6 +129,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_scrollFlags="enterAlwaysCollapsed"
+            app:mt_hint="Pesquise aí vá..."
             app:mt_navIconEnabled="false">
 
         </com.mancj.materialsearchbar.MaterialSearchBar>

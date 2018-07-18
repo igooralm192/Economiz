@@ -49,7 +49,8 @@
         app:layout_constraintEnd_toEndOf="@+id/app_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:mt_hint="Pesquise aí vá.."
         app:mt_navIconEnabled="false"
-        app:mt_placeholder="BaratinhoVéi" />
+        app:mt_placeholder="Economiz" />
 
 </android.support.constraint.ConstraintLayout>

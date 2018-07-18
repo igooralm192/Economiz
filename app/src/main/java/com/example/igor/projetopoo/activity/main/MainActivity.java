@@ -83,7 +83,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_main));
 
         appBar = (RelativeLayout) findViewById(R.id.app_bar);
-        presenterOps = new MainPresenter(this, this, getDatabase());
+        presenterOps = new MainPresenter(this, getDatabase());
     }
 
     @Override
@@ -263,7 +263,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         newFragment.setExitTransition(fade);
 
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.constraint_layout_main, newFragment);
+        transaction.replace(R.id.container_main, newFragment);
         transaction.commit();
     }
 

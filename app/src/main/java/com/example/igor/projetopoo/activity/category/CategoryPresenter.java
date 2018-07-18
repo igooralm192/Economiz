@@ -9,6 +9,8 @@ import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
@@ -16,12 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.ReqPresenterOps {
+    private CategoryActivity activity;
     private CategoryMVP.ReqViewOps reqViewOps;
     private CategoryMVP.ModelOps modelOps;
 
-    public CategoryPresenter(CategoryMVP.ReqViewOps reqViewOps, Database database) {
-        this.reqViewOps = reqViewOps;
-        this.modelOps = new CategoryModel(this, database);
+    public CategoryPresenter(CategoryActivity activity, Database database) {
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new CategoryModel(activity, this, database);
     }
 
     @Override
@@ -35,7 +39,13 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.categoryRequest(category);
+                try {
+                    modelOps.categoryRequest(category);
+                } catch (ConnectionException e) {
+                    e.connectionFail(CategoryPresenter.this, category);
+                } catch (DatabaseException e) {
+                    e.failReadData();
+                }
 
                 return null;
             }
