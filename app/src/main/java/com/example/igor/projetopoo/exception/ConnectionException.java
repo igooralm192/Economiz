@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.Image;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryMVP;
@@ -69,7 +71,12 @@ public class ConnectionException extends Exception {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                layout.addView(view, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                NestedScrollView scrollView = null;
+                if (object instanceof ProductPresenter) {
+                    scrollView = new NestedScrollView(activity);
+                    scrollView.addView(view);
+                    layout.addView(scrollView, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                } else layout.addView(view, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
             }
         });
 

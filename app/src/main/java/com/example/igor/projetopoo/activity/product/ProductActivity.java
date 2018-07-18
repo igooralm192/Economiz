@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentManager;
@@ -294,18 +295,19 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 CardView card = findViewById(R.id.info_product);
+                ConstraintLayout layout = findViewById(R.id.layout_info_product);
 
-                toolbarName.setAlpha((float)(-verticalOffset/400.0));
-                toolbarPrice.setAlpha((float)(-verticalOffset/400.0));
-                card.setAlpha((float)(1+(verticalOffset/400.0)));
+                int offset = appbar.getTotalScrollRange();
 
-                if(card.getAlpha()==0)card.setVisibility(View.GONE);
-                else card.setVisibility(View.VISIBLE);
+                toolbarName.setAlpha((float)(-verticalOffset / (float) offset));
+                toolbarPrice.setAlpha((float)(-verticalOffset/(float) offset));
+                card.setAlpha((float)(1+(verticalOffset/(float)offset)));
 
                 card.setTranslationY(verticalOffset);
 
                 CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getSwipeRefreshLayout().getLayoutParams();
-                lp.setMargins(0, 190 + verticalOffset*220/400, 0,0);
+                double top = Math.floor((card.getTop() + layout.getBottom() - appbar.getBottom()) * (1 + verticalOffset/(float)offset) );
+                lp.setMargins(0, (int) top, 0,0);
                 getSwipeRefreshLayout().setLayoutParams(lp);
             }
         });

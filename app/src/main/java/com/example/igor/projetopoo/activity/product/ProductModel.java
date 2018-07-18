@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.support.constraint.ConstraintLayout;
+import android.widget.ScrollView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -45,7 +46,11 @@ public class ProductModel implements ProductMVP.ModelOps {
             }
         });
 
-        if (!ParentActivity.checkConnection(activity)) throw new ConnectionException(activity, layout);
+        if (!ParentActivity.checkConnection(activity)) {
+
+
+            throw new ConnectionException(activity, layout);
+        }
 
         List<Object> objects = new ArrayList<>();
 
