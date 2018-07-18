@@ -32,6 +32,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
@@ -57,7 +58,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -314,7 +318,41 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     }
 
     public void createFeedback(View v){
-        presenterOps.addFeedback(dialog, currentProduct.getName(), currentProduct.getPriceRange());
+        EditText location = dialog.findViewById(R.id.location_edit_text);
+        EditText price = dialog.findViewById(R.id.price_edit_text);
+        String prc = price.getText().toString();
+        String loc = location.getText().toString();
+        Pair<Number, Number> range = currentProduct.getPriceRange();
+
+        location.setError(null);
+        price.setError(null);
+
+        if ("".equals(loc)) {
+            loc = "Localização não informada";
+        }
+
+        if ("".equals(prc)) {
+            price.setError("Este campo é obrigatório");
+            return;
+        }
+        if(Double.parseDouble(prc) > range.second.doubleValue()){
+            String s = "R$ "+ String.format("%.2f", range.second);
+            s = s.replace('.',',');
+            price.setError("O valor deve ser menor que " + s);
+            return;
+        }else if(Double.parseDouble(prc) < range.first.doubleValue()){
+            String s = "R$ "+ String.format("%.2f", range.first);
+            s = s.replace('.',',');
+            price.setError("O valor deve ser maior que "+ s);
+            return;
+        }
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        String str = format.format(date);
+
+        Feedback feedback = new Feedback(currentProduct.getName(), loc, str, Double.parseDouble(prc));
+        presenterOps.addFeedback(dialog, feedback);
     }
 
     public void showDialog(View v){

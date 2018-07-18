@@ -80,39 +80,8 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     }
 
     @Override
-    public void addFeedback(Dialog dialog, final String name, Pair<Number,Number> range) {
-        EditText location = dialog.findViewById(R.id.location_edit_text);
-        EditText price = dialog.findViewById(R.id.price_edit_text);
-        String prc = price.getText().toString();
-        String loc = location.getText().toString();
+    public void addFeedback(final Dialog dialog, final Feedback feedback) {
 
-        location.setError(null);
-        price.setError(null);
-
-        if ("".equals(loc)) {
-            loc = "Localização não informada";
-        }
-
-        if ("".equals(prc)) {
-            price.setError("Este campo é obrigatório");
-            return;
-        }
-        if(Double.parseDouble(prc) > range.second.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.second);
-            s = s.replace('.',',');
-            price.setError("O valor deve ser menor que " + s);
-            return;
-        }else if(Double.parseDouble(prc) < range.first.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.first);
-            s = s.replace('.',',');
-            price.setError("O valor deve ser maior que "+ s);
-            return;
-        }
-
-        Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String str = format.format(date);
-        final Feedback feedback = new Feedback(name, loc, str, Double.parseDouble(prc));
         dialog.dismiss();
 
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
@@ -125,6 +94,8 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             public Object doInBackground(Object... objects) {
                 try {
                     modelOps.insertFeedback(feedback);
+                } catch (ConnectionException e) {
+                    e.connectionFail(ProductPresenter.this, feedback, dialog);
                 } catch (DatabaseException e) {
                     e.failWriteData();
                 }
@@ -134,9 +105,10 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-                ProductPresenter.this.getFeedbacks(name);
+                ProductPresenter.this.getFeedbacks(feedback.getProduct());
             }
         });
+
         asyncDownload.execute();
     }
 
@@ -150,12 +122,17 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
+
                 try {
                     modelOps.deleteFeedback();
+                } catch (ConnectionException e) {
+                    e.connectionFail(ProductPresenter.this, null);
                 } catch (DatabaseException e) {
                     e.failRemoveData();
                 }
+
                 return null;
+
             }
 
             @Override

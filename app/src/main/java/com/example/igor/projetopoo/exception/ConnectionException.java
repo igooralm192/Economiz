@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.exception;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.media.Image;
 import android.support.constraint.ConstraintLayout;
@@ -22,6 +23,7 @@ import com.example.igor.projetopoo.activity.product.ProductPresenter;
 import com.example.igor.projetopoo.activity.search.SearchMVP;
 import com.example.igor.projetopoo.activity.search.SearchPresenter;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Feedback;
 
 public class ConnectionException extends Exception {
     private Context context;
@@ -34,7 +36,7 @@ public class ConnectionException extends Exception {
         this.layout = layout;
     }
 
-    public void connectionFail(final Object presenter, final Object object) {
+    public void connectionFail(final Object presenter, final Object ... object) {
         final View view = LayoutInflater.from(context).inflate(R.layout.connection_fail, layout, false);
 
         Button button = view.findViewById(R.id.try_again_connection);
@@ -51,19 +53,22 @@ public class ConnectionException extends Exception {
                 if (presenter instanceof CategoryPresenter) {
                     CategoryMVP.PresenterOps presenterOps = (CategoryMVP.PresenterOps) presenter;
 
-                    presenterOps.getCategory((Category) object);
+                    presenterOps.getCategory((Category) object[0]);
                 }
 
                 if (presenter instanceof ProductPresenter) {
                     ProductMVP.PresenterOps presenterOps = (ProductMVP.PresenterOps) presenter;
 
-                    presenterOps.getFeedbacks((String) object);
+                    if (object[0] instanceof String)
+                        presenterOps.getFeedbacks((String) object[0]);
+                    else if (object[0] instanceof Feedback)
+                        presenterOps.addFeedback((Dialog) object[1], (Feedback) object[0]);
                 }
 
                 if (presenter instanceof SearchPresenter) {
                     SearchMVP.PresenterOps presenterOps = (SearchMVP.PresenterOps) presenter;
 
-                    presenterOps.getResultList((String) object);
+                    presenterOps.getResultList((String) object[0]);
                 }
             }
         });
@@ -71,12 +76,7 @@ public class ConnectionException extends Exception {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                NestedScrollView scrollView = null;
-                if (object instanceof ProductPresenter) {
-                    scrollView = new NestedScrollView(activity);
-                    scrollView.addView(view);
-                    layout.addView(scrollView, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
-                } else layout.addView(view, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                layout.addView(view, ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
             }
         });
 

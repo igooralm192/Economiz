@@ -16,15 +16,15 @@ public interface ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View acess
         void getFeedbacks(String productName);
-        void addFeedback(Dialog dialog, String name, Pair<Number,Number> range);
+        void addFeedback(Dialog dialog, Feedback feedback);
         void removeFeedback();
     }
 
     public interface ModelOps {
         // Model methods => Presenter acess
         void feedbackListRequest(String productName) throws ConnectionException, DatabaseException;
-        void insertFeedback(Feedback feedback) throws DatabaseException;
-        void deleteFeedback() throws DatabaseException;
+        void insertFeedback(Feedback feedback) throws ConnectionException, DatabaseException;
+        void deleteFeedback() throws ConnectionException, DatabaseException;
     }
 
     public interface ReqPresenterOps {
