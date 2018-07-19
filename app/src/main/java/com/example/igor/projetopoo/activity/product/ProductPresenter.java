@@ -126,7 +126,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
                 try {
                     modelOps.deleteFeedback();
                 } catch (ConnectionException e) {
-                    e.connectionFail(ProductPresenter.this, null);
+                    e.connectionFail(ProductPresenter.this);
                 } catch (DatabaseException e) {
                     e.failRemoveData();
                 }

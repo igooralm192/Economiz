@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Entitie;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
@@ -20,12 +21,11 @@ public interface CategoryMVP {
     }
 
     public interface ReqPresenterOps {
-        void onReturnedCategory(String type, List<Object> objects);
+        void onReturnedCategory(List<Object> objects);
     }
 
     public interface ReqViewOps {
-        void showSubcategories(List<Category> subcategories);
-        void showProducts(List<Product> products);
+        void showSubitems(List<Entitie> subitems);
         void showProgressBar(Boolean enabled);
     }
 }

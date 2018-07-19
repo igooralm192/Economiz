@@ -1,5 +1,6 @@
 package com.example.igor.projetopoo.entities;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Product implements Serializable {
+public class Product extends Entitie implements Serializable {
     private String name;
     private String parentCategory;
     private Number averagePrice;
@@ -27,8 +28,7 @@ public class Product implements Serializable {
     private Pair<Number, Number> priceRange;
 
     public Product(String name, String parentCategory, Number averagePrice, List<String> feedbacks, Pair<Number, Number> priceRange) {
-        this.name = name;
-        this.parentCategory = parentCategory;
+        super(name, parentCategory);
         this.averagePrice = averagePrice;
         this.feedbacks = feedbacks;
         this.priceRange = priceRange;
@@ -45,14 +45,6 @@ public class Product implements Serializable {
 
         this.priceRange = new Pair<>(min, max);
     }
-
-    public String getName() { return name; }
-
-    public void setName(String name) { this.name = name; }
-
-    public String getParentCategory() { return parentCategory; }
-
-    public void setParentCategory(String parentCategory) { this.parentCategory = parentCategory; }
 
     public Number getAveragePrice() { return averagePrice; }
 
@@ -115,31 +107,5 @@ public class Product implements Serializable {
         }
     }
 
-    public static class Holder extends RecyclerView.ViewHolder {
-        public TextView name;
-        public TextView averagePrice;
-        public Product product;
 
-        public Holder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
-            super(view);
-
-            name = view.findViewById(R.id.name_product);
-            averagePrice = view.findViewById(R.id.price_product);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onProductClick( Holder.this.getProduct() );
-                }
-            });
-        }
-
-        public Product getProduct() {
-            return product;
-        }
-
-        public void setProduct(Product product) {
-            this.product = product;
-        }
-    }
 }

@@ -32,10 +32,12 @@ import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
+import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
+import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.Blur;
 import com.example.igor.projetopoo.helper.Constant;
 import com.mancj.materialsearchbar.MaterialSearchBar;
@@ -74,7 +76,10 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             }
         });
 
-
+        Log.i("TAG", ""+R.drawable.food);
+        Log.i("TAG", ""+R.drawable.drinks);
+        Log.i("TAG", ""+R.drawable.farmacia);
+        Log.i("TAG", ""+R.drawable.cleaning2);
     }
 
     @Override
@@ -106,9 +111,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                         Category category = items.get(position);
                         holder.setCategory(category);
                         holder.name.setText(category.getName());
-                        holder.background.setImageResource(category.getBackground());
-
-                        Blur.blurImage(holder.background, 5, getContext());
+                        holder.background.setImageResource(category.getBackgroundCategory().intValue());
                     }
                 });
 
