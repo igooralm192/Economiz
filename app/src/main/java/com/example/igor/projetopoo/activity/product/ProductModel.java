@@ -1,7 +1,10 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.widget.ScrollView;
+import android.widget.Toolbar;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -20,6 +23,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.example.igor.projetopoo.entities.Category;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,12 +51,13 @@ public class ProductModel implements ProductMVP.ModelOps {
             }
         });
 
+        AppBarLayout tab = activity.findViewById(R.id.appbar);
         if (!ParentActivity.checkConnection(activity)) {
 
-
+            tab.setExpanded(false);
             throw new ConnectionException(activity, layout);
         }
-
+        tab.setExpanded(true);
         List<Object> objects = new ArrayList<>();
 
         FirebaseFirestore firestore = database.getFirestore();

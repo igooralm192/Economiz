@@ -150,9 +150,9 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     }
 
     @Override
-    public void showFeedbacks(List<Feedback> list) {
+    public void showFeedbacks(List<Feedback> list, Double averagePrice) {
         final Context context = this;
-
+        currentProduct.setAveragePrice(averagePrice);
         final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
                 this,
                 list,
@@ -326,5 +326,15 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         dialog.dismiss();
     }
 
+    public void updateProductData(String name, Number newPrice){
+        if (currentProduct != null) {
+            String price = String.format("R$ %.2f", newPrice.doubleValue()).replace('.', ',');
 
+            toolbarName.setText(name);
+            toolbarPrice.setText(price);
+            infoName.setText(name);
+            infoPrice.setText(price);
+        }
+
+    }
 }

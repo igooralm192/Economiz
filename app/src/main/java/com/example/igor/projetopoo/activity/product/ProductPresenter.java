@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -75,8 +76,21 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
         for (Object object: objects) {
             feedbacks.add((Feedback) object);
         }
+        Double sum = 0.0;
+        for (Feedback a:feedbacks
+             ) {
+            sum += a.getPrice().doubleValue();
+        }
+        sum/=feedbacks.size();
 
-        reqViewOps.showFeedbacks(feedbacks);
+        Collections.sort(feedbacks, new Comparator<Feedback>() {
+            @Override
+            public int compare(Feedback f1, Feedback f2) {
+                return f2.getDate().compareTo(f1.getDate());
+            }
+        });
+
+        reqViewOps.showFeedbacks(feedbacks,sum);
     }
 
     @Override

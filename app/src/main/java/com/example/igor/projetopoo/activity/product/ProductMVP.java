@@ -36,7 +36,7 @@ public interface ProductMVP {
 
     public interface ReqViewOps {
         //View methods => Presenter access
-        void showFeedbacks(List<Feedback> list);
+        void showFeedbacks(List<Feedback> list,Double averagePrice);
         void showSnackbar(int op);
         void showProgressBar(Boolean enabled);
     }
