@@ -87,6 +87,15 @@ public abstract class ParentActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        recentQueries = loadRecentQueries();
+        recentQueriesClone = new ArrayList<>(recentQueries);
+        searchBar.setLastSuggestions(recentQueries);
+    }
+
+    @Override
     public void onSearchStateChanged(boolean enabled) {
 
     }
@@ -97,13 +106,26 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
         if (newText.length() != 0) {
             Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
+            if (recentQueriesClone.size() > 0) {
+                if (!recentQueriesClone.get(0).equals(item)) {
+                    if (getRecentQueries().contains(item)) {
+                        int index = getRecentQueries().indexOf(item);
+                        while (index != -1) {
+                            getRecentQueries().remove(index);
+                            index = getRecentQueries().indexOf(item);
+                        }
+                    }
 
-            if (!recentQueriesClone.contains(item)) {
-                if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
+                    if (recentQueriesClone.size() == 2) recentQueriesClone.remove(1);
 
+                    recentQueriesClone.add(0, item);
+                    recentQueries.add(item);
+                }
+            } else {
                 recentQueriesClone.add(0, item);
                 recentQueries.add(item);
             }
+
 
             searchBar.setLastSuggestions(recentQueriesClone);
 

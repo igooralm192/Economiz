@@ -110,12 +110,13 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         List<Result> resultList = new ArrayList<>();
 
         for(Category category: categoryList){
-            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName());
+            Log.i("TAG", category.getName());
+            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName(), category);
             resultList.add(result);
         }
 
         for(Product product: productList){
-            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice());
+            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice(), product);
             resultList.add(result);
         }
 
@@ -154,13 +155,26 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
 
         if (newText.length() != 0) {
             Item item = new Item(R.drawable.ic_history_black_24dp, newText, "recent", null);
+            if (getRecentQueriesClone().size() > 0) {
+                if (!getRecentQueriesClone().get(0).equals(item)) {
+                    if (getRecentQueries().contains(item)) {
+                        int index = getRecentQueries().indexOf(item);
+                        while (index != -1) {
+                            getRecentQueries().remove(index);
+                            index = getRecentQueries().indexOf(item);
+                        }
+                    }
 
-            if (!getRecentQueriesClone().contains(item)) {
-                if (getRecentQueriesClone().size() == 2) getRecentQueriesClone().remove(1);
+                    if (getRecentQueriesClone().size() == 2) getRecentQueriesClone().remove(1);
 
+                    getRecentQueriesClone().add(0, item);
+                    getRecentQueries().add(item);
+                }
+            } else {
                 getRecentQueriesClone().add(0, item);
                 getRecentQueries().add(item);
             }
+
 
             getSearchBar().setLastSuggestions(getRecentQueriesClone());
 
@@ -191,16 +205,14 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
 
             if (indItem != -1) {
                 if (type.equals("category")) {
-
                     List list = getSearchBar().getLastSuggestions();
                     Item categoryItem = (Item) list.get(indItem);
-                    this.onCategoryClick((Category) categoryItem.getObject());
+                    super.onCategoryClick((Category) categoryItem.getObject());
 
                 } else if (type.equals("product")) {
-
                     List list = getSearchBar().getLastSuggestions();
                     Item productItem = (Item) list.get(indItem);
-                    this.onProductClick((Product) productItem.getObject());
+                    super.onProductClick((Product) productItem.getObject());
 
                 } else {
                     lastQuery = query.getText().toString();
@@ -216,6 +228,8 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
                         getSearchBar().disableSearch();
                     }
                 }, 300);
+
+                break;
             }
         }
     }
@@ -229,12 +243,25 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
             @Override
             public Result.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(context).inflate(R.layout.item_list_result, parent, false);
+
                 return new Result.Holder(view);
             }
 
             @Override
-            public void onBindViewHolder(List<Result> items, @NonNull Result.Holder holder, int position) {
-                Result result = items.get(position);
+            public void onBindViewHolder(List<Result> items, @NonNull final Result.Holder holder, int position) {
+                final Result result = items.get(position);
+                final Double price = result.getPrice().doubleValue();
+
+                holder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (price == -1)
+                            SearchActivity.this.onCategoryClick((Category) result.getObject());
+                        else
+                            SearchActivity.this.onProductClick((Product) result.getObject());
+                    }
+                });
+
                 holder.iconResult.setImageResource(result.getIcon());
                 holder.nameResult.setText(result.getName());
                 if (result.getPrice().doubleValue() != -1)
