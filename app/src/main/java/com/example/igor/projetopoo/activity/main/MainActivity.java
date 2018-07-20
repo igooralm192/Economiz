@@ -76,10 +76,6 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             }
         });
 
-        Log.i("TAG", ""+R.drawable.food);
-        Log.i("TAG", ""+R.drawable.drinks);
-        Log.i("TAG", ""+R.drawable.farmacia);
-        Log.i("TAG", ""+R.drawable.cleaning2);
     }
 
     @Override

@@ -186,7 +186,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
                         product.getName(),
                         "product",
                         product,
-                        String.format("R$ %.2f", product.getAveragePrice())
+                        String.format("R$ %.2f", product.getAveragePrice()).replace('.', ',')
                 );
 
                 newSuggestions.add(item);

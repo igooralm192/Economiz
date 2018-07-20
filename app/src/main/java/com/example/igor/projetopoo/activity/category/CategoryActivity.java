@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -116,10 +117,10 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
             toolbar.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    getSupportActionBar().setTitle( categoryLinks.get(currentCategory).getName() );
+                    getSupportActionBar().setTitle( getSupportActionBar().getSubtitle() );
                     currentCategory = categoryLinks.get(currentCategory);
                     if (categoryLinks.get(currentCategory) == null) toolbar.setSubtitle("");
-                    else toolbar.setSubtitle(currentCategory.getName());
+                    else toolbar.setSubtitle(categoryLinks.get(currentCategory).getName());
                 }
             }, 500);
 
@@ -233,6 +234,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     @Override
     public void onCategoryClick(Category category) {
+        Log.i("TAG", category.getName());
+        Log.i("TAG", currentCategory.getName());
         categoryLinks.put(category, currentCategory);
         currentCategory = category;
 
