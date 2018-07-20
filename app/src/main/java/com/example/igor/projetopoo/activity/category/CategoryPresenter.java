@@ -64,18 +64,27 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
     @Override
     public void onReturnedCategory(List<Object> objects) {
-        List<Entitie> subitems = new ArrayList<>();
+        List<Entitie> subcategories = new ArrayList<>();
+        List<Entitie> products = new ArrayList<>();
 
         for (Object object: objects) {
             if (object instanceof Product)
-                subitems.add((Product) object);
+                products.add((Product) object);
 
         }
+
+        Collections.sort(products);
 
         for (Object object: objects) {
             if (object instanceof Category)
-                subitems.add((Category) object);
+                subcategories.add((Category) object);
         }
+
+        Collections.sort(subcategories);
+
+        List<Entitie> subitems = new ArrayList<>();
+        subitems.addAll(products);
+        subitems.addAll(subcategories);
 
         reqViewOps.showSubitems(subitems);
 

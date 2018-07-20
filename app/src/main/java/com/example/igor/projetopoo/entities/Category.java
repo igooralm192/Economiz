@@ -15,23 +15,12 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class Category extends Entitie implements Serializable {
-    private Number backgroundCategory;
-
     public Category(String name, String parentCategory, Number backgroundCategory) {
-        super(name, parentCategory);
-        this.backgroundCategory = backgroundCategory;
+        super(name, parentCategory, backgroundCategory);
     }
 
     public Category(Map<String, Object> map) {
         this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"));
-    }
-
-    public Number getBackgroundCategory() {
-        return backgroundCategory;
-    }
-
-    public void setBackgroundCategory(Number backgroundCategory) {
-        this.backgroundCategory = backgroundCategory;
     }
 
     public JSONObject toJSON() {

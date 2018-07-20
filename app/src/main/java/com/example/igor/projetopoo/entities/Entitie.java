@@ -8,13 +8,17 @@ import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 
-public abstract class Entitie implements Comparable<Entitie> {
+import java.io.Serializable;
+
+public abstract class Entitie implements Comparable<Entitie>, Serializable {
     private String name;
     private String parentCategory;
+    private Number backgroundCategory;
 
-    public Entitie(String name, String parentCategory) {
+    public Entitie(String name, String parentCategory, Number backgroundCategory) {
         this.name = name;
         this.parentCategory = parentCategory;
+        this.backgroundCategory = backgroundCategory;
     }
 
     public String getName() {
@@ -31,6 +35,14 @@ public abstract class Entitie implements Comparable<Entitie> {
 
     public void setParentCategory(String parentCategory) {
         this.parentCategory = parentCategory;
+    }
+
+    public Number getBackgroundCategory() {
+        return backgroundCategory;
+    }
+
+    public void setBackgroundCategory(Number backgroundCategory) {
+        this.backgroundCategory = backgroundCategory;
     }
 
     @Override

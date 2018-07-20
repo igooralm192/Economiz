@@ -21,22 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 public class Product extends Entitie implements Serializable {
-    private String name;
-    private String parentCategory;
     private Number averagePrice;
-    private List<String> feedbacks;
     private Pair<Number, Number> priceRange;
 
-    public Product(String name, String parentCategory, Number averagePrice, List<String> feedbacks, Pair<Number, Number> priceRange) {
-        super(name, parentCategory);
+    public Product(String name, String parentCategory, Number backgroundCategory, Number averagePrice, Pair<Number, Number> priceRange) {
+        super(name, parentCategory, backgroundCategory);
         this.averagePrice = averagePrice;
-        this.feedbacks = feedbacks;
         this.priceRange = priceRange;
     }
 
     public Product(Map<String, Object> map) {
-        this((String) map.get("name"), (String) map.get("parent_category"), (Double) map.get("average_price"), null, null);
-        this.feedbacks = (List<String>) map.get("feedbacks");
+
+        this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"), (Number) map.get("average_price"), null);
 
         Map<String, Object> range = (Map<String, Object>) map.get("price_range");
 
@@ -44,19 +40,25 @@ public class Product extends Entitie implements Serializable {
         Number max = (Number) range.get("maximum_price");
 
         this.priceRange = new Pair<>(min, max);
+        Log.i("TAG", this.priceRange.toString());
     }
 
     public Number getAveragePrice() { return averagePrice; }
 
     public void setAveragePrice(Number averagePrice) { this.averagePrice = averagePrice; }
 
-    public List<String> getFeedbacks() { return feedbacks; }
-
-    public void setFeedbacks(List<String> feedbacks) { this.feedbacks = feedbacks; }
-
     public Pair<Number, Number> getPriceRange() { return priceRange; }
 
     public void setPriceRange(Pair<Number, Number> priceRange) { this.priceRange = priceRange; }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Product) {
+            Product product = (Product) obj;
+
+            return this.getName().equals(product.getName()) && this.getParentCategory().equals(product.getParentCategory());
+        } else return super.equals(obj);
+    }
 
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
@@ -64,11 +66,8 @@ public class Product extends Entitie implements Serializable {
         try {
             object.put("name", this.getName());
             object.put("parent_category", this.getParentCategory());
-            object.put("average_price", this.getAveragePrice());
-
-            JSONArray array = new JSONArray();
-            for (String feedback: feedbacks) array.put(feedback);
-            object.put("feedbacks", array);
+            object.put("background_category", this.getBackgroundCategory().doubleValue());
+            object.put("average_price", this.getAveragePrice().doubleValue());
 
             JSONObject range = new JSONObject();
             range.put("minimum_range", this.getPriceRange().first.doubleValue());
@@ -85,20 +84,14 @@ public class Product extends Entitie implements Serializable {
         try {
             JSONObject object = new JSONObject(json);
 
-            JSONArray array = object.getJSONArray("feedbacks");
-            List<String> feedbacks = new ArrayList<>();
-
-            for (int i=0; i<array.length(); i++)
-                feedbacks.add((String) array.get(i));
-
             JSONObject range = object.getJSONObject("price_range");
             Pair<Number, Number> priceRange = new Pair<>( (Number) range.getDouble("minimum_range"), (Number) range.getDouble("maximum_range") );
 
             return new Product(
                     (String) object.get("name"),
                     (String) object.get("parent_category"),
+                    (Number) object.get("background_category"),
                     (Number) object.get("average_price"),
-                    feedbacks,
                     priceRange
             );
         } catch (JSONException e) {

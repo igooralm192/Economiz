@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
@@ -74,6 +75,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     private TextView toolbarPrice;
     private TextView infoName;
     private TextView infoPrice;
+    private ImageView backgroundProduct;
 
     private ProductMVP.PresenterOps presenterOps;
     private Product currentProduct;
@@ -115,18 +117,16 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         toolbarPrice = findViewById(R.id.toolbar_price);
         infoName = findViewById(R.id.name_info_product);
         infoPrice = findViewById(R.id.price_info_product);
-
+        backgroundProduct = findViewById(R.id.background_product);
 
         Intent intent = getIntent();
         currentProduct = Product.toObject( intent.getStringExtra(Constant.SELECTED_PRODUCT) );
-        if (currentProduct != null) {
-            String name = currentProduct.getName();
-            String price = String.format("R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
 
-            toolbarName.setText(name);
-            toolbarPrice.setText(price);
-            infoName.setText(name);
-            infoPrice.setText(price);
+        if (currentProduct != null) {
+
+            updateProductData(currentProduct);
+
+            backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
         }
 
         appbar = findViewById(R.id.appbar);
@@ -156,7 +156,13 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     @Override
     public void showFeedbacks(List<Feedback> list, Double averagePrice) {
         final Context context = this;
+
         currentProduct.setAveragePrice(averagePrice);
+        updateProductData(currentProduct);
+
+        int indexProduct = getProductsSuggestions().indexOf(currentProduct);
+        getProductsSuggestions().set(indexProduct, currentProduct);
+
         final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
                 this,
                 list,
@@ -364,15 +370,19 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         dialog.dismiss();
     }
 
-    public void updateProductData(String name, Number newPrice){
-        if (currentProduct != null) {
-            String price = String.format("R$ %.2f", newPrice.doubleValue()).replace('.', ',');
+    public void updateProductData(Product currentProduct){
+        final String name = currentProduct.getName();
+        final String price = String.format("R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
 
-            toolbarName.setText(name);
-            toolbarPrice.setText(price);
-            infoName.setText(name);
-            infoPrice.setText(price);
-        }
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toolbarName.setText(name);
+                toolbarPrice.setText(price);
+                infoName.setText(name);
+                infoPrice.setText(price);
+            }
+        });
 
     }
 }

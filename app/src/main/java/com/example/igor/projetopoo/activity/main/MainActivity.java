@@ -146,8 +146,10 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
             suggestions.put(Constant.Entities.CATEGORIES, arrCategories);
 
-            for (Product product: products)
+            for (Product product: products) {
+                Log.i("TAG", product.getPriceRange().toString());
                 arrProducts.put(product.toJSON().toString());
+            }
 
 
             suggestions.put(Constant.Entities.PRODUCTS, arrProducts);

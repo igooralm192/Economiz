@@ -10,10 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title=" " />
 
     <TextView

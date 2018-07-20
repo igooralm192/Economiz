@@ -74,8 +74,9 @@ public abstract class DatabaseHelper {
 
                 map.put("name", product.getName());
                 map.put("parent_category", product.getParentCategory());
+                map.put("background_category", product.getBackgroundCategory());
                 map.put("average_price", product.getAveragePrice());
-                map.put("feedbacks", product.getFeedbacks());
+
 
                 Map<String, Object> range = new HashMap<>();
                 range.put("minimum_price", product.getPriceRange().first);
