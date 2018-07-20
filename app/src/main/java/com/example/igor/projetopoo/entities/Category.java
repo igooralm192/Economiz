@@ -14,51 +14,24 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.Map;
 
-public class Category implements Comparable<Category>, Serializable {
-    private String name;
-    private String parentCategory;
-    private Boolean haveSubcategories;
-    private int backCategory;
+public class Category extends Entitie implements Serializable {
+    private Number backgroundCategory;
 
-    public Category(String name, String parentCategory, Boolean haveSubcategories) {
-        this.name = name;
-        this.parentCategory = parentCategory;
-        this.haveSubcategories = haveSubcategories;
-    }
-
-    public Category(String nameCategory, int backCategory) {
-        this.name = nameCategory;
-        this.backCategory = backCategory;
+    public Category(String name, String parentCategory, Number backgroundCategory) {
+        super(name, parentCategory);
+        this.backgroundCategory = backgroundCategory;
     }
 
     public Category(Map<String, Object> map) {
-        this((String) map.get("name"), (String) map.get("parent_category"), (Boolean) map.get("have_subcategories"));
+        this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"));
     }
 
-    public String getName() {
-        return name;
+    public Number getBackgroundCategory() {
+        return backgroundCategory;
     }
 
-    public int getBackground() {
-        return backCategory;
-    }
-
-    public void setBackground(int backCategory) {
-        this.backCategory = backCategory;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getParentCategory() { return parentCategory; }
-
-    public void setParentCategory(String parentCategory) { this.parentCategory = parentCategory; }
-
-    public Boolean getHaveSubcategories() { return haveSubcategories; }
-
-    public void setHaveSubcategories(Boolean haveSubcategories) {
-        this.haveSubcategories = haveSubcategories;
+    public void setBackgroundCategory(Number backgroundCategory) {
+        this.backgroundCategory = backgroundCategory;
     }
 
     public JSONObject toJSON() {
@@ -66,8 +39,7 @@ public class Category implements Comparable<Category>, Serializable {
         try {
             object.put("name", this.getName());
             object.put("parent_category", this.getParentCategory());
-            object.put("have_subcategories", this.getHaveSubcategories());
-
+            object.put("background_category", this.getBackgroundCategory());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -82,16 +54,12 @@ public class Category implements Comparable<Category>, Serializable {
             return new Category(
                     (String) object.get("name"),
                     (String) object.get("parent_category"),
-                    (Boolean) object.get("have_subcategories")
+                    (Integer) object.get("background_category")
             );
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public int compareTo(Category other) {
-        return this.name.compareTo(other.name);
     }
 
     public static class MainHolder extends RecyclerView.ViewHolder {
@@ -122,29 +90,4 @@ public class Category implements Comparable<Category>, Serializable {
         }
     }
 
-    public static class CategoryHolder extends RecyclerView.ViewHolder {
-        public TextView name;
-        public Category category;
-
-        public CategoryHolder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
-            super(view);
-
-            name = view.findViewById(R.id.name_category);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onCategoryClick( CategoryHolder.this.getCategory() );
-                }
-            });
-        }
-
-        public Category getCategory() {
-            return category;
-        }
-
-        public void setCategory(Category category) {
-            this.category = category;
-        }
-    }
 }

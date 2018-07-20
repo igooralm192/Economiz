@@ -46,33 +46,40 @@ public class CategoryModel implements CategoryMVP.ModelOps {
         if (!ParentActivity.checkConnection(activity)) throw new ConnectionException(activity, layout);
 
         List<Object> objects = new ArrayList<>();
+        List<QuerySnapshot> querySnapshotList = new ArrayList<>();
 
         FirebaseFirestore firestore = database.getFirestore();
         CollectionReference collectionReference;
 
-        if (category.getHaveSubcategories()) collectionReference = firestore.collection("categories");
-        else collectionReference = firestore.collection("products");
+        Query categoryQuery = firestore.collection("categories").whereEqualTo("parent_category", category.getName());
+        Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
+        if (!categoryTask.isSuccessful()) throw new DatabaseException(activity);
+        querySnapshotList.add(categoryTask.getResult());
 
-        Query query = collectionReference.whereEqualTo("parent_category", category.getName());
-        Task<QuerySnapshot> task = database.getDocuments(query);
-        if (!task.isSuccessful()) throw new DatabaseException(activity);
+        Query productQuery = firestore.collection("products").whereEqualTo("parent_category", category.getName());
+        Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
+        if (!productTask.isSuccessful()) throw new DatabaseException(activity);
+        querySnapshotList.add(productTask.getResult());
 
-        for (DocumentSnapshot documentSnapshot: task.getResult()) {
-            Map<String, Object> data = documentSnapshot.getData();
+        for (QuerySnapshot querySnapshot: querySnapshotList) {
+            for (DocumentSnapshot documentSnapshot: querySnapshot) {
+                String path = documentSnapshot.getReference().getPath().split("/")[0];
+                Map<String, Object> data = documentSnapshot.getData();
 
-            if (collectionReference.getId().equals("categories")) {
-                if (data != null) {
-                    Category subcategory = new Category(data);
-                    objects.add(subcategory);
-                }
-            } else {
-                if (data != null) {
-                    Product product = new Product(data);
-                    objects.add(product);
+                if (path.equals("categories")) {
+                    if (data != null) {
+                        Category subcategory = new Category(data);
+                        objects.add(subcategory);
+                    }
+                } else {
+                    if (data != null) {
+                        Product product = new Product(data);
+                        objects.add(product);
+                    }
                 }
             }
         }
 
-        reqPresenterOps.onReturnedCategory(collectionReference.getId(), objects);
+        reqPresenterOps.onReturnedCategory(objects);
     }
 }

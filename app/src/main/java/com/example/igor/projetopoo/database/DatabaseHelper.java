@@ -32,7 +32,7 @@ public abstract class DatabaseHelper {
 
                 map.put("name", category.getName());
                 map.put("parent_category", category.getParentCategory());
-                map.put("have_subcategories", category.getHaveSubcategories());
+                map.put("background_category", category.getBackgroundCategory());
 
                 FirebaseFirestore firestore = database.getFirestore();
                 DocumentReference documentReference = firestore.collection("categories").document(name);

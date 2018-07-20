@@ -43,7 +43,7 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
                 try {
                     modelOps.categoryListRequest();
                 } catch (ConnectionException e) {
-                    e.connectionFail(MainPresenter.this, null);
+                    e.connectionFail(MainPresenter.this);
                 } catch (DatabaseException e) {
                     e.failReadData();
                 }
@@ -66,7 +66,6 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
 
         for (Object object: objects) {
             categories.add((Category) object);
-            categories.get(categories.indexOf(object)).setBackground(R.drawable.food);
         }
 
         Collections.sort(categories);

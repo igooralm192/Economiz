@@ -67,8 +67,10 @@ public class MainModel implements MainMVP.ModelOps {
             Category category = null;
             if (data != null) {
                 category = new Category(data);
+                objects.add(category);
             }
-            objects.add(category);
+
+
         }
 
         reqPresenterOps.onReturnedCategoryList(objects);

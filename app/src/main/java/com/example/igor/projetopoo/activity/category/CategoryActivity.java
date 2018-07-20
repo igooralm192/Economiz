@@ -2,30 +2,25 @@ package com.example.igor.projetopoo.activity.category;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.transition.Slide;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
@@ -34,23 +29,15 @@ import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
-import com.example.igor.projetopoo.adapter.SuggestionAdapter;
-import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Entitie;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Constant;
-import com.example.igor.projetopoo.helper.CustomDialog;
 import com.example.igor.projetopoo.utils.Animation;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,59 +128,30 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
     }
 
     @Override
-    public void showSubcategories(List<Category> subcategories) {
-        final ListGenericAdapter<Category, Category.CategoryHolder> adapter = new ListGenericAdapter<>(
+    public void showSubitems(List<Entitie> subitems) {
+        final ListGenericAdapter<Entitie, Entitie.Holder> adapter = new ListGenericAdapter<>(
                 getContext(),
-                subcategories,
-                new ListAdapter<Category, Category.CategoryHolder>() {
+                subitems,
+                new ListAdapter<Entitie, Entitie.Holder>() {
                     @Override
-                    public Category.CategoryHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_category, parent, false);
+                    public Entitie.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_entitie, parent, false);
 
-                        return new Category.CategoryHolder(view, CategoryActivity.this);
+                        return new Entitie.Holder(view, CategoryActivity.this);
                     }
 
                     @Override
-                    public void onBindViewHolder(List<Category> items, @NonNull Category.CategoryHolder holder, int position) {
-                        holder.setCategory(items.get(position));
-                        holder.name.setText(items.get(position).getName());
-                    }
-                }
-        );
+                    public void onBindViewHolder(List<Entitie> items, @NonNull Entitie.Holder holder, int position) {
+                        Entitie entitie = items.get(position);
 
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(getContext()));
-                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                lista.setItemAnimator(new DefaultItemAnimator());
-
-                return lista;
-            }
-        });
-
-        changeListFragment(listFragment);
-    }
-
-    @Override
-    public void showProducts(List<Product> products) {
-        final ListGenericAdapter<Product, Product.Holder> adapter = new ListGenericAdapter<>(
-                getContext(),
-                products,
-                new ListAdapter<Product, Product.Holder>() {
-                    @Override
-                    public Product.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_product, parent, false);
-
-                        return new Product.Holder(view, CategoryActivity.this);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Product> items, @NonNull Product.Holder holder, int position) {
-                        holder.setProduct(items.get(position));
-                        holder.name.setText(items.get(position).getName());
-                        holder.averagePrice.setText("R$ " + String.format("%.2f", items.get(position).getAveragePrice()));
+                        holder.setEntitie(entitie);
+                        holder.name.setText(entitie.getName());
+                        if (entitie instanceof Category) {
+                            holder.price.setText("");
+                        } else {
+                            Product product = (Product) entitie;
+                            holder.price.setText(String.format("R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
+                        }
                     }
                 }
         );

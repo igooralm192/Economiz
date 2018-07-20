@@ -8,6 +8,7 @@ import android.util.Log;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Entitie;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
@@ -15,6 +16,8 @@ import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.ReqPresenterOps {
@@ -60,21 +63,21 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
     }
 
     @Override
-    public void onReturnedCategory(String type, List<Object> objects) {
-        if (type.equals("categories")) {
-            List<Category> subcategories = new ArrayList<>();
+    public void onReturnedCategory(List<Object> objects) {
+        List<Entitie> subitems = new ArrayList<>();
 
-            for (Object object: objects)
-                subcategories.add((Category) object);
+        for (Object object: objects) {
+            if (object instanceof Product)
+                subitems.add((Product) object);
 
-            reqViewOps.showSubcategories(subcategories);
-        } else {
-            List<Product> products = new ArrayList<>();
-
-            for (Object object: objects)
-                products.add((Product) object);
-
-            reqViewOps.showProducts(products);
         }
+
+        for (Object object: objects) {
+            if (object instanceof Category)
+                subitems.add((Category) object);
+        }
+
+        reqViewOps.showSubitems(subitems);
+
     }
 }
