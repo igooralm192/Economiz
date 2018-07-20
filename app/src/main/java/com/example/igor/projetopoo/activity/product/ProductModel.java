@@ -1,7 +1,7 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
+import android.support.design.widget.AppBarLayout;
 import android.widget.ScrollView;
 
 import com.example.igor.projetopoo.R;
@@ -47,11 +47,11 @@ public class ProductModel implements ProductMVP.ModelOps {
             }
         });
 
+        AppBarLayout appbar = activity.findViewById(R.id.appbar);
         if (!ParentActivity.checkConnection(activity)) {
-
-
+            appbar.setExpanded(false);
             throw new ConnectionException(activity, layout);
-        }
+        } else appbar.setExpanded(true);
 
         List<Object> objects = new ArrayList<>();
 
@@ -75,42 +75,15 @@ public class ProductModel implements ProductMVP.ModelOps {
     }
 
     @Override
-    public void insertFeedback(Feedback feedback) throws ConnectionException, DatabaseException {
-        final ConstraintLayout layout = activity.findViewById(R.id.container_product);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                layout.removeAllViews();
-            }
-        });
-
-        if (!ParentActivity.checkConnection(activity)) {
-            throw new ConnectionException(activity, layout);
-        }
-
+    public void insertFeedback(Feedback feedback) throws DatabaseException {
         FirebaseFirestore firestore = database.getFirestore();
         task = database.addDocument(firestore.collection("feedbacks"),feedback);
         if (!task.isSuccessful()) throw new DatabaseException(activity);
-        Log.i("TAG", "EAE");
         reqPresenterOps.onFeedbackInserted();
     }
 
     @Override
-    public void deleteFeedback() throws ConnectionException, DatabaseException {
-        final ConstraintLayout layout = activity.findViewById(R.id.container_product);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                layout.removeAllViews();
-            }
-        });
-
-        if (!ParentActivity.checkConnection(activity)) {
-            throw new ConnectionException(activity, layout);
-        }
-
+    public void deleteFeedback() throws DatabaseException {
         database.deleteDocument(task.getResult());
         if (!task.isSuccessful()) throw new DatabaseException(activity);
         reqPresenterOps.onFeedbackDeleted();
