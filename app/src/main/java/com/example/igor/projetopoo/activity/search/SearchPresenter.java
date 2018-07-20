@@ -1,20 +1,26 @@
 package com.example.igor.projetopoo.activity.search;
 
+import android.content.Context;
+
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPresenterOps {
+    private SearchActivity activity;
     private SearchMVP.ReqViewOps reqViewOps;
     private SearchMVP.ModelOps modelOps;
 
-    public SearchPresenter(SearchMVP.ReqViewOps reqViewOps, Database database){
-        this.reqViewOps = reqViewOps;
-        this.modelOps = new SearchModel(this, database);
+    public SearchPresenter(SearchActivity activity, Database database){
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new SearchModel(activity, this, database);
 
     }
 
@@ -29,23 +35,31 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
 
             @Override
             public Object doInBackground(Object... objects) {
-                char lastChar = query.charAt(query.length()-1);
-                char letters[] = query.toCharArray();
 
-                for (int i =0; i < letters.length; i++){
-                    if (letters[i] == ' '){
-                        letters[i+1] = Character.toUpperCase(letters[i+1]);
+                try {
+                    char lastChar = query.charAt(query.length()-1);
+                    char letters[] = query.toCharArray();
+
+                    for (int i =0; i < letters.length; i++){
+                        if (letters[i] == ' '){
+                            letters[i+1] = Character.toUpperCase(letters[i+1]);
+                        }
                     }
+
+                    if (letters.length == 1) lastChar = Character.toUpperCase(lastChar);
+
+                    letters[0] = Character.toUpperCase(letters[0]);
+                    String lowerbound = new String(letters);
+
+                    letters[query.length()-1] = ++lastChar;
+                    String upperbound = new String(letters);
+
+                    modelOps.resultListRequest(lowerbound, upperbound);
+                } catch (ConnectionException e) {
+                    e.connectionFail(SearchPresenter.this, query);
+                } catch (DatabaseException e) {
+                    e.failReadData();
                 }
-
-                letters[0] = Character.toUpperCase(letters[0]);
-                String lowerbound = new String(letters);
-
-                letters[query.length()-1] = ++lastChar;
-                String upperbound = new String(letters);
-
-
-                modelOps.resultListRequest(lowerbound, upperbound);
 
                 return null;
             }

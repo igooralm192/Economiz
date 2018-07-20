@@ -133,7 +133,7 @@ public class Animation {
         fadeOutView(hideView, duration);
     }
 
-    public static void openSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
+    public static void openSearch(final MaterialSearchBar search, FrameLayout layout) {
         search.setVisibility(View.VISIBLE);
 
         circleRevealView(search, ANIMATION_DURATION_SHORT);
@@ -145,11 +145,12 @@ public class Animation {
             }
         }, ANIMATION_DURATION_SHORT);
 
+        layout.setVisibility(View.VISIBLE);
         TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.startTransition(1000);
     }
 
-    public static void closeSearch(final MaterialSearchBar search, ActionBar actionBar, FrameLayout layout) {
+    public static void closeSearch(final MaterialSearchBar search, final FrameLayout layout) {
         search.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -165,6 +166,13 @@ public class Animation {
 
         final TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.reverseTransition(1000);
+
+        layout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                layout.setVisibility(View.GONE);
+            }
+        }, 300);
 
 
     }

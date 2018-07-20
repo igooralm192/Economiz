@@ -25,20 +25,19 @@ import java.util.List;
 import java.util.Map;
 
 public class MainModel implements MainMVP.ModelOps {
-    private Context context;
+    private MainActivity activity;
     private MainMVP.ReqPresenterOps reqPresenterOps;
     private Database database;
 
-    public MainModel (MainMVP.ReqPresenterOps reqPresenterOps, Context context, Database database) {
+    public MainModel (MainActivity activity, MainMVP.ReqPresenterOps reqPresenterOps, Database database) {
+        this.activity = activity;
         this.reqPresenterOps = reqPresenterOps;
-        this.context = context;
         this.database = database;
     }
 
     @Override
     public void categoryListRequest() throws ConnectionException, DatabaseException {
-        MainActivity activity = (MainActivity) context;
-        final ConstraintLayout layout = activity.findViewById(R.id.constraint_layout_main);
+        final ConstraintLayout layout = activity.findViewById(R.id.container_main);
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -47,7 +46,7 @@ public class MainModel implements MainMVP.ModelOps {
             }
         });
 
-        if (!ParentActivity.checkConnection(context)) throw new ConnectionException(context, layout);
+        if (!ParentActivity.checkConnection(activity)) throw new ConnectionException(activity, layout);
 
         List<Object> objects = new ArrayList<>();
 
@@ -59,7 +58,7 @@ public class MainModel implements MainMVP.ModelOps {
         Query query = collectionReference.whereEqualTo("parent_category", "");
         Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
 
-        if (!querySnapshot.isSuccessful()) throw new DatabaseException(context);
+        if (!querySnapshot.isSuccessful()) throw new DatabaseException(activity);
 
 
         for (DocumentSnapshot documentSnapshot: querySnapshot.getResult()) {

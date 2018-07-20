@@ -11,14 +11,17 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
+import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
@@ -120,16 +123,20 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
     }
 
-
-
     @Override
     public void onCategoryClick(Category category) {
+        Map<String, String> map = new HashMap<>();
+        map.put(Constant.SELECTED_CATEGORY, category.toJSON().toString());
 
+        startActivity(CategoryActivity.class, map);
     }
 
     @Override
     public void onProductClick(Product product) {
+        Map<String, String> map = new HashMap<>();
+        map.put(Constant.SELECTED_PRODUCT, product.toJSON().toString());
 
+        startActivity(ProductActivity.class, map);
     }
 
     public void filterSuggestions(String query) {
@@ -191,19 +198,20 @@ public abstract class ParentActivity extends AppCompatActivity implements
         String json = sharedPreferences.getString(Constant.ALL_SUGGESTIONS, null);
 
         if (json != null) {
+
             try {
                 JSONObject suggestions = new JSONObject(json);
 
-                JSONArray arrCategories = suggestions.getJSONArray("categories");
-                JSONArray arrProducts = suggestions.getJSONArray("products");
+                JSONArray arrCategories = suggestions.getJSONArray(Constant.Entities.CATEGORIES);
+                JSONArray arrProducts = suggestions.getJSONArray(Constant.Entities.PRODUCTS);
 
                 for (int i=0; i<arrCategories.length(); i++) {
-                    Category category = Category.toObject(arrCategories.getJSONObject(i));
+                    Category category = Category.toObject(arrCategories.getString(i));
                     categories.add(category);
                 }
 
                 for (int i=0; i<arrProducts.length(); i++) {
-                    Product product = Product.toObject(arrProducts.getJSONObject(i));
+                    Product product = Product.toObject(arrProducts.getString(i));
                     products.add(product);
                 }
 
@@ -247,10 +255,10 @@ public abstract class ParentActivity extends AppCompatActivity implements
                     Product product = null;
 
                     if (object.getString("type").equals("category")) {
-                        category = Category.toObject(object.getJSONObject("object"));
+                        category = Category.toObject(object.getString("object"));
                         obj = category;
                     } else if (object.getString("type").equals("product")) {
-                        product = Product.toObject(object.getJSONObject("object"));
+                        product = Product.toObject(object.getString("object"));
                         obj = product;
                     }
 
@@ -273,6 +281,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
     }
 
     public void createSearchBar() {
+        getBlackLayout().setClickable(true);
+
         recentQueries = loadRecentQueries();
         recentQueriesClone = new ArrayList<>(recentQueries);
 

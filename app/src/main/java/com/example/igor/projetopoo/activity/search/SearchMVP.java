@@ -3,6 +3,8 @@ package com.example.igor.projetopoo.activity.search;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.entities.Result;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ public interface SearchMVP {
 
     interface ModelOps{
         // Model methods => Presenter acess
-        void resultListRequest(String query, String upperbound);
+        void resultListRequest(String query, String upperbound) throws ConnectionException, DatabaseException;
     }
 
     interface ReqPresenterOps{

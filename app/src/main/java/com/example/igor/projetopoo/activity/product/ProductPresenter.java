@@ -14,6 +14,8 @@ import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.exception.ConnectionException;
+import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
 import com.example.igor.projetopoo.helper.CustomDialog;
 
@@ -21,17 +23,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.ReqPresenterOps {
-
+    private ProductActivity activity;
     private ProductMVP.ReqViewOps reqViewOps;
     private ProductMVP.ModelOps modelOps;
 
-    public ProductPresenter(ProductMVP.ReqViewOps reqViewOps, Database database) {
-        this.reqViewOps = reqViewOps;
-        this.modelOps = new ProductModel(this, database);
+    public ProductPresenter(ProductActivity activity, Database database) {
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new ProductModel(activity, this, database);
     }
 
     @Override
@@ -45,7 +49,13 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.feedbackListRequest(productName);
+                try {
+                    modelOps.feedbackListRequest(productName);
+                } catch (ConnectionException e) {
+                    e.connectionFail(ProductPresenter.this, productName);
+                } catch (DatabaseException e) {
+                    e.failReadData();
+                }
 
                 return null;
             }
@@ -66,12 +76,25 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
         for (Object object: objects) {
             feedbacks.add((Feedback) object);
         }
+        Double sum = 0.0;
+        for (Feedback a:feedbacks
+             ) {
+            sum += a.getPrice().doubleValue();
+        }
+        sum/=feedbacks.size();
 
-        reqViewOps.showFeedbacks(feedbacks);
+        Collections.sort(feedbacks, new Comparator<Feedback>() {
+            @Override
+            public int compare(Feedback f1, Feedback f2) {
+                return f2.getDate().compareTo(f1.getDate());
+            }
+        });
+
+        reqViewOps.showFeedbacks(feedbacks,sum);
     }
 
     @Override
-    public void addFeedback(Dialog dialog, String name, Pair<Number,Number> range) {
+    public void addFeedback(Dialog dialog, final String name, Pair<Number,Number> range) {
         EditText location = dialog.findViewById(R.id.location_edit_text);
         EditText price = dialog.findViewById(R.id.price_edit_text);
         String prc = price.getText().toString();
@@ -114,13 +137,18 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.insertFeedback(feedback);
+                try {
+                    modelOps.insertFeedback(feedback);
+                } catch (DatabaseException e) {
+                    e.failWriteData();
+                }
+
                 return null;
             }
 
             @Override
             public void onPostExecute(Object object) {
-                reqViewOps.showProgressBar(false);
+                ProductPresenter.this.getFeedbacks(name);
             }
         });
         asyncDownload.execute();
@@ -136,7 +164,11 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.deleteFeedback();
+                try {
+                    modelOps.deleteFeedback();
+                } catch (DatabaseException e) {
+                    e.failRemoveData();
+                }
                 return null;
             }
 

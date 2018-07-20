@@ -19,14 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenterOps {
-    private Context context;
+    private MainActivity activity;
     private MainMVP.ReqViewOps reqViewOps;
     private MainMVP.ModelOps modelOps;
 
-    public MainPresenter(MainMVP.ReqViewOps reqViewOps, Context context, Database database) {
-        this.reqViewOps = reqViewOps;
-        this.context = context;
-        this.modelOps = new MainModel(this, context, database);
+    public MainPresenter(MainActivity activity, Database database) {
+        this.activity = activity;
+        this.reqViewOps = activity;
+        this.modelOps = new MainModel(activity, this, database);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
                 try {
                     modelOps.categoryListRequest();
                 } catch (ConnectionException e) {
-                    e.connectionFail(MainPresenter.this);
+                    e.connectionFail(MainPresenter.this, null);
                 } catch (DatabaseException e) {
                     e.failReadData();
                 }

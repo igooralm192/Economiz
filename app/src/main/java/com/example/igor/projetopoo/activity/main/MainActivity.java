@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
+import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
@@ -76,13 +77,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     @Override
     public void init() {
-        setContext(getApplicationContext());
-        setBlackLayout( (FrameLayout) findViewById(R.id.black_bar));
+        setContext(this);
+        setBlackLayout( (FrameLayout) findViewById(R.id.black_product));
         setSearchBar( (MaterialSearchBar) findViewById(R.id.search_bar_main) );
         setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_main));
 
         appBar = (RelativeLayout) findViewById(R.id.app_bar);
-        presenterOps = new MainPresenter(this, this, getDatabase());
+        presenterOps = new MainPresenter(this, getDatabase());
     }
 
     @Override
@@ -139,13 +140,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             JSONArray arrProducts = new JSONArray();
 
             for (Category category: categories)
-                arrCategories.put(category.toJSON());
+                arrCategories.put(category.toJSON().toString());
 
 
             suggestions.put(Constant.Entities.CATEGORIES, arrCategories);
 
             for (Product product: products)
-                arrProducts.put(product.toJSON());
+                arrProducts.put(product.toJSON().toString());
 
 
             suggestions.put(Constant.Entities.PRODUCTS, arrProducts);
@@ -193,7 +194,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         Map<String, Class> index = new HashMap<>();
 
         index.put(Constant.Entities.Item.TYPE_RECENT, SearchActivity.class);
-        //index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
+        index.put(Constant.Entities.Item.TYPE_PRODUCT, ProductActivity.class);
         index.put(Constant.Entities.Item.TYPE_CATEGORY, CategoryActivity.class);
 
         for (String type : index.keySet()) {
@@ -203,13 +204,15 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             if (indItem != -1) {
                 if (type.equals("category")) {
 
-                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
-                    this.onCategoryClick((Category) list.get(indItem).getObject());
+                    List list = getSearchBar().getLastSuggestions();
+                    Item categoryItem = (Item) list.get(indItem);
+                    this.onCategoryClick((Category) categoryItem.getObject());
 
                 } else if (type.equals("product")) {
 
-                    List<Item> list = (List<Item>) getSearchBar().getLastSuggestions();
-                    this.onProductClick((Product) list.get(indItem).getObject());
+                    List list = getSearchBar().getLastSuggestions();
+                    Item productItem = (Item) list.get(indItem);
+                    this.onProductClick((Product) productItem.getObject());
 
                 } else {
                     Map<String, String> map = new HashMap<>();
@@ -218,13 +221,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                     this.startActivity(index.get(type), map);
                 }
 
-                /*getSearchBar().postDelayed(new Runnable() {
+                getSearchBar().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         getSearchBar().setLastSuggestions(getRecentQueriesClone());
                         getSearchBar().disableSearch();
                     }
-                }, 300);*/
+                }, 300);
 
             }
         }
@@ -232,17 +235,18 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     @Override
     public void onCategoryClick(Category category) {
-        Log.i("TAG", "Na main");
         Map<String, String> map = new HashMap<>();
         map.put(Constant.SELECTED_CATEGORY, category.toJSON().toString());
 
         startActivity(CategoryActivity.class, map);
-
     }
 
     @Override
     public void onProductClick(Product product) {
+        Map<String, String> map = new HashMap<>();
+        map.put(Constant.SELECTED_PRODUCT, product.toJSON().toString());
 
+        startActivity(ProductActivity.class, map);
     }
 
     private void changeListFragment(ListFragment newFragment) {
@@ -259,16 +263,12 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         newFragment.setExitTransition(fade);
 
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.constraint_layout_main, newFragment);
+        transaction.replace(R.id.container_main, newFragment);
         transaction.commit();
     }
 
     private void configSuggestions() {
         String sug = getSharedPreferences().getString(Constant.ALL_SUGGESTIONS, null);
-        sug = null;
-        if (sug != null) {
-            suggestionsStatus = true;
-            setAllSuggestions();
-        } else presenterOps.getAllSuggestions(this);
+        presenterOps.getAllSuggestions(this);
     }
 }

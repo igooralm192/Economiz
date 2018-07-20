@@ -17,4 +17,8 @@ public class DatabaseException extends Exception {
     public void failWriteData() {
         Toast.makeText(context, "Não foi possível adicionar os dados, tente novamente.", Toast.LENGTH_LONG).show();
     }
+
+    public void failRemoveData() {
+        Toast.makeText(context, "Não foi possível remover os dados, tente novamente.", Toast.LENGTH_LONG).show();
+    }
 }
