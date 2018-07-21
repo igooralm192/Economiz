@@ -69,7 +69,6 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                 presenterOps.getCategoryList();
             }
         });
-
     }
 
     @Override
@@ -101,7 +100,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                         Category category = items.get(position);
                         holder.setCategory(category);
                         holder.name.setText(category.getName());
-                        holder.background.setImageResource(category.getBackgroundCategory().intValue());
+                        holder.background.setImageResource(R.drawable.foods);
                     }
                 });
 

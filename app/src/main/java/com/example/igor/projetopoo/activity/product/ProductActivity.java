@@ -115,7 +115,8 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
             updateProductData(currentProduct);
 
-            backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
+            //backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
+            backgroundProduct.setImageResource(R.drawable.foods);
         }
 
         appbar = findViewById(R.id.appbar);

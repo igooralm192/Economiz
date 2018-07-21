@@ -50,7 +50,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:mt_hint="Pesquise aí vá.."
-        app:mt_navIconEnabled="false"
+        app:mt_navIconEnabled="true"
+        app:mt_navIconUseTint="false"
         app:mt_placeholder="Economiz" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="37dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/search_bar_main"
+        app:layout_constraintStart_toStartOf="@+id/search_bar_main"
+        app:layout_constraintTop_toTopOf="@+id/search_bar_main"
+        app:srcCompat="@drawable/cart" />
 
 </android.support.constraint.ConstraintLayout>
