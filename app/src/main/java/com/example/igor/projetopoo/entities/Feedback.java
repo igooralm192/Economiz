@@ -12,10 +12,10 @@ import java.util.Map;
 public class Feedback {
     private String product;
     private String location;
-    private String date;
+    private long date;
     private Number price;
 
-    public Feedback(String product, String location, String date, Number price) {
+    public Feedback(String product, String location, long date, Number price) {
         this.product = product;
         this.location = location;
         this.date = date;
@@ -23,7 +23,7 @@ public class Feedback {
     }
 
     public Feedback(Map<String, Object> map) {
-        this((String) map.get("product"), (String) map.get("location"), (String) map.get("date"), (Number) map.get("price"));
+        this((String) map.get("product"), (String) map.get("location"), (long) map.get("date"), (Number) map.get("price"));
     }
 
     public String getProduct() { return product; }
@@ -32,7 +32,7 @@ public class Feedback {
         return location;
     }
 
-    public String getDate() {
+    public long getDate() {
         return date;
     }
 
@@ -44,7 +44,7 @@ public class Feedback {
         this.location = location;
     }
 
-    public void setDate(String date) { this.date = date; }
+    public void setDate(long date) { this.date = date; }
 
     public void setPrice(Double price) {
         this.price = price;

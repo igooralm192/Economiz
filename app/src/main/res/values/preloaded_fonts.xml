@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/keep_calm</item>
+        <item>@font/code_light</item>
+        <item>@font/comfortaa</item>
+        <item>@font/comfortaa_bold</item>
         <item>@font/comfortaa_light</item>
         <item>@font/open_sans_light</item>
         <item>@font/roboto</item>

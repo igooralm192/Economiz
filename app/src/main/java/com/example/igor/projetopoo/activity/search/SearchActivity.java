@@ -90,7 +90,6 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         List<Result> resultList = new ArrayList<>();
 
         for(Category category: categoryList){
-            Log.i("TAG", category.getName());
             Result result = new Result(R.drawable.ic_search_black_24dp,category.getName(), category);
             resultList.add(result);
         }
@@ -100,13 +99,67 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
             resultList.add(result);
         }
 
-        setResultList(this, resultList);
+        setAdapter(new ListGenericAdapter<>(
+                this,
+                resultList,
+                new ListAdapter<Result, Result.Holder>() {
+                    @Override
+                    public Result.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_result, parent, false);
+
+                        return new Result.Holder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(List<Result> items, @NonNull final Result.Holder holder, int position) {
+                        final Result result = items.get(position);
+                        final Double price = result.getPrice().doubleValue();
+
+                        holder.view.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (price == -1)
+                                    SearchActivity.this.onCategoryClick((Category) result.getObject());
+                                else
+                                    SearchActivity.this.onProductClick((Product) result.getObject());
+                            }
+                        });
+
+                        holder.iconResult.setImageResource(result.getIcon());
+                        holder.nameResult.setText(result.getName());
+                        if (result.getPrice().doubleValue() != -1)
+                            holder.priceResult.setText(String.format("R$ %.2f", result.getPrice()));
+                        else
+                            holder.priceResult.setText("");
+
+
+                    }
+                })
+        );
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Exemplo de instanciação do ListFragment
+        ListFragment listFragment = ListFragment.getInstance();
+
+        fragmentTransaction.add(R.id.container_search, listFragment);
+        fragmentTransaction.commitAllowingStateLoss();
     }
 
 
     @Override
     public void showProgressBar(Boolean enabled) {
         getSwipeRefreshLayout().setRefreshing(enabled);
+    }
+
+    @Override
+    public RecyclerView onListSettings(RecyclerView lista) {
+        lista.setAdapter(getAdapter());
+        lista.setLayoutManager(new LinearLayoutManager(getContext()));
+        lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+        return lista;
     }
 
     @Override
@@ -214,61 +267,5 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         }
     }
 
-    private void setResultList(final Context context, List<Result> result){
 
-        final RecyclerView.LayoutManager layout = new LinearLayoutManager(context,
-                LinearLayoutManager.VERTICAL, false);
-
-        final ListGenericAdapter<Result, Result.Holder> listGenericAdapter = new ListGenericAdapter<>(this, result, new ListAdapter<Result, Result.Holder>() {
-            @Override
-            public Result.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(context).inflate(R.layout.item_list_result, parent, false);
-
-                return new Result.Holder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(List<Result> items, @NonNull final Result.Holder holder, int position) {
-                final Result result = items.get(position);
-                final Double price = result.getPrice().doubleValue();
-
-                holder.view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (price == -1)
-                            SearchActivity.this.onCategoryClick((Category) result.getObject());
-                        else
-                            SearchActivity.this.onProductClick((Product) result.getObject());
-                    }
-                });
-
-                holder.iconResult.setImageResource(result.getIcon());
-                holder.nameResult.setText(result.getName());
-                if (result.getPrice().doubleValue() != -1)
-                    holder.priceResult.setText(String.format("R$ %.2f", result.getPrice()));
-                else
-                    holder.priceResult.setText("");
-
-
-            }
-        });
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        // Exemplo de instanciação do ListFragment
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(listGenericAdapter);
-                lista.setLayoutManager(layout);
-                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL  ));
-
-                return lista;
-            }
-        });
-
-        fragmentTransaction.add(R.id.container_search, listFragment);
-        fragmentTransaction.commitAllowingStateLoss();
-    }
 }

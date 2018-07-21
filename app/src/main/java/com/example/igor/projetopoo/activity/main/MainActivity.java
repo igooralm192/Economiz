@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -46,9 +47,9 @@ import java.util.Map;
 
 
 public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
-
     private Boolean suggestionsStatus = false;
 
+    private ImageView logo;
     private RelativeLayout appBar;
     private MainMVP.PresenterOps presenterOps;
 
@@ -79,12 +80,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_main));
 
         appBar = (RelativeLayout) findViewById(R.id.app_bar);
+        logo = findViewById(R.id.logo);
         presenterOps = new MainPresenter(this, getDatabase());
     }
 
     @Override
     public void showCategories(List<Category> categories) {
-        final ListGenericAdapter<Category, Category.Holder> listGenericAdapter = new ListGenericAdapter<>(
+        setAdapter(new ListGenericAdapter<>(
                 getContext(),
                 categories,
                 new ListAdapter<Category, Category.Holder>() {
@@ -102,18 +104,10 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                         holder.name.setText(category.getName());
                         holder.background.setImageResource(R.drawable.foods);
                     }
-                });
+                })
+        );
 
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(listGenericAdapter);
-                lista.setLayoutManager(new LinearLayoutManager(getContext()));
-                lista.setItemAnimator(new DefaultItemAnimator());
-
-                return lista;
-            }
-        });
+        ListFragment listFragment = ListFragment.getInstance();
 
         changeListFragment(listFragment);
     }
@@ -136,14 +130,10 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             for (Category category: categories)
                 arrCategories.put(category.toJSON().toString());
 
-
             suggestions.put(Constant.Entities.CATEGORIES, arrCategories);
 
-            for (Product product: products) {
-                Log.i("TAG", product.toJSON().toString());
+            for (Product product: products)
                 arrProducts.put(product.toJSON().toString());
-            }
-
 
             suggestions.put(Constant.Entities.PRODUCTS, arrProducts);
 
@@ -166,14 +156,26 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
     }
 
     @Override
+    public RecyclerView onListSettings(RecyclerView lista) {
+        lista.setAdapter(getAdapter());
+        lista.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        return lista;
+    }
+
+    @Override
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) getBlackLayout().getBackground();
 
         if (enabled) {
+            logo.setVisibility(View.INVISIBLE);
             getBlackLayout().setVisibility(View.VISIBLE);
             background.startTransition(300);
+            getSearchBar().setNavButtonEnabled(false);
         } else {
             background.reverseTransition(300);
+            getSearchBar().setNavButtonEnabled(true);
+            logo.setVisibility(View.VISIBLE);
             getBlackLayout().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -260,7 +262,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_main, newFragment);
-        transaction.commitAllowingStateLoss();
+        transaction.commit();
     }
 
     private void configSuggestions() {
@@ -268,9 +270,4 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         presenterOps.getAllSuggestions(this);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
-        super.onSaveInstanceState(outState);
-    }
 }

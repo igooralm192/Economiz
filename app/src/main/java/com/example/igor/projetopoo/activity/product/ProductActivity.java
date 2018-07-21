@@ -50,12 +50,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class ProductActivity extends ParentActivity implements ProductMVP.ReqViewOps {
@@ -65,6 +67,17 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     private TextView toolbarPrice;
     private TextView infoName;
     private TextView infoPrice;
+    private ImageView backgroundProduct;
+
+    public static final List<Long> times = Arrays.asList(
+            TimeUnit.DAYS.toMillis(365),
+            TimeUnit.DAYS.toMillis(30),
+            TimeUnit.DAYS.toMillis(1),
+            TimeUnit.HOURS.toMillis(1),
+            TimeUnit.MINUTES.toMillis(1),
+            TimeUnit.SECONDS.toMillis(1) );
+    public static final List<String> timesString = Arrays.asList("ano","mês","dia","hora","minuto","segundo");
+
 
     private ProductMVP.PresenterOps presenterOps;
     private Product currentProduct;
@@ -106,7 +119,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         toolbarPrice = findViewById(R.id.toolbar_price);
         infoName = findViewById(R.id.name_info_product);
         infoPrice = findViewById(R.id.price_info_product);
-        ImageView backgroundProduct = findViewById(R.id.background_product);
+        backgroundProduct = findViewById(R.id.background_product);
 
         Intent intent = getIntent();
         currentProduct = Product.toObject(intent.getStringExtra(Constant.SELECTED_PRODUCT));
@@ -152,8 +165,8 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         int indexProduct = getProductsSuggestions().indexOf(currentProduct);
         getProductsSuggestions().set(indexProduct, currentProduct);
 
-        final ListGenericAdapter<Feedback, Feedback.Holder> adapter = new ListGenericAdapter<>(
-                this,
+        setAdapter(new ListGenericAdapter<>(
+                getContext(),
                 list,
                 new ListAdapter<Feedback, Feedback.Holder>() {
                     @Override
@@ -165,29 +178,35 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
                     @Override
                     public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
                         holder.location.setText(items.get(position).getLocation());
-                        holder.date.setText(items.get(position).getDate().toUpperCase());
-
+                        long diff = System.currentTimeMillis() - items.get(position).getDate();
+                        holder.date.setText(toDuration(diff));
                         String s = "R$ " + String.format(Locale.US, "%.2f", items.get(position).getPrice().floatValue()).replace('.', ',');
                         holder.price.setText(s);
                     }
 
-                }
+                })
         );
 
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(context));
-                lista.setItemAnimator(new DefaultItemAnimator());
-                lista.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-
-                return lista;
-            }
-        });
+        ListFragment listFragment = ListFragment.getInstance();
 
         changeListFragment(listFragment);
 
+    }
+
+    public static String toDuration(long duration) {
+        StringBuffer res = new StringBuffer();
+        for(int i=0;i< times.size(); i++) {
+            Long current = times.get(i);
+            long temp = duration/current;
+            if(temp>0) {
+                res.append(temp).append(" ").append( timesString.get(i) ).append(temp != 1 ? "s" : "").append(" atrás");
+                break;
+            }
+        }
+        if("".equals(res.toString()))
+            return "agora mesmo";
+        else
+            return res.toString();
     }
 
     @Override
@@ -218,6 +237,16 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             });
 
         mySnackbar.show();
+    }
+
+    @Override
+    public RecyclerView onListSettings(RecyclerView lista) {
+        lista.setAdapter(getAdapter());
+        lista.setLayoutManager(new LinearLayoutManager(getContext()));
+        lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        lista.setItemAnimator(new DefaultItemAnimator());
+
+        return lista;
     }
 
     @Override
@@ -353,11 +382,9 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             return;
         }
 
-        Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US);
-        String str = format.format(date);
+        long date = Calendar.getInstance().getTimeInMillis();
 
-        Feedback feedback = new Feedback(currentProduct.getName(), loc, str, Double.parseDouble(prc));
+        Feedback feedback = new Feedback(currentProduct.getName(), loc, date, Double.parseDouble(prc));
         presenterOps.addFeedback(feedback, currentProduct, dialog);
     }
 

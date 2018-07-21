@@ -114,6 +114,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
         if (count == 0) finish();
         else {
+            presenterOps.getCategory(categoryLinks.get(currentCategory));
+
             toolbar.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -130,7 +132,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     @Override
     public void showSubitems(List<Entitie> subitems) {
-        final ListGenericAdapter<Entitie, Entitie.Holder> adapter = new ListGenericAdapter<>(
+        setAdapter(new ListGenericAdapter<>(
                 getContext(),
                 subitems,
                 new ListAdapter<Entitie, Entitie.Holder>() {
@@ -154,20 +156,10 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
                             holder.price.setText(String.format(Locale.getDefault(), "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
                         }
                     }
-                }
+                })
         );
 
-        ListFragment listFragment = ListFragment.getInstance(new ListFragment.OnListFragmentSettings() {
-            @Override
-            public RecyclerView setList(RecyclerView lista) {
-                lista.setAdapter(adapter);
-                lista.setLayoutManager(new LinearLayoutManager(getContext()));
-                lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                lista.setItemAnimator(new DefaultItemAnimator());
-
-                return lista;
-            }
-        });
+        ListFragment listFragment = ListFragment.getInstance();
 
         changeListFragment(listFragment);
     }
@@ -175,6 +167,16 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
     @Override
     public void showProgressBar(Boolean enabled) {
         getSwipeRefreshLayout().setRefreshing(enabled);
+    }
+
+    @Override
+    public RecyclerView onListSettings(RecyclerView lista) {
+        lista.setAdapter(getAdapter());
+        lista.setLayoutManager(new LinearLayoutManager(getContext()));
+        lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        lista.setItemAnimator(new DefaultItemAnimator());
+
+        return lista;
     }
 
     @Override
@@ -243,32 +245,6 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
     private void changeListFragment(ListFragment newFragment) {
         FragmentManager manager = getSupportFragmentManager();
         final Category oldcategory = categoryLinks.get( currentCategory );
-        Fragment oldFragment;
-
-        if (oldcategory != null) {
-            oldFragment = manager.findFragmentByTag(oldcategory.getName());
-            Slide slide = new Slide();
-            slide.setDuration(500);
-
-            slide.setSlideEdge(Gravity.END);
-            oldFragment.setEnterTransition(slide);
-
-            slide.setSlideEdge(Gravity.START);
-            oldFragment.setExitTransition(slide);
-        } else {
-            Integer count = manager.getBackStackEntryCount();
-
-            if (count == 0) {
-                oldFragment = manager.findFragmentByTag(currentCategory.getName());
-                if (oldFragment != null) {
-                    Slide slide = new Slide();
-                    slide.setDuration(500);
-
-                    slide.setSlideEdge(Gravity.START);
-                    oldFragment.setExitTransition(slide);
-                }
-            }
-        }
 
         Slide slide2 = new Slide();
         slide2.setDuration(500);
@@ -276,13 +252,11 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         slide2.setSlideEdge(Gravity.START);
         newFragment.setEnterTransition(slide2);
 
-        slide2.setSlideEdge(Gravity.END);
-        newFragment.setExitTransition(slide2);
-
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.container_category, newFragment, currentCategory.getName());
+
+        transaction.add(R.id.container_category, newFragment, currentCategory.getName());
         if (oldcategory != null) transaction.addToBackStack(null);
-        transaction.commitAllowingStateLoss();
+        transaction.commit();
 
         toolbar.postDelayed(new Runnable() {
             @Override

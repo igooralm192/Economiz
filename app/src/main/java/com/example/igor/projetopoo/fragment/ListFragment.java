@@ -1,5 +1,6 @@
 package com.example.igor.projetopoo.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,17 +15,13 @@ import com.example.igor.projetopoo.R;
 
 public class ListFragment extends Fragment {
     private RecyclerView list;
-    private static OnListFragmentSettings onListFragmentSettings;
+    private OnListSettingsListener onListSettingsListener;
 
     public ListFragment() {
         // Required empty public constructor
     }
 
-    public static ListFragment getInstance(OnListFragmentSettings onListFragmentSettings) {
-        ListFragment listFragment = new ListFragment();
-        ListFragment.onListFragmentSettings = onListFragmentSettings;
-        return listFragment;
-    }
+    public static ListFragment getInstance() { return new ListFragment(); }
 
     public RecyclerView getList() {
         return list;
@@ -41,13 +38,31 @@ public class ListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
         list = view.findViewById(R.id.list_fragment);
-        list = ListFragment.onListFragmentSettings.setList(list);
-
+        if (onListSettingsListener != null) list = onListSettingsListener.onListSettings(list);
         return view;
     }
 
-    public interface OnListFragmentSettings {
-        public RecyclerView setList(RecyclerView lista);
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnListSettingsListener) {
+            onListSettingsListener = (OnListSettingsListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnListSettingsListener");
+        }
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        onListSettingsListener = null;
+    }
+
+    public interface OnListSettingsListener {
+        RecyclerView onListSettings(RecyclerView lista);
+    }
+
 
 }

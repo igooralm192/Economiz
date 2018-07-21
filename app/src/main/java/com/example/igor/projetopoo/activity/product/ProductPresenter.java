@@ -8,18 +8,12 @@ import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.ReqPresenterOps {
     private ProductActivity activity;
@@ -69,24 +63,25 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     public void onReturnedFeedbackList(List<Object> objects, Product product) {
         List<Feedback> feedbacks = new ArrayList<>();
 
-        for (Object object: objects) {
+        for (Object object : objects) {
             feedbacks.add((Feedback) object);
         }
         Double sum = 0.0;
-        for (Feedback a:feedbacks)
+        for (Feedback a : feedbacks)
             sum += a.getPrice().doubleValue();
 
-        if(feedbacks.size()>0) sum/=feedbacks.size();
-        else sum = (product.getPriceRange().first.doubleValue()+product.getPriceRange().second.doubleValue())/2;
+        if (feedbacks.size() > 0) sum /= feedbacks.size();
+        else
+            sum = (product.getPriceRange().first.doubleValue() + product.getPriceRange().second.doubleValue()) / 2;
 
         Collections.sort(feedbacks, new Comparator<Feedback>() {
             @Override
             public int compare(Feedback f1, Feedback f2) {
-                return f2.getDate().compareTo(f1.getDate());
+                return new Date(f2.getDate()).compareTo(new Date(f1.getDate()));
             }
         });
 
-        reqViewOps.showFeedbacks(feedbacks,sum);
+        reqViewOps.showFeedbacks(feedbacks, sum);
     }
 
     @Override
@@ -114,7 +109,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-               ProductPresenter.this.getFeedbacks(product);
+                ProductPresenter.this.getFeedbacks(product);
             }
         });
 

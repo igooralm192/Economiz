@@ -23,6 +23,7 @@ import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
+import com.example.igor.projetopoo.fragment.ListFragment;
 import com.example.igor.projetopoo.helper.Constant;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -39,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class ParentActivity extends AppCompatActivity implements
+        ListFragment.OnListSettingsListener,
         MaterialSearchBar.OnSearchActionListener,
         SuggestionAdapter.OnItemViewClickListener,
         ListGenericAdapter.OnItemViewClickListener {
@@ -47,6 +49,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
     private FrameLayout blackLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MaterialSearchBar searchBar;
+    private ListGenericAdapter adapter;
 
     private Database database;
     private SharedPreferences sharedPreferences;
@@ -388,6 +391,14 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
     public void setSearchBar(MaterialSearchBar searchBar) {
         this.searchBar = searchBar;
+    }
+
+    public ListGenericAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(ListGenericAdapter adapter) {
+        this.adapter = adapter;
     }
 
     public Database getDatabase() {
