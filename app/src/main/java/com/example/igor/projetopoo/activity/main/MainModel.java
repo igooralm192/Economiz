@@ -1,9 +1,7 @@
 package com.example.igor.projetopoo.activity.main;
 
-import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.database.Database;
@@ -102,7 +100,7 @@ public class MainModel implements MainMVP.ModelOps {
                     }
                 } else {
                     if (data != null) {
-                        Product product = new Product(data);
+                        Product product = new Product(documentSnapshot.getId(), data);
                         objects.add(product);
                     }
                 }

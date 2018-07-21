@@ -2,8 +2,6 @@ package com.example.igor.projetopoo.activity.product;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -19,13 +17,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.transition.Fade;
 import android.transition.Slide;
-import android.util.Log;
 import android.util.Pair;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,13 +30,13 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
-import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
@@ -55,16 +49,12 @@ import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -75,7 +65,6 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     private TextView toolbarPrice;
     private TextView infoName;
     private TextView infoPrice;
-    private ImageView backgroundProduct;
 
     private ProductMVP.PresenterOps presenterOps;
     private Product currentProduct;
@@ -117,7 +106,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         toolbarPrice = findViewById(R.id.toolbar_price);
         infoName = findViewById(R.id.name_info_product);
         infoPrice = findViewById(R.id.price_info_product);
-        backgroundProduct = findViewById(R.id.background_product);
+        ImageView backgroundProduct = findViewById(R.id.background_product);
 
         Intent intent = getIntent();
         currentProduct = Product.toObject( intent.getStringExtra(Constant.SELECTED_PRODUCT) );
@@ -178,7 +167,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
                         holder.location.setText(items.get(position).getLocation());
                         holder.date.setText(items.get(position).getDate().toUpperCase());
 
-                        String s = "R$ " + String.format("%.2f", items.get(position).getPrice().floatValue()).replace('.',',');
+                        String s = "R$ " + String.format(Locale.US, "%.2f", items.get(position).getPrice().floatValue()).replace('.',',');
                         holder.price.setText(s);
                     }
 
@@ -248,26 +237,32 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             int indItem = getSearchBar().getLastSuggestions().indexOf(item);
 
             if (indItem != -1) {
-                if (type.equals("category")) {
+                switch (type) {
+                    case "category": {
 
-                    List list = getSearchBar().getLastSuggestions();
-                    Item categoryItem = (Item) list.get(indItem);
-                    this.onCategoryClick((Category) categoryItem.getObject());
+                        List list = getSearchBar().getLastSuggestions();
+                        Item categoryItem = (Item) list.get(indItem);
+                        this.onCategoryClick((Category) categoryItem.getObject());
 
-                } else if (type.equals("product")) {
+                        break;
+                    }
+                    case "product": {
 
-                    List list = getSearchBar().getLastSuggestions();
-                    Item productItem = (Item) list.get(indItem);
-                    Product product = (Product) productItem.getObject();
+                        List list = getSearchBar().getLastSuggestions();
+                        Item productItem = (Item) list.get(indItem);
+                        Product product = (Product) productItem.getObject();
 
-                    if (!product.getName().equals(currentProduct.getName()))
-                        super.onProductClick((Product) productItem.getObject());
+                        if (!product.getName().equals(currentProduct.getName()))
+                            super.onProductClick((Product) productItem.getObject());
 
-                } else {
-                    Map<String, String> map = new HashMap<>();
-                    map.put(Constant.LAST_QUERY, query.getText().toString());
+                        break;
+                    }
+                    default:
+                        Map<String, String> map = new HashMap<>();
+                        map.put(Constant.LAST_QUERY, query.getText().toString());
 
-                    this.startActivity(index.get(type), map);
+                        this.startActivity(index.get(type), map);
+                        break;
                 }
 
                 getSearchBar().postDelayed(new Runnable() {
@@ -342,19 +337,19 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             return;
         }
         if(Double.parseDouble(prc) > range.second.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.second);
+            String s = "R$ "+ String.format(Locale.US, "%.2f", range.second);
             s = s.replace('.',',');
             price.setError("O valor deve ser menor que " + s);
             return;
         }else if(Double.parseDouble(prc) < range.first.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.first);
+            String s = "R$ "+ String.format(Locale.US, "%.2f", range.first);
             s = s.replace('.',',');
             price.setError("O valor deve ser maior que "+ s);
             return;
         }
 
         Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US);
         String str = format.format(date);
 
         Feedback feedback = new Feedback(currentProduct.getName(), loc, str, Double.parseDouble(prc));
@@ -384,5 +379,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             }
         });
 
+
+        presenterOps.updateProduct(currentProduct);
     }
 }

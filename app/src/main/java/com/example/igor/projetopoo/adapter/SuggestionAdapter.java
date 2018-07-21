@@ -1,23 +1,17 @@
 package com.example.igor.projetopoo.adapter;
 
 
-import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.entities.Item;
-import com.mancj.materialsearchbar.adapter.DefaultSuggestionsAdapter;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapter.Holder> {
     private SuggestionAdapter.OnItemViewClickListener listener;

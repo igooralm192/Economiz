@@ -1,16 +1,13 @@
 package com.example.igor.projetopoo.activity.search;
 
-import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 
 import com.example.igor.projetopoo.R;
-import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
-import com.example.igor.projetopoo.entities.Result;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
 import com.google.android.gms.tasks.Task;
@@ -80,7 +77,7 @@ public class SearchModel implements SearchMVP.ModelOps {
                     }
                 } else {
                     if (data != null) {
-                        Product product = new Product(data);
+                        Product product = new Product(document.getId(), data);
                         objects.add(product);
                     }
                 }

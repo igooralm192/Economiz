@@ -1,11 +1,5 @@
 package com.example.igor.projetopoo.activity.category;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
-
-import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Entitie;
@@ -13,11 +7,9 @@ import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
-import com.example.igor.projetopoo.helper.CustomDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.ReqPresenterOps {
@@ -67,7 +59,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
         List<Entitie> subcategories = new ArrayList<>();
         List<Entitie> products = new ArrayList<>();
 
-        for (Object object: objects) {
+        for (Object object : objects) {
             if (object instanceof Product)
                 products.add((Product) object);
 
@@ -75,7 +67,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
         Collections.sort(products);
 
-        for (Object object: objects) {
+        for (Object object : objects) {
             if (object instanceof Category)
                 subcategories.add((Category) object);
         }

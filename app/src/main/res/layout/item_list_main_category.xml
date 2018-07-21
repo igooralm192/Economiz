@@ -49,7 +49,7 @@
                 android:shadowColor="@color/common_google_signin_btn_text_dark_focused"
                 android:shadowDx="4.0"
                 android:shadowDy="4.0"
-                android:shadowRadius="4.0"
+                android:shadowRadius="8.0"
                 android:text="TextView"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"

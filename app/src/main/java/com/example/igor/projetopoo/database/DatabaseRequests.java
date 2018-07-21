@@ -7,8 +7,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.List;
-
 public interface DatabaseRequests {
     Task<DocumentSnapshot> getDocument(DocumentReference documentReference);
     Task<QuerySnapshot> getDocuments(CollectionReference collectionReference);

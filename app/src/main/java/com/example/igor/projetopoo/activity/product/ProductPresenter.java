@@ -1,30 +1,17 @@
 package com.example.igor.projetopoo.activity.product;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.util.Log;
-import android.util.Pair;
-import android.widget.EditText;
 
-import com.example.igor.projetopoo.R;
-import com.example.igor.projetopoo.activity.product.ProductMVP;
-import com.example.igor.projetopoo.activity.product.ProductModel;
 import com.example.igor.projetopoo.database.Database;
-import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
 import com.example.igor.projetopoo.helper.AsyncDownload;
-import com.example.igor.projetopoo.helper.CustomDialog;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.ReqPresenterOps {
@@ -155,6 +142,33 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             }
         });
         asyncDownload.execute();
+    }
+
+    @Override
+    public void updateProduct(final Product currentProduct) {
+
+        new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
+            @Override
+            public void onPreExecute() {
+                reqViewOps.showProgressBar(true);
+            }
+
+            @Override
+            public Object doInBackground(Object... objects) {
+                try {
+                    modelOps.refreshProduct(currentProduct);
+                } catch (DatabaseException e) {
+                    e.failWriteData();
+                }
+
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Object object) {
+                // ProductPresenter.this.getFeedbacks(feedback.getProduct());
+            }
+        }).execute();
     }
 
 

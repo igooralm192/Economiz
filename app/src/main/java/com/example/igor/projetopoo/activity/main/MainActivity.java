@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,9 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,13 +29,10 @@ import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
-import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
-import com.example.igor.projetopoo.helper.AsyncDownload;
-import com.example.igor.projetopoo.helper.Blur;
 import com.example.igor.projetopoo.helper.Constant;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
@@ -91,7 +85,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     @Override
     public void showCategories(List<Category> categories) {
-        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<Category, Category.MainHolder>(
+        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<>(
                 getContext(),
                 categories,
                 new ListAdapter<Category, Category.MainHolder>() {
