@@ -247,7 +247,6 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
         if (oldcategory != null) {
             oldFragment = manager.findFragmentByTag(oldcategory.getName());
-
             Slide slide = new Slide();
             slide.setDuration(500);
 
