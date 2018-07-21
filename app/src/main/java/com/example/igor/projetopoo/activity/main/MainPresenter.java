@@ -1,9 +1,6 @@
 package com.example.igor.projetopoo.activity.main;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.database.Database;

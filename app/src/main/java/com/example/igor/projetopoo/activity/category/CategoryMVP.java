@@ -1,11 +1,7 @@
 package com.example.igor.projetopoo.activity.category;
 
-import android.app.Activity;
-import android.content.Context;
-
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Entitie;
-import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
 

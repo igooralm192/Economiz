@@ -11,13 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.util.Pair;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;

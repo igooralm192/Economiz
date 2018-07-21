@@ -73,7 +73,7 @@ public class CategoryModel implements CategoryMVP.ModelOps {
                     }
                 } else {
                     if (data != null) {
-                        Product product = new Product(data);
+                        Product product = new Product(documentSnapshot.getId(), data);
                         objects.add(product);
                     }
                 }

@@ -5,8 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Item implements Serializable {
     private int idIcon;
@@ -61,8 +59,7 @@ public class Item implements Serializable {
         if (obj instanceof Item) {
             Item item = (Item) obj;
 
-            if (this.getName().equals(item.getName()) && this.getType().equals(item.getType())) return true;
-            else return false;
+            return this.getName().equals(item.getName()) && this.getType().equals(item.getType());
         } else return super.equals(obj);
 
     }

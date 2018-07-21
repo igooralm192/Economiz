@@ -3,19 +3,14 @@ package com.example.igor.projetopoo.exception;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.media.Image;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryMVP;
 import com.example.igor.projetopoo.activity.category.CategoryPresenter;
-import com.example.igor.projetopoo.activity.main.MainActivity;
 import com.example.igor.projetopoo.activity.main.MainMVP;
 import com.example.igor.projetopoo.activity.main.MainPresenter;
 import com.example.igor.projetopoo.activity.product.ProductMVP;
@@ -24,6 +19,7 @@ import com.example.igor.projetopoo.activity.search.SearchMVP;
 import com.example.igor.projetopoo.activity.search.SearchPresenter;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
+import com.example.igor.projetopoo.entities.Product;
 
 public class ConnectionException extends Exception {
     private Context context;
@@ -59,8 +55,8 @@ public class ConnectionException extends Exception {
                 if (presenter instanceof ProductPresenter) {
                     ProductMVP.PresenterOps presenterOps = (ProductMVP.PresenterOps) presenter;
 
-                    if (object[0] instanceof String)
-                        presenterOps.getFeedbacks((String) object[0]);
+                    if (object[0] instanceof Product)
+                        presenterOps.getFeedbacks((Product) object[0]);
                     else if (object[0] instanceof Feedback)
                         presenterOps.addFeedback((Dialog) object[1], (Feedback) object[0]);
                 }

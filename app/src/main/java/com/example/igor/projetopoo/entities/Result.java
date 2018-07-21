@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.igor.projetopoo.R;
-import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 
 public class Result {
     private int icon;
@@ -21,7 +20,7 @@ public class Result {
     }
 
     public Result(int icon, String name, Object object) {
-        this(icon, name, Double.valueOf(-1f), object);
+        this(icon, name, -1d, object);
     }
 
     public int getIcon() {

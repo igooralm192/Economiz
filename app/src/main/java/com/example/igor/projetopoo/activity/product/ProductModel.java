@@ -2,7 +2,6 @@ package com.example.igor.projetopoo.activity.product;
 
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
-import android.widget.ScrollView;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -18,7 +17,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.example.igor.projetopoo.entities.Category;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,41 +35,42 @@ public class ProductModel implements ProductMVP.ModelOps {
     }
 
     @Override
-    public void feedbackListRequest(String productName) throws ConnectionException, DatabaseException {
+    public void feedbackListRequest(Product product) throws ConnectionException, DatabaseException {
         final ConstraintLayout layout = activity.findViewById(R.id.container_product);
+
+        final AppBarLayout appbar = activity.findViewById(R.id.appbar);
+        final boolean hasConnectivity = ParentActivity.checkConnection(activity);
 
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 layout.removeAllViews();
+                appbar.setExpanded(hasConnectivity);
             }
         });
 
-        AppBarLayout appbar = activity.findViewById(R.id.appbar);
-        if (!ParentActivity.checkConnection(activity)) {
-            appbar.setExpanded(false);
+        if (!hasConnectivity) {
             throw new ConnectionException(activity, layout);
-        } else appbar.setExpanded(true);
+        }
 
         List<Object> objects = new ArrayList<>();
 
         FirebaseFirestore firestore = database.getFirestore();
-        CollectionReference collectionReference;
-
-        collectionReference = firestore.collection("feedbacks");
-
-        Query query = collectionReference.whereEqualTo("product", productName);
+        CollectionReference collectionReference = firestore.collection("feedbacks");
+        Query query = collectionReference.whereEqualTo("product", product.getName());
         Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
         if (!querySnapshot.isSuccessful()) throw new DatabaseException(activity);
 
         for (DocumentSnapshot documentSnapshot: querySnapshot.getResult()) {
             Map<String, Object> data = documentSnapshot.getData();
 
-            Feedback feedback = new Feedback(data);
-            objects.add(feedback);
+            if (data != null) {
+                Feedback feedback = new Feedback(data);
+                objects.add(feedback);
+            }
         }
 
-        reqPresenterOps.onReturnedFeedbackList(objects);
+        reqPresenterOps.onReturnedFeedbackList(objects, product);
     }
 
     @Override
@@ -87,5 +86,12 @@ public class ProductModel implements ProductMVP.ModelOps {
         database.deleteDocument(task.getResult());
         if (!task.isSuccessful()) throw new DatabaseException(activity);
         reqPresenterOps.onFeedbackDeleted();
+    }
+
+    @Override
+    public void refreshProduct(Product product) throws DatabaseException {
+        FirebaseFirestore firestore = database.getFirestore();
+        Task<Void> task = database.updateDocument(firestore.collection("products").document(product.getId()), product.toMap());
+        if (!task.isSuccessful()) throw new DatabaseException(activity);
     }
 }

@@ -1,7 +1,5 @@
 package com.example.igor.projetopoo.activity.search;
 
-import android.content.Context;
-
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;

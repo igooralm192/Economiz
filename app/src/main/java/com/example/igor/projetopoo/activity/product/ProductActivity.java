@@ -2,30 +2,24 @@ package com.example.igor.projetopoo.activity.product;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.transition.Fade;
 import android.transition.Slide;
-import android.util.Log;
 import android.util.Pair;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,13 +30,13 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.category.CategoryActivity;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
-import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
@@ -55,16 +49,12 @@ import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -75,7 +65,6 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     private TextView toolbarPrice;
     private TextView infoName;
     private TextView infoPrice;
-    private ImageView backgroundProduct;
 
     private ProductMVP.PresenterOps presenterOps;
     private Product currentProduct;
@@ -88,12 +77,12 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         init();
         createSearchBar();
 
-        presenterOps.getFeedbacks(currentProduct.getName());
+        presenterOps.getFeedbacks(currentProduct);
 
         getSwipeRefreshLayout().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenterOps.getFeedbacks(currentProduct.getName());
+                presenterOps.getFeedbacks(currentProduct);
             }
         });
 
@@ -102,9 +91,9 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     @Override
     public void init() {
         setContext(this);
-        setBlackLayout( (FrameLayout) findViewById(R.id.black_product));
-        setSearchBar( (MaterialSearchBar) findViewById(R.id.product_search_bar));
-        setSwipeRefreshLayout( (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_feedback));
+        setBlackLayout((FrameLayout) findViewById(R.id.black_product));
+        setSearchBar((MaterialSearchBar) findViewById(R.id.product_search_bar));
+        setSwipeRefreshLayout((SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_feedback));
 
         presenterOps = new ProductPresenter(this, new Database(FirebaseFirestore.getInstance()));
         dialog = new CustomDialog(this, R.layout.dialog);
@@ -117,10 +106,10 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         toolbarPrice = findViewById(R.id.toolbar_price);
         infoName = findViewById(R.id.name_info_product);
         infoPrice = findViewById(R.id.price_info_product);
-        backgroundProduct = findViewById(R.id.background_product);
+        ImageView backgroundProduct = findViewById(R.id.background_product);
 
         Intent intent = getIntent();
-        currentProduct = Product.toObject( intent.getStringExtra(Constant.SELECTED_PRODUCT) );
+        currentProduct = Product.toObject(intent.getStringExtra(Constant.SELECTED_PRODUCT));
 
         if (currentProduct != null) {
 
@@ -145,9 +134,9 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == android.R.id.home) finish();
+        if (id == android.R.id.home) finish();
 
-        if(id == R.id.app_bar_search)
+        if (id == R.id.app_bar_search)
             Animation.openSearch(getSearchBar(), getBlackLayout());
 
         return super.onOptionsItemSelected(item);
@@ -163,7 +152,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         int indexProduct = getProductsSuggestions().indexOf(currentProduct);
         getProductsSuggestions().set(indexProduct, currentProduct);
 
-        final ListGenericAdapter<Feedback,Feedback.Holder> adapter = new ListGenericAdapter<>(
+        final ListGenericAdapter<Feedback, Feedback.Holder> adapter = new ListGenericAdapter<>(
                 this,
                 list,
                 new ListAdapter<Feedback, Feedback.Holder>() {
@@ -178,7 +167,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
                         holder.location.setText(items.get(position).getLocation());
                         holder.date.setText(items.get(position).getDate().toUpperCase());
 
-                        String s = "R$ " + String.format("%.2f", items.get(position).getPrice().floatValue()).replace('.',',');
+                        String s = "R$ " + String.format(Locale.US, "%.2f", items.get(position).getPrice().floatValue()).replace('.', ',');
                         holder.price.setText(s);
                     }
 
@@ -202,24 +191,30 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     }
 
     @Override
-    public void showProgressBar(Boolean enabled) {
-        getSwipeRefreshLayout().setRefreshing(enabled);
+    public void showProgressBar(final Boolean enabled) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getSwipeRefreshLayout().setRefreshing(enabled);
+            }
+        });
     }
 
     @Override
     public void showSnackbar(int op) {
         String str;
 
-        if(op == 1) str = getString(R.string.feedback_removed);
+        if (op == 1) str = getString(R.string.feedback_removed);
         else str = getString(R.string.feedback_added);
 
         Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator), str, Snackbar.LENGTH_LONG);
 
-        if(op == 0)
+        if (op == 0)
             mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     presenterOps.removeFeedback();
+                    presenterOps.getFeedbacks(currentProduct);
                 }
             });
 
@@ -228,7 +223,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
     @Override
     public void onSearchStateChanged(boolean enabled) {
-        if(!enabled){
+        if (!enabled) {
             Animation.closeSearch(getSearchBar(), getBlackLayout());
         }
     }
@@ -248,26 +243,32 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             int indItem = getSearchBar().getLastSuggestions().indexOf(item);
 
             if (indItem != -1) {
-                if (type.equals("category")) {
+                switch (type) {
+                    case "category": {
 
-                    List list = getSearchBar().getLastSuggestions();
-                    Item categoryItem = (Item) list.get(indItem);
-                    this.onCategoryClick((Category) categoryItem.getObject());
+                        List list = getSearchBar().getLastSuggestions();
+                        Item categoryItem = (Item) list.get(indItem);
+                        this.onCategoryClick((Category) categoryItem.getObject());
 
-                } else if (type.equals("product")) {
+                        break;
+                    }
+                    case "product": {
 
-                    List list = getSearchBar().getLastSuggestions();
-                    Item productItem = (Item) list.get(indItem);
-                    Product product = (Product) productItem.getObject();
+                        List list = getSearchBar().getLastSuggestions();
+                        Item productItem = (Item) list.get(indItem);
+                        Product product = (Product) productItem.getObject();
 
-                    if (!product.getName().equals(currentProduct.getName()))
-                        super.onProductClick((Product) productItem.getObject());
+                        if (!product.getName().equals(currentProduct.getName()))
+                            super.onProductClick((Product) productItem.getObject());
 
-                } else {
-                    Map<String, String> map = new HashMap<>();
-                    map.put(Constant.LAST_QUERY, query.getText().toString());
+                        break;
+                    }
+                    default:
+                        Map<String, String> map = new HashMap<>();
+                        map.put(Constant.LAST_QUERY, query.getText().toString());
 
-                    this.startActivity(index.get(type), map);
+                        this.startActivity(index.get(type), map);
+                        break;
                 }
 
                 getSearchBar().postDelayed(new Runnable() {
@@ -309,21 +310,21 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
                 int offset = appbar.getTotalScrollRange();
 
-                toolbarName.setAlpha((float)(-verticalOffset / (float) offset));
-                toolbarPrice.setAlpha((float)(-verticalOffset/(float) offset));
-                card.setAlpha((float)(1+(verticalOffset/(float)offset)));
+                toolbarName.setAlpha(-verticalOffset / (float) offset);
+                toolbarPrice.setAlpha(-verticalOffset / (float) offset);
+                card.setAlpha(1 + (verticalOffset / (float) offset));
 
                 card.setTranslationY(verticalOffset);
 
                 CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getSwipeRefreshLayout().getLayoutParams();
-                double top = Math.floor((card.getTop() + layout.getBottom() - appbar.getBottom()) * (1 + verticalOffset/(float)offset) );
-                lp.setMargins(0, (int) top, 0,0);
+                double top = Math.floor((card.getTop() + layout.getBottom() - appbar.getBottom()) * (1 + verticalOffset / (float) offset));
+                lp.setMargins(0, (int) top, 0, 0);
                 getSwipeRefreshLayout().setLayoutParams(lp);
             }
         });
     }
 
-    public void createFeedback(View v){
+    public void createFeedback(View v) {
         EditText location = dialog.findViewById(R.id.location_edit_text);
         EditText price = dialog.findViewById(R.id.price_edit_text);
         String prc = price.getText().toString();
@@ -341,38 +342,38 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             price.setError("Este campo é obrigatório");
             return;
         }
-        if(Double.parseDouble(prc) > range.second.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.second);
-            s = s.replace('.',',');
+        if (Double.parseDouble(prc) > range.second.doubleValue()) {
+            String s = "R$ " + String.format(Locale.US, "%.2f", range.second);
+            s = s.replace('.', ',');
             price.setError("O valor deve ser menor que " + s);
             return;
-        }else if(Double.parseDouble(prc) < range.first.doubleValue()){
-            String s = "R$ "+ String.format("%.2f", range.first);
-            s = s.replace('.',',');
-            price.setError("O valor deve ser maior que "+ s);
+        } else if (Double.parseDouble(prc) < range.first.doubleValue()) {
+            String s = "R$ " + String.format(Locale.US, "%.2f", range.first);
+            s = s.replace('.', ',');
+            price.setError("O valor deve ser maior que " + s);
             return;
         }
 
         Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US);
         String str = format.format(date);
 
         Feedback feedback = new Feedback(currentProduct.getName(), loc, str, Double.parseDouble(prc));
         presenterOps.addFeedback(dialog, feedback);
     }
 
-    public void showDialog(View v){
+    public void showDialog(View v) {
         dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
         dialog.show();
     }
 
-    public void cancelDialog(View v){
+    public void cancelDialog(View v) {
         dialog.dismiss();
     }
 
-    public void updateProductData(Product currentProduct){
+    public void updateProductData(Product currentProduct) {
         final String name = currentProduct.getName();
-        final String price = String.format("R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
+        final String price = String.format(Locale.US, "R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
 
         this.runOnUiThread(new Runnable() {
             @Override
@@ -384,5 +385,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             }
         });
 
+
+        presenterOps.updateProduct(currentProduct);
     }
 }
