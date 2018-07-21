@@ -13,7 +13,7 @@ import com.example.igor.projetopoo.R;
 
 public class ListFragment extends Fragment {
     private RecyclerView list;
-    private OnListFragmentSettings onListFragmentSettings;
+    private static OnListFragmentSettings onListFragmentSettings;
 
     public ListFragment() {
         // Required empty public constructor
@@ -21,7 +21,7 @@ public class ListFragment extends Fragment {
 
     public static ListFragment getInstance(OnListFragmentSettings onListFragmentSettings) {
         ListFragment listFragment = new ListFragment();
-        listFragment.onListFragmentSettings = onListFragmentSettings;
+        ListFragment.onListFragmentSettings = onListFragmentSettings;
         return listFragment;
     }
 
@@ -40,7 +40,7 @@ public class ListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
         list = view.findViewById(R.id.list_fragment);
-        list = onListFragmentSettings.setList(list);
+        list = ListFragment.onListFragmentSettings.setList(list);
 
         return view;
     }

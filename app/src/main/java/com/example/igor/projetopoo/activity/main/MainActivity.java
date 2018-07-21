@@ -261,11 +261,17 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_main, newFragment);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     private void configSuggestions() {
         String sug = getSharedPreferences().getString(Constant.ALL_SUGGESTIONS, null);
         presenterOps.getAllSuggestions(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE");
+        super.onSaveInstanceState(outState);
     }
 }
