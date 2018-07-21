@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View access
-        void getFeedbacks(String productName);
+        void getFeedbacks(Product product);
         void addFeedback(Dialog dialog, Feedback feedback);
         void removeFeedback();
         void updateProduct(Product currentProduct);
@@ -20,7 +20,7 @@ public interface ProductMVP {
 
     public interface ModelOps {
         // Model methods => Presenter access
-        void feedbackListRequest(String productName) throws ConnectionException, DatabaseException;
+        void feedbackListRequest(Product product) throws ConnectionException, DatabaseException;
         void insertFeedback(Feedback feedback) throws ConnectionException, DatabaseException;
         void deleteFeedback() throws ConnectionException, DatabaseException;
         void refreshProduct(Product product) throws DatabaseException;
@@ -28,7 +28,7 @@ public interface ProductMVP {
 
     public interface ReqPresenterOps {
         // Presenter methods => Model access
-        void onReturnedFeedbackList(List<Object> objects);
+        void onReturnedFeedbackList(List<Object> objects, Product product);
         void onFeedbackInserted();
         void onFeedbackDeleted();
     }

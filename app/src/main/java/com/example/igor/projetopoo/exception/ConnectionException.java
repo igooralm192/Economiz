@@ -19,6 +19,7 @@ import com.example.igor.projetopoo.activity.search.SearchMVP;
 import com.example.igor.projetopoo.activity.search.SearchPresenter;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
+import com.example.igor.projetopoo.entities.Product;
 
 public class ConnectionException extends Exception {
     private Context context;
@@ -54,8 +55,8 @@ public class ConnectionException extends Exception {
                 if (presenter instanceof ProductPresenter) {
                     ProductMVP.PresenterOps presenterOps = (ProductMVP.PresenterOps) presenter;
 
-                    if (object[0] instanceof String)
-                        presenterOps.getFeedbacks((String) object[0]);
+                    if (object[0] instanceof Product)
+                        presenterOps.getFeedbacks((Product) object[0]);
                     else if (object[0] instanceof Feedback)
                         presenterOps.addFeedback((Dialog) object[1], (Feedback) object[0]);
                 }

@@ -21,10 +21,10 @@ public class Product extends Entitie implements Serializable {
         this.priceRange = priceRange;
     }
 
+    @SuppressWarnings("unchecked")
     public Product(String id, Map<String, Object> map) {
         this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"), (Number) map.get("average_price"), null);
 
-        //noinspection unchecked
         Map<String, Object> range = (Map<String, Object>) map.get("price_range");
 
         Number min = (Number) range.get("minimum_price");

@@ -35,7 +35,7 @@ public class ProductModel implements ProductMVP.ModelOps {
     }
 
     @Override
-    public void feedbackListRequest(String productName) throws ConnectionException, DatabaseException {
+    public void feedbackListRequest(Product product) throws ConnectionException, DatabaseException {
         final ConstraintLayout layout = activity.findViewById(R.id.container_product);
 
         final AppBarLayout appbar = activity.findViewById(R.id.appbar);
@@ -56,11 +56,8 @@ public class ProductModel implements ProductMVP.ModelOps {
         List<Object> objects = new ArrayList<>();
 
         FirebaseFirestore firestore = database.getFirestore();
-        CollectionReference collectionReference;
-
-        collectionReference = firestore.collection("feedbacks");
-
-        Query query = collectionReference.whereEqualTo("product", productName);
+        CollectionReference collectionReference = firestore.collection("feedbacks");
+        Query query = collectionReference.whereEqualTo("product", product.getName());
         Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
         if (!querySnapshot.isSuccessful()) throw new DatabaseException(activity);
 
@@ -73,7 +70,7 @@ public class ProductModel implements ProductMVP.ModelOps {
             }
         }
 
-        reqPresenterOps.onReturnedFeedbackList(objects);
+        reqPresenterOps.onReturnedFeedbackList(objects, product);
     }
 
     @Override
