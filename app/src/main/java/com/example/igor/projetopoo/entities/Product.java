@@ -8,30 +8,28 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Product extends Entitie implements Serializable {
     private Number averagePrice;
     private Pair<Number, Number> priceRange;
-    private String id;
 
-    public Product(String name, String parentCategory, Number backgroundCategory, Number averagePrice, Pair<Number, Number> priceRange) {
-        super(name, parentCategory, backgroundCategory);
+    public Product(String id, String name, String parentCategory, Number backgroundCategory, Number averagePrice, Pair<Number, Number> priceRange) {
+        super(id, name, parentCategory, backgroundCategory);
         this.averagePrice = averagePrice;
         this.priceRange = priceRange;
     }
 
     @SuppressWarnings("unchecked")
     public Product(String id, Map<String, Object> map) {
-        this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"), (Number) map.get("average_price"), null);
+        this(id, (String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"), (Number) map.get("average_price"), null);
 
         Map<String, Object> range = (Map<String, Object>) map.get("price_range");
 
         Number min = (Number) range.get("minimum_price");
         Number max = (Number) range.get("maximum_price");
-        this.id = id;
         this.priceRange = new Pair<>(min, max);
-        Log.i("TAG", this.priceRange.toString());
     }
 
     public Number getAveragePrice() { return averagePrice; }
@@ -62,8 +60,8 @@ public class Product extends Entitie implements Serializable {
             object.put("average_price", this.getAveragePrice().doubleValue());
 
             JSONObject range = new JSONObject();
-            range.put("minimum_range", this.getPriceRange().first.doubleValue());
-            range.put("maximum_range", this.getPriceRange().second.doubleValue());
+            range.put("minimum_price", this.getPriceRange().first.doubleValue());
+            range.put("maximum_price", this.getPriceRange().second.doubleValue());
             object.put("price_range", range);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -72,28 +70,15 @@ public class Product extends Entitie implements Serializable {
         return object;
     }
 
-    public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", this.getName());
-        map.put("parent_category", this.getParentCategory());
-        map.put("background_category", this.getBackgroundCategory().doubleValue());
-        map.put("average_price", this.getAveragePrice().doubleValue());
-
-        Map<String, Object> range = new HashMap<>();
-        range.put("minimum_price", this.getPriceRange().first.doubleValue());
-        range.put("maximum_price", this.getPriceRange().second.doubleValue());
-        map.put("price_range", range);
-        return map;
-    }
-
     public static Product toObject(String json) {
         try {
             JSONObject object = new JSONObject(json);
 
             JSONObject range = object.getJSONObject("price_range");
-            Pair<Number, Number> priceRange = new Pair<>( (Number) range.getDouble("minimum_range"), (Number) range.getDouble("maximum_range") );
+            Pair<Number, Number> priceRange = new Pair<>( (Number) range.get("minimum_price"), (Number) range.get("maximum_price") );
 
-            Product p = new Product(
+            return new Product(
+                    (String) object.get("id"),
                     (String) object.get("name"),
                     (String) object.get("parent_category"),
                     (Number) object.get("background_category"),
@@ -101,20 +86,28 @@ public class Product extends Entitie implements Serializable {
                     priceRange
             );
 
-            p.setId((String) object.get("id"));
-            return p;
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", this.getId());
+        map.put("name", this.getName());
+        map.put("parent_category", this.getParentCategory());
+        map.put("background_category", this.getBackgroundCategory());
+        map.put("average_price", this.getAveragePrice().doubleValue());
 
-    public String getId() {
-        return id;
+        Map<String, Object> range = new HashMap<>();
+        range.put("minimum_price", this.getPriceRange().first);
+        range.put("maximum_price", this.getPriceRange().second);
+
+        map.put("price_range", range);
+
+        return map;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 }

@@ -7,11 +7,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Map;
+
 public interface DatabaseRequests {
     Task<DocumentSnapshot> getDocument(DocumentReference documentReference);
     Task<QuerySnapshot> getDocuments(CollectionReference collectionReference);
     Task<QuerySnapshot> getDocuments(Query query);
     Task<DocumentReference> addDocument(CollectionReference collectionReference, Object object);
-    Task<Void> updateDocument(DocumentReference documentReference, Object object);
+    Task<Void> updateDocument(DocumentReference documentReference, Map<String, Object> map);
     Task<Void> deleteDocument(DocumentReference documentReference);
 }

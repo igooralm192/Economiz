@@ -1,5 +1,6 @@
 package com.example.igor.projetopoo.activity.main;
 
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -64,11 +66,9 @@ public class MainModel implements MainMVP.ModelOps {
 
             Category category = null;
             if (data != null) {
-                category = new Category(data);
+                category = new Category(documentSnapshot.getId(), data);
                 objects.add(category);
             }
-
-
         }
 
         reqPresenterOps.onReturnedCategoryList(objects);
@@ -95,7 +95,7 @@ public class MainModel implements MainMVP.ModelOps {
 
                 if (path.equals("categories")) {
                     if (data != null) {
-                        Category category = new Category(data);
+                        Category category = new Category(documentSnapshot.getId(), data);
                         objects.add(category);
                     }
                 } else {

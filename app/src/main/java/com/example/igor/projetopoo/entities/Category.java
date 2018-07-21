@@ -15,17 +15,18 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class Category extends Entitie implements Serializable {
-    public Category(String name, String parentCategory, Number backgroundCategory) {
-        super(name, parentCategory, backgroundCategory);
+    public Category(String id, String name, String parentCategory, Number backgroundCategory) {
+        super(id, name, parentCategory, backgroundCategory);
     }
 
-    public Category(Map<String, Object> map) {
-        this((String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"));
+    public Category(String id, Map<String, Object> map) {
+        this(id, (String) map.get("name"), (String) map.get("parent_category"), (Number) map.get("background_category"));
     }
 
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
         try {
+            object.put("id", this.getId());
             object.put("name", this.getName());
             object.put("parent_category", this.getParentCategory());
             object.put("background_category", this.getBackgroundCategory());
@@ -41,6 +42,7 @@ public class Category extends Entitie implements Serializable {
             JSONObject object = new JSONObject(json);
 
             return new Category(
+                    (String) object.get("id"),
                     (String) object.get("name"),
                     (String) object.get("parent_category"),
                     (Integer) object.get("background_category")
@@ -51,12 +53,12 @@ public class Category extends Entitie implements Serializable {
         }
     }
 
-    public static class MainHolder extends RecyclerView.ViewHolder {
+    public static class Holder extends RecyclerView.ViewHolder {
         public final TextView name;
         public final ImageView background;
         public Category category;
 
-        public MainHolder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
+        public Holder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
             super(view);
 
             name = (TextView) view.findViewById(R.id.name_main_category);
@@ -65,7 +67,7 @@ public class Category extends Entitie implements Serializable {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onCategoryClick( MainHolder.this.getCategory() );
+                    listener.onCategoryClick( Holder.this.getCategory() );
                 }
             });
         }

@@ -13,8 +13,8 @@ public interface ProductMVP {
     public interface PresenterOps {
         // Presenter methods => View access
         void getFeedbacks(Product product);
-        void addFeedback(Dialog dialog, Feedback feedback);
-        void removeFeedback();
+        void addFeedback(Feedback feedback, Product product, Dialog dialog);
+        void removeFeedback(Product product);
         void updateProduct(Product currentProduct);
     }
 

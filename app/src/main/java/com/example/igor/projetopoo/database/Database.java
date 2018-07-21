@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Map;
+
 public class Database implements DatabaseRequests {
     private FirebaseFirestore firestore;
 
@@ -71,8 +73,8 @@ public class Database implements DatabaseRequests {
         return task;
     }
 
-    public Task<Void> updateDocument(DocumentReference documentReference, Object object) {
-        Task<Void> task = documentReference.set(object);
+    public Task<Void> updateDocument(DocumentReference documentReference, Map<String, Object> map) {
+        Task<Void> task = documentReference.set(map);
 
         while (!task.isComplete()) {
             try {

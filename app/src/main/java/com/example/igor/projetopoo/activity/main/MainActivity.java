@@ -85,19 +85,19 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
     @Override
     public void showCategories(List<Category> categories) {
-        final ListGenericAdapter<Category, Category.MainHolder> listGenericAdapter = new ListGenericAdapter<>(
+        final ListGenericAdapter<Category, Category.Holder> listGenericAdapter = new ListGenericAdapter<>(
                 getContext(),
                 categories,
-                new ListAdapter<Category, Category.MainHolder>() {
+                new ListAdapter<Category, Category.Holder>() {
                     @Override
-                    public Category.MainHolder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                    public Category.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
                         View view = LayoutInflater.from(context).inflate(R.layout.item_list_main_category, parent, false);
 
-                        return new Category.MainHolder(view, MainActivity.this);
+                        return new Category.Holder(view, MainActivity.this);
                     }
 
                     @Override
-                    public void onBindViewHolder(List<Category> items, @NonNull Category.MainHolder holder, int position) {
+                    public void onBindViewHolder(List<Category> items, @NonNull Category.Holder holder, int position) {
                         Category category = items.get(position);
                         holder.setCategory(category);
                         holder.name.setText(category.getName());
@@ -141,7 +141,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
             suggestions.put(Constant.Entities.CATEGORIES, arrCategories);
 
             for (Product product: products) {
-                Log.i("TAG", product.getPriceRange().toString());
+                Log.i("TAG", product.toJSON().toString());
                 arrProducts.put(product.toJSON().toString());
             }
 

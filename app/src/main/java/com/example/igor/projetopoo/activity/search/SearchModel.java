@@ -72,7 +72,7 @@ public class SearchModel implements SearchMVP.ModelOps {
 
                 if(path.equals("categories")) {
                     if(data != null) {
-                        Category category = new Category(data);
+                        Category category = new Category(document.getId(), data);
                         objects.add(category);
                     }
                 } else {

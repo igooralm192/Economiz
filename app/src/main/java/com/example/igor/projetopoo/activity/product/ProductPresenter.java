@@ -73,10 +73,9 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             feedbacks.add((Feedback) object);
         }
         Double sum = 0.0;
-        for (Feedback a:feedbacks
-             ) {
+        for (Feedback a:feedbacks)
             sum += a.getPrice().doubleValue();
-        }
+
         if(feedbacks.size()>0) sum/=feedbacks.size();
         else sum = (product.getPriceRange().first.doubleValue()+product.getPriceRange().second.doubleValue())/2;
 
@@ -91,8 +90,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     }
 
     @Override
-    public void addFeedback(final Dialog dialog, final Feedback feedback) {
-
+    public void addFeedback(final Feedback feedback, final Product product, final Dialog dialog) {
         dialog.dismiss();
 
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
@@ -105,22 +103,8 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             public Object doInBackground(Object... objects) {
                 try {
                     modelOps.insertFeedback(feedback);
-
-                    FirebaseFirestore firestore = database.getFirestore();
-                    CollectionReference collectionReference = firestore.collection("products");
-                    Query query = collectionReference.whereEqualTo("name", feedback.getProduct());
-                    Task<QuerySnapshot> querySnapshot = database.getDocuments(query);
-                    if (!querySnapshot.isSuccessful()) throw new DatabaseException(activity);
-
-                    if (querySnapshot.getResult().size() > 0) {
-                        DocumentSnapshot product = querySnapshot.getResult().getDocuments().get(0);
-
-                        if (product.getData() != null) {
-                            return new Product(product.getId(), product.getData());
-                        }
-                    }
                 } catch (ConnectionException e) {
-                    e.connectionFail(ProductPresenter.this, feedback, dialog);
+                    e.connectionFail(ProductPresenter.this, feedback, product, dialog);
                 } catch (DatabaseException e) {
                     e.failWriteData();
                 }
@@ -130,9 +114,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-                if (object instanceof Product) {
-                    ProductPresenter.this.getFeedbacks((Product) object);
-                }
+               ProductPresenter.this.getFeedbacks(product);
             }
         });
 
@@ -140,7 +122,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
     }
 
     @Override
-    public void removeFeedback() {
+    public void removeFeedback(final Product product) {
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -153,7 +135,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
                 try {
                     modelOps.deleteFeedback();
                 } catch (ConnectionException e) {
-                    e.connectionFail(ProductPresenter.this);
+                    e.connectionFail(ProductPresenter.this, product);
                 } catch (DatabaseException e) {
                     e.failRemoveData();
                 }
@@ -164,9 +146,10 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-                reqViewOps.showProgressBar(false);
+                ProductPresenter.this.getFeedbacks(product);
             }
         });
+
         asyncDownload.execute();
     }
 
@@ -176,7 +159,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
         new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
-                reqViewOps.showProgressBar(true);
+
             }
 
             @Override
@@ -192,7 +175,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-                // ProductPresenter.this.getFeedbacks(feedback.getProduct());
+
             }
         }).execute();
     }

@@ -11,14 +11,24 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import java.io.Serializable;
 
 public abstract class Entitie implements Comparable<Entitie>, Serializable {
+    private String id;
     private String name;
     private String parentCategory;
     private Number backgroundCategory;
 
-    public Entitie(String name, String parentCategory, Number backgroundCategory) {
+    public Entitie(String id, String name, String parentCategory, Number backgroundCategory) {
+        this.id = id;
         this.name = name;
         this.parentCategory = parentCategory;
         this.backgroundCategory = backgroundCategory;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

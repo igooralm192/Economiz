@@ -83,8 +83,6 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         Intent intent = getIntent();
         lastQuery = intent.getStringExtra(Constant.LAST_QUERY);
         getSearchBar().setPlaceHolder(lastQuery);
-
-        setAllSuggestions();
     }
 
     @Override
@@ -271,6 +269,6 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         });
 
         fragmentTransaction.add(R.id.container_search, listFragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.commitAllowingStateLoss();
     }
 }

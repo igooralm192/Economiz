@@ -2,6 +2,7 @@ package com.example.igor.projetopoo.activity.product;
 
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
+import android.util.Log;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -91,7 +92,8 @@ public class ProductModel implements ProductMVP.ModelOps {
     @Override
     public void refreshProduct(Product product) throws DatabaseException {
         FirebaseFirestore firestore = database.getFirestore();
-        Task<Void> task = database.updateDocument(firestore.collection("products").document(product.getId()), product.toMap());
+        Map<String, Object> map = product.toMap();
+        Task<Void> task = database.updateDocument(firestore.collection("products").document(product.getId()), map);
         if (!task.isSuccessful()) throw new DatabaseException(activity);
     }
 }

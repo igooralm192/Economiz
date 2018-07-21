@@ -58,7 +58,7 @@ public class ConnectionException extends Exception {
                     if (object[0] instanceof Product)
                         presenterOps.getFeedbacks((Product) object[0]);
                     else if (object[0] instanceof Feedback)
-                        presenterOps.addFeedback((Dialog) object[1], (Feedback) object[0]);
+                        presenterOps.addFeedback((Feedback) object[0], (Product) object[1], (Dialog) object[2]);
                 }
 
                 if (presenter instanceof SearchPresenter) {

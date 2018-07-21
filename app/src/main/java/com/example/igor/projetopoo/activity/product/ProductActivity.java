@@ -96,7 +96,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         setSwipeRefreshLayout((SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_feedback));
 
         presenterOps = new ProductPresenter(this, new Database(FirebaseFirestore.getInstance()));
-        dialog = new CustomDialog(this, R.layout.dialog);
+        dialog = new CustomDialog(this, R.layout.add_feedback_dialog);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -120,7 +120,6 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
         appbar = findViewById(R.id.appbar);
         settingsAppBar();
-        setAllSuggestions();
     }
 
     @Override
@@ -213,8 +212,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    presenterOps.removeFeedback();
-                    presenterOps.getFeedbacks(currentProduct);
+                    presenterOps.removeFeedback(currentProduct);
                 }
             });
 
@@ -298,7 +296,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_product, newFragment);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     private void settingsAppBar() {
@@ -359,7 +357,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         String str = format.format(date);
 
         Feedback feedback = new Feedback(currentProduct.getName(), loc, str, Double.parseDouble(prc));
-        presenterOps.addFeedback(dialog, feedback);
+        presenterOps.addFeedback(feedback, currentProduct, dialog);
     }
 
     public void showDialog(View v) {
@@ -384,7 +382,6 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
                 infoPrice.setText(price);
             }
         });
-
 
         presenterOps.updateProduct(currentProduct);
     }

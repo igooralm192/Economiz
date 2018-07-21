@@ -25,6 +25,7 @@ import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.helper.Constant;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import org.json.JSONArray;
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class ParentActivity extends AppCompatActivity implements
@@ -52,8 +54,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
     private List<Item> recentQueries;
     private List<Item> recentQueriesClone;
 
-    private List<Category> categoriesSuggestions;
-    private List<Product> productsSuggestions;
+    private static List<Category> categoriesSuggestions;
+    private static List<Product> productsSuggestions;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -180,7 +182,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
                         product.getName(),
                         "product",
                         product,
-                        String.format("R$ %.2f", product.getAveragePrice()).replace('.', ',')
+                        String.format(Locale.US, "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ',')
                 );
 
                 newSuggestions.add(item);
@@ -231,8 +233,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
                     products.add(product);
                 }
 
-                this.categoriesSuggestions = categories;
-                this.productsSuggestions = products;
+                ParentActivity.categoriesSuggestions = categories;
+                ParentActivity.productsSuggestions = products;
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -425,7 +427,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
     }
 
     public void setCategoriesSuggestions(List<Category> categoriesSuggestions) {
-        this.categoriesSuggestions = categoriesSuggestions;
+        ParentActivity.categoriesSuggestions = categoriesSuggestions;
     }
 
     public List<Product> getProductsSuggestions() {
@@ -433,6 +435,6 @@ public abstract class ParentActivity extends AppCompatActivity implements
     }
 
     public void setProductsSuggestions(List<Product> productsSuggestions) {
-        this.productsSuggestions = productsSuggestions;
+        ParentActivity.productsSuggestions = productsSuggestions;
     }
 }

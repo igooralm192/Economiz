@@ -68,7 +68,7 @@ public class CategoryModel implements CategoryMVP.ModelOps {
 
                 if (path.equals("categories")) {
                     if (data != null) {
-                        Category subcategory = new Category(data);
+                        Category subcategory = new Category(documentSnapshot.getId(), data);
                         objects.add(subcategory);
                     }
                 } else {

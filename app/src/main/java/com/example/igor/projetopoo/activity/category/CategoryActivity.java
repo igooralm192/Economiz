@@ -41,6 +41,7 @@ import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqViewOps {
@@ -86,7 +87,6 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         getSupportActionBar().setTitle(currentCategory.getName());
         categoryLinks.put(currentCategory, null);
 
-        setAllSuggestions();
     }
 
     @Override
@@ -151,7 +151,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
                             holder.price.setText("");
                         } else {
                             Product product = (Product) entitie;
-                            holder.price.setText(String.format("R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
+                            holder.price.setText(String.format(Locale.getDefault(), "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
                         }
                     }
                 }
@@ -234,8 +234,6 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     @Override
     public void onCategoryClick(Category category) {
-        Log.i("TAG", category.getName());
-        Log.i("TAG", currentCategory.getName());
         categoryLinks.put(category, currentCategory);
         currentCategory = category;
 
@@ -285,7 +283,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_category, newFragment, currentCategory.getName());
         if (oldcategory != null) transaction.addToBackStack(null);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
 
         toolbar.postDelayed(new Runnable() {
             @Override
