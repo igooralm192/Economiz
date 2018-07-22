@@ -26,6 +26,11 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
         this.modelOps = new MainModel(activity, this, database);
     }
 
+    /*
+      Executa uma AsyncTask (tarefas simultâneas), determina que a View mostre o símbolo de
+      carregamento, solicita a Model a lista de categorias principais e depois desabilita o
+      símbolo que estava sendo mostrado.
+     */
     @Override
     public void getCategoryList() {
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
@@ -57,6 +62,10 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
         asyncDownload.execute();
     }
 
+    /*
+      Recebe uma lista de Objects (da Model) e os transforma em Category, ordena-a por nome e
+      determina que a View mostre essa lista de categorias.
+     */
     @Override
     public void onReturnedCategoryList(List<Object> objects) {
         List<Category> categories = new ArrayList<>();
@@ -70,6 +79,11 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
         reqViewOps.showCategories(categories);
     }
 
+    /*
+      Executa uma AsyncTask (tarefas simultâneas), abre uma mensagem informando o processamento de
+      informações, solicita a Model as sugestões de categorias e de produtos, depois fecha a caixa
+      de mensagem.
+     */
     @Override
     public void getAllSuggestions(Activity activity) {
         final CustomDialog loadSuggestions = new CustomDialog(activity, R.layout.load_suggestions);
@@ -97,6 +111,10 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
         asyncDownload.execute();
     }
 
+    /*
+      Recebe uma lista de Objects (da Model) e a transforma em duas lista, uma de Category e outra
+      de Product e determina que a View salve-as como sugestão.
+     */
     @Override
     public void onReturnedAllSuggestions(List<Object> objects) {
         List<Category> categories = new ArrayList<>();

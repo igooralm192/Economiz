@@ -49,7 +49,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/*
+  É classe principal do projeto, sendo usada para mostrar a tela principal do aplicativo,
+  representando a View no padrão MVP.
+ */
 public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
     private Boolean suggestionsStatus = false;
 
@@ -57,6 +60,11 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
     private RelativeLayout appBar;
     private MainMVP.PresenterOps presenterOps;
 
+    /*
+      Método principal, chamado quando a tela é criada. Determina o layout, inicializa atributos,
+      chama o método para construir a barra de pesquisa, configurar as sugestões e solicita a
+      Presenter as categorias principais.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +91,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         placeholder.setTypeface(typeface);
     }
 
+    // Inicializa alguns atributos
     @Override
     public void init() {
         setContext(this);
@@ -95,6 +104,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         presenterOps = new MainPresenter(this, getDatabase());
     }
 
+    // Recebe uma lista de categorias (da Presenter) e exibe-as na tela utilizando Fragment.
     @Override
     public void showCategories(List<Category> categories) {
         setAdapter(new ListGenericAdapter<>(
@@ -123,11 +133,16 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         changeListFragment(listFragment);
     }
 
+    // Mostra o símbolo de carregamento ou não a depender do valor de enabled.
     @Override
     public void showProgressBar(Boolean enabled) {
         getSwipeRefreshLayout().setRefreshing(enabled);
     }
 
+    /*
+     Recebe uma lista de categorias e produtos (disponíveis no banco de dados) e os salva como
+     sugestão.
+    */
     @Override
     public void saveAllSuggestions(List<Category> categories, List<Product> products) {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
@@ -166,6 +181,10 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         }
     }
 
+    /*
+     Recebe uma RecyclerView (do fragmento) e define algumas configurações, como seu Adapter e
+     LayourManager, retornando a lista configurada em seguida
+    */
     @Override
     public RecyclerView onListSettings(RecyclerView lista) {
         lista.setAdapter(getAdapter());
@@ -174,6 +193,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         return lista;
     }
 
+    // Verifica se a barra de pesquisa foi selecionada ou não e executa as animações necessárias.
     @Override
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) getBlackLayout().getBackground();
@@ -196,6 +216,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         }
     }
 
+    // Ao clicar numa sugestão, verifica-se o seu tipo para poder redirecionar o usuário a tela correta.
     @Override
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
@@ -242,6 +263,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         }
     }
 
+    // Redireciona o usuário para a tela da categoria clicada, no caso, recebida por parâmetro.
     @Override
     public void onCategoryClick(Category category) {
         Map<String, String> map = new HashMap<>();
@@ -250,6 +272,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         startActivity(CategoryActivity.class, map);
     }
 
+    // Redireciona o usuário para a tela do produto clicado, no caso, recebido por parêmetro.
     @Override
     public void onProductClick(Product product) {
         Map<String, String> map = new HashMap<>();
@@ -258,6 +281,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         startActivity(ProductActivity.class, map);
     }
 
+    // Adiciona ou repõe um fragmento na tela através de uma animação
     private void changeListFragment(ListFragment newFragment) {
         FragmentManager manager = getSupportFragmentManager();
 
@@ -276,6 +300,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
         transaction.commitAllowingStateLoss();
     }
 
+    // Configurar as sugestões, solicitando a Presenter, as categorias e produtos disponíveis.
     private void configSuggestions() {
         String sug = getSharedPreferences().getString(Constant.ALL_SUGGESTIONS, null);
         presenterOps.getAllSuggestions(this);

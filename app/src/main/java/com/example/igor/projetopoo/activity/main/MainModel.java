@@ -35,6 +35,10 @@ public class MainModel implements MainMVP.ModelOps {
         this.database = database;
     }
 
+    /*
+      Requisita ao banco de dados (Firebase) a lista de categoriais principais e envia para a Presenter
+      a lista em formato Object.
+     */
     @Override
     public void categoryListRequest() throws ConnectionException, DatabaseException {
         final ConstraintLayout layout = activity.findViewById(R.id.container_main);
@@ -74,6 +78,11 @@ public class MainModel implements MainMVP.ModelOps {
         reqPresenterOps.onReturnedCategoryList(objects);
     }
 
+    /*
+      Requisita ao banco de dados (Firebase) todas as categorias e produtos disponíveis para que
+      possam ser acessados diretamente pela barra de pesquisa. Ao requisitar, envia para a Presenter
+      uma lista de Objects.
+     */
     @Override
     public void suggestionsRequest() {
         List<Object> objects = new ArrayList<>();

@@ -13,12 +13,13 @@ public class Blur {
 
     private static Context context;
 
+    //
     public static void blurImage(ImageView imageView, int radius, Context cont) {
         context = cont;
 
         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
-        Bitmap blurred = blurRenderScript(bitmap, radius); //second parametre is radius
+        Bitmap blurred = blurRenderScript(bitmap, radius);
         imageView.setImageBitmap(blurred);
     }
 
@@ -41,7 +42,7 @@ public class Blur {
         ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(renderScript,
                 Element.U8_4(renderScript));
         blur.setInput(blurInput);
-        blur.setRadius(radius); // radius must be 0 < r <= 25
+        blur.setRadius(radius);
         blur.forEach(blurOutput);
 
         blurOutput.copyTo(bitmap);
