@@ -49,18 +49,26 @@ import com.example.igor.projetopoo.utils.Animation;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
 public class ProductActivity extends ParentActivity implements ProductMVP.ReqViewOps {
+
+    private static final List<Long> times = Arrays.asList(
+            TimeUnit.DAYS.toMillis(365),
+            TimeUnit.DAYS.toMillis(30),
+            TimeUnit.DAYS.toMillis(1),
+            TimeUnit.HOURS.toMillis(1),
+            TimeUnit.MINUTES.toMillis(1),
+            TimeUnit.SECONDS.toMillis(1));
+    private static final List<String> timesString = Arrays.asList("ano", "mês", "dia", "hora", "minuto", "segundo");
     private CustomDialog dialog;
     private AppBarLayout appbar;
     private TextView toolbarName;
@@ -68,17 +76,6 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     private TextView infoName;
     private TextView infoPrice;
     private ImageView backgroundProduct;
-
-    public static final List<Long> times = Arrays.asList(
-            TimeUnit.DAYS.toMillis(365),
-            TimeUnit.DAYS.toMillis(30),
-            TimeUnit.DAYS.toMillis(1),
-            TimeUnit.HOURS.toMillis(1),
-            TimeUnit.MINUTES.toMillis(1),
-            TimeUnit.SECONDS.toMillis(1) );
-    public static final List<String> timesString = Arrays.asList("ano","mês","dia","hora","minuto","segundo");
-
-
     private ProductMVP.PresenterOps presenterOps;
     private Product currentProduct;
 
@@ -101,6 +98,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
     }
 
+    //Inicializa variáveis
     @Override
     public void init() {
         setContext(this);
@@ -113,21 +111,19 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         toolbarName = findViewById(R.id.toolbar_name);
         toolbarPrice = findViewById(R.id.toolbar_price);
+
         infoName = findViewById(R.id.name_info_product);
         infoPrice = findViewById(R.id.price_info_product);
         backgroundProduct = findViewById(R.id.background_product);
 
+
         Intent intent = getIntent();
         currentProduct = Product.toObject(intent.getStringExtra(Constant.SELECTED_PRODUCT));
-
         if (currentProduct != null) {
-
             updateProductData(currentProduct);
-
             backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
         }
 
@@ -135,128 +131,63 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         settingsAppBar();
     }
 
+    //Menu functions
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_toolbar, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        //Fecha activity atual
         if (id == android.R.id.home) finish();
-
+        //Abre search
         if (id == R.id.app_bar_search)
             Animation.openSearch(getSearchBar(), getBlackLayout());
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void showFeedbacks(List<Feedback> list, Double averagePrice) {
-        final Context context = this;
-
-        currentProduct.setAveragePrice(averagePrice);
-        updateProductData(currentProduct);
-
-        int indexProduct = getProductsSuggestions().indexOf(currentProduct);
-        getProductsSuggestions().set(indexProduct, currentProduct);
-
-        setAdapter(new ListGenericAdapter<>(
-                getContext(),
-                list,
-                new ListAdapter<Feedback, Feedback.Holder>() {
-                    @Override
-                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
-                        return new Feedback.Holder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
-                        holder.location.setText(items.get(position).getLocation());
-                        long diff = System.currentTimeMillis() - items.get(position).getDate();
-                        holder.date.setText(toDuration(diff));
-                        String s = "R$ " + String.format(Locale.US, "%.2f", items.get(position).getPrice().floatValue()).replace('.', ',');
-                        holder.price.setText(s);
-                    }
-
-                })
-        );
-
-        ListFragment listFragment = ListFragment.getInstance();
-
-        changeListFragment(listFragment);
-
-    }
-
-    public static String toDuration(long duration) {
-        StringBuffer res = new StringBuffer();
-        for (int i=0;i< times.size(); i++) {
-            Long current = times.get(i);
-            long temp = duration/current;
-            if(temp>0) {
-                res.append(temp).append(" ").append( timesString.get(i) ).append(temp != 1 ? "s" : "").append(" atrás");
-                break;
-            }
-        }
-        if("".equals(res.toString()))
-            return "agora mesmo";
-        else
-            return res.toString();
-    }
-
-    @Override
-    public void showProgressBar(final Boolean enabled) {
-        runOnUiThread(new Runnable() {
+    private void settingsAppBar() {
+        appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
-            public void run() {
-                getSwipeRefreshLayout().setRefreshing(enabled);
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                CardView card = findViewById(R.id.info_product);
+                ConstraintLayout layout = findViewById(R.id.layout_info_product);
+
+                int offset = appbar.getTotalScrollRange();
+
+                toolbarName.setAlpha(-verticalOffset / (float) offset);
+                toolbarPrice.setAlpha(-verticalOffset / (float) offset);
+
+                //Animação do card: subir e fade out
+                card.setAlpha(1 + (verticalOffset / (float) offset));
+                card.setTranslationY(verticalOffset);
+
+                //Sobe lista de feedbacks
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getSwipeRefreshLayout().getLayoutParams();
+                double top = Math.floor((card.getTop() + layout.getBottom() - appbar.getBottom()) * (1 + verticalOffset / (float) offset));
+                lp.setMargins(0, (int) top, 0, 0);
+                getSwipeRefreshLayout().setLayoutParams(lp);
             }
         });
     }
 
-    @Override
-    public void showSnackbar(int op) {
-        String str;
-
-        if (op == 1) str = getString(R.string.feedback_removed);
-        else str = getString(R.string.feedback_added);
-
-        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator), str, Snackbar.LENGTH_LONG);
-
-        if (op == 0)
-            mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    presenterOps.removeFeedback(currentProduct);
-                }
-            });
-
-        mySnackbar.show();
-    }
-
-    @Override
-    public RecyclerView onListSettings(RecyclerView lista) {
-        lista.setAdapter(getAdapter());
-        lista.setLayoutManager(new LinearLayoutManager(getContext()));
-        lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        lista.setItemAnimator(new DefaultItemAnimator());
-
-        return lista;
-    }
-
+    //Search Functions
     @Override
     public void onSearchStateChanged(boolean enabled) {
+        //fecha search
         if (!enabled) {
             Animation.closeSearch(getSearchBar(), getBlackLayout());
         }
     }
-
     @Override
     public void onItemClick(View view) {
+
+        //Cria sugestões durante a pesquisa: pesquisas anteriores, produtos  e categorias prováveis
         TextView query = view.findViewById(R.id.name_suggestion);
 
         Map<String, Class> index = new HashMap<>();
@@ -311,6 +242,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
     }
 
     private void changeListFragment(ListFragment newFragment) {
+        //Animação de transição entre listas
         FragmentManager manager = getSupportFragmentManager();
 
         Slide slide2 = new Slide();
@@ -328,30 +260,45 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         transaction.commitAllowingStateLoss();
     }
 
-    private void settingsAppBar() {
-        appbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                CardView card = findViewById(R.id.info_product);
-                ConstraintLayout layout = findViewById(R.id.layout_info_product);
+    //Feedback functions
+    @Override
+    public void showFeedbacks(List<Feedback> list, Double averagePrice) {
+        //Carrega feedbacks atuais e altera preço do produto atual
+        currentProduct.setAveragePrice(averagePrice);
+        updateProductData(currentProduct);
 
-                int offset = appbar.getTotalScrollRange();
+        int indexProduct = getProductsSuggestions().indexOf(currentProduct);
+        getProductsSuggestions().set(indexProduct, currentProduct);
 
-                toolbarName.setAlpha(-verticalOffset / (float) offset);
-                toolbarPrice.setAlpha(-verticalOffset / (float) offset);
-                card.setAlpha(1 + (verticalOffset / (float) offset));
+        setAdapter(new ListGenericAdapter<>(
+                getContext(),
+                list,
+                new ListAdapter<Feedback, Feedback.Holder>() {
+                    @Override
+                    public Feedback.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = getLayoutInflater().inflate(R.layout.item_list_feedback, parent, false);
+                        return new Feedback.Holder(view);
+                    }
 
-                card.setTranslationY(verticalOffset);
+                    @Override
+                    public void onBindViewHolder(List<Feedback> items, @NonNull Feedback.Holder holder, int position) {
+                        holder.location.setText(items.get(position).getLocation());
+                        long diff = System.currentTimeMillis() - items.get(position).getDate();
+                        holder.date.setText(toDuration(diff));
+                        String s = "R$ " + String.format(Locale.US, "%.2f", items.get(position).getPrice().floatValue()).replace('.', ',');
+                        holder.price.setText(s);
+                    }
 
-                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getSwipeRefreshLayout().getLayoutParams();
-                double top = Math.floor((card.getTop() + layout.getBottom() - appbar.getBottom()) * (1 + verticalOffset / (float) offset));
-                lp.setMargins(0, (int) top, 0, 0);
-                getSwipeRefreshLayout().setLayoutParams(lp);
-            }
-        });
+                })
+        );
+
+        ListFragment listFragment = ListFragment.getInstance();
+
+        changeListFragment(listFragment);
+
     }
-
     public void createFeedback(View v) {
+        //Adiciona novo feedback
         EditText location = dialog.findViewById(R.id.location_edit_text);
         EditText price = dialog.findViewById(R.id.price_edit_text);
         String prc = price.getText().toString();
@@ -387,16 +334,40 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         presenterOps.addFeedback(feedback, currentProduct, dialog);
     }
 
+    @Override
+    public void showSnackbar(int op) {
+        //Mostra "snackbar" dizendo que o feedback foi inserido
+
+        String str;
+
+        if (op == 1) str = getString(R.string.feedback_removed);
+        else str = getString(R.string.feedback_added);
+
+        Snackbar mySnackbar = Snackbar.make(findViewById(R.id.product_cordinator), str, Snackbar.LENGTH_LONG);
+
+        if (op == 0)
+            mySnackbar.setAction(R.string.undo_string, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    presenterOps.removeFeedback(currentProduct);
+                }
+            });
+
+        mySnackbar.show();
+    }
     public void showDialog(View v) {
-        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+        //Abre diálogo para inserir novo feedback
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(R.color.transparent);
         dialog.show();
     }
 
     public void cancelDialog(View v) {
+        //Fecha diálogo
         dialog.dismiss();
     }
 
-    public void updateProductData(Product currentProduct) {
+    private void updateProductData(Product currentProduct) {
+        //Atualiza dados do produto nas views em que eles aparecem
         final String name = currentProduct.getName();
         final String price = String.format(Locale.US, "R$ %.2f", currentProduct.getAveragePrice().doubleValue()).replace('.', ',');
 
@@ -411,5 +382,44 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         });
 
         presenterOps.updateProduct(currentProduct);
+    }
+
+    @Override
+    public void showProgressBar(final Boolean enabled) {
+        //Mostra view de carregamento
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getSwipeRefreshLayout().setRefreshing(enabled);
+            }
+        });
+    }
+
+    @Override
+    public RecyclerView onListSettings(RecyclerView lista) {
+        //Inicializa lista de feedbacks
+        lista.setAdapter(getAdapter());
+        lista.setLayoutManager(new LinearLayoutManager(getContext()));
+        lista.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        lista.setItemAnimator(new DefaultItemAnimator());
+
+        return lista;
+    }
+
+    private static String toDuration(long duration) {
+        //Formata tempo em que feedback foi inserido
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < times.size(); i++) {
+            Long current = times.get(i);
+            long temp = duration / current;
+            if (temp > 0) {
+                res.append(temp).append(" ").append(timesString.get(i)).append(temp != 1 ? "s" : "").append(" atrás");
+                break;
+            }
+        }
+        if ("".equals(res.toString()))
+            return "agora mesmo";
+        else
+            return res.toString();
     }
 }

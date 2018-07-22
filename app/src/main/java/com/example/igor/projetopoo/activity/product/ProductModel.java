@@ -37,6 +37,7 @@ public class ProductModel implements ProductMVP.ModelOps {
 
     @Override
     public void feedbackListRequest(Product product) throws ConnectionException, DatabaseException {
+        //Busca lista de feedbacks no banco de dados do produto passado como parâmetro
         final ConstraintLayout layout = activity.findViewById(R.id.container_product);
 
         final AppBarLayout appbar = activity.findViewById(R.id.appbar);
@@ -70,12 +71,13 @@ public class ProductModel implements ProductMVP.ModelOps {
                 objects.add(feedback);
             }
         }
-
+        //Retorna lista de feedbacks criada
         reqPresenterOps.onReturnedFeedbackList(objects, product);
     }
 
     @Override
     public void insertFeedback(Feedback feedback) throws DatabaseException {
+        //Adiciona feedback no banco de dados
         FirebaseFirestore firestore = database.getFirestore();
         task = database.addDocument(firestore.collection("feedbacks"),feedback);
         if (!task.isSuccessful()) throw new DatabaseException(activity);
@@ -84,6 +86,7 @@ public class ProductModel implements ProductMVP.ModelOps {
 
     @Override
     public void deleteFeedback() throws DatabaseException {
+        //Remove feedback do banco de dados
         database.deleteDocument(task.getResult());
         if (!task.isSuccessful()) throw new DatabaseException(activity);
         reqPresenterOps.onFeedbackDeleted();
@@ -91,6 +94,7 @@ public class ProductModel implements ProductMVP.ModelOps {
 
     @Override
     public void refreshProduct(Product product) throws DatabaseException {
+        //Atualiza preço do produto no banco de dados
         FirebaseFirestore firestore = database.getFirestore();
         Map<String, Object> map = product.toMap();
         Task<Void> task = database.updateDocument(firestore.collection("products").document(product.getId()), map);

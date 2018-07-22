@@ -61,6 +61,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
     @Override
     public void onReturnedFeedbackList(List<Object> objects, Product product) {
+        //Retorna lista de feedbacks ordenada pelo tempo de criação e novo preço médio
         List<Feedback> feedbacks = new ArrayList<>();
 
         for (Object object : objects) {
@@ -86,6 +87,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
     @Override
     public void addFeedback(final Feedback feedback, final Product product, final Dialog dialog) {
+        //Manda requisição de adição de feedback para a model
         dialog.dismiss();
 
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
@@ -118,6 +120,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
     @Override
     public void removeFeedback(final Product product) {
+        //Manda requisição de deleção de feedback para a model
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -150,7 +153,7 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
     @Override
     public void updateProduct(final Product currentProduct) {
-
+        //Manda requisição de atualização do preço médio do produto para a model
         new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -178,11 +181,13 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
     @Override
     public void onFeedbackInserted() {
+        //Retorno do feedback inserido com sucesso
         reqViewOps.showSnackbar(0);
     }
 
     @Override
     public void onFeedbackDeleted() {
+        //Retorno do feedback deletado com sucesso
         reqViewOps.showSnackbar(1);
     }
 }
