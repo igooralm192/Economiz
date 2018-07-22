@@ -128,8 +128,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
             updateProductData(currentProduct);
 
-            //backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
-            backgroundProduct.setImageResource(R.drawable.foods);
+            backgroundProduct.setImageResource(currentProduct.getBackgroundCategory().intValue());
         }
 
         appbar = findViewById(R.id.appbar);
@@ -195,7 +194,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
     public static String toDuration(long duration) {
         StringBuffer res = new StringBuffer();
-        for(int i=0;i< times.size(); i++) {
+        for (int i=0;i< times.size(); i++) {
             Long current = times.get(i);
             long temp = duration/current;
             if(temp>0) {
@@ -325,7 +324,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
         newFragment.setExitTransition(fade);
 
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.container_product, newFragment);
+        transaction.add(R.id.container_product, newFragment);
         transaction.commitAllowingStateLoss();
     }
 

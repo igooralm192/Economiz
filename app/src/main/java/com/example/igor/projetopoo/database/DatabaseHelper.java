@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class DatabaseHelper {
-    public static void addCategory(final Database database, final String name, final Category category) {
+    public static void addCategory(final Database database, final Category category) {
         new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -32,13 +32,13 @@ public abstract class DatabaseHelper {
                 map.put("background_category", category.getBackgroundCategory());
 
                 FirebaseFirestore firestore = database.getFirestore();
-                DocumentReference documentReference = firestore.collection("categories").document(name);
+                DocumentReference documentReference = firestore.collection("categories").document(category.getId());
                 Task<Void> task = database.updateDocument(documentReference, map);
 
                 task.addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.i("DATABASE", "Documento " + name + " foi adicionado com sucesso!");
+                        Log.i("DATABASE", "Documento " + category.getId() + " foi adicionado com sucesso!");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -58,7 +58,7 @@ public abstract class DatabaseHelper {
 
     }
 
-    public static void addProduct(final Database database, final String name, final Product product) {
+    public static void addProduct(final Database database, final Product product) {
         new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
             @Override
             public void onPreExecute() {
@@ -81,13 +81,13 @@ public abstract class DatabaseHelper {
                 map.put("price_range", range);
 
                 FirebaseFirestore firestore = database.getFirestore();
-                DocumentReference documentReference = firestore.collection("products").document(name);
+                DocumentReference documentReference = firestore.collection("products").document(product.getId());
                 Task<Void> task = database.updateDocument(documentReference, map);
 
                 task.addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.i("DATABASE", "Documento " + name + " foi adicionado com sucesso!");
+                        Log.i("DATABASE", "Documento " + product.getId() + " foi adicionado com sucesso!");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -105,6 +105,4 @@ public abstract class DatabaseHelper {
             }
         }).execute();
     }
-
-    //public static void addFeedback(Database database, final String name, Feedback feedback);
 }

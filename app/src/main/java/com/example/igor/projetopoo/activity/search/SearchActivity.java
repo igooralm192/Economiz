@@ -89,13 +89,13 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
     public void showResults(List<Category> categoryList, List<Product> productList) {
         List<Result> resultList = new ArrayList<>();
 
-        for(Category category: categoryList){
-            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName(), category);
+        for(Product product: productList){
+            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice(), product);
             resultList.add(result);
         }
 
-        for(Product product: productList){
-            Result result = new Result(R.drawable.ic_shopping_cart_red_32dp, product.getName(), product.getAveragePrice(), product);
+        for(Category category: categoryList){
+            Result result = new Result(R.drawable.ic_search_black_24dp,category.getName(), category);
             resultList.add(result);
         }
 

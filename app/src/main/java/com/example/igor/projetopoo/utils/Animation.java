@@ -139,7 +139,7 @@ public class Animation {
             }
         }, ANIMATION_DURATION_SHORT);
 
-        layout.setVisibility(View.VISIBLE);
+        layout.setElevation(22f);
         TransitionDrawable background = (TransitionDrawable) layout.getBackground();
         background.startTransition(1000);
     }
@@ -164,9 +164,9 @@ public class Animation {
         layout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                layout.setVisibility(View.GONE);
+                layout.setElevation(0f);
             }
-        }, 300);
+        }, ANIMATION_DURATION_LONG);
 
 
     }

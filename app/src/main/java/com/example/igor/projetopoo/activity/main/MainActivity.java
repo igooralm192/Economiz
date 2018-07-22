@@ -2,10 +2,12 @@ package com.example.igor.projetopoo.activity.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.graphics.drawable.TransitionDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +33,7 @@ import com.example.igor.projetopoo.activity.product.ProductActivity;
 import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
+import com.example.igor.projetopoo.database.DatabaseHelper;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
@@ -70,6 +74,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                 presenterOps.getCategoryList();
             }
         });
+
+        TextView placeholder = findViewById(R.id.mt_placeholder);
+        placeholder.setTextSize(20f);
+        placeholder.setPadding(placeholder.getPaddingLeft(), 12, placeholder.getPaddingRight(), placeholder.getPaddingBottom());
+
+        Typeface typeface = ResourcesCompat.getFont(this, R.font.qanelas_medium);
+        placeholder.setTypeface(typeface);
     }
 
     @Override
@@ -102,7 +113,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
                         Category category = items.get(position);
                         holder.setCategory(category);
                         holder.name.setText(category.getName());
-                        holder.background.setImageResource(R.drawable.foods);
+                        holder.background.setImageResource(category.getBackgroundCategory().intValue());
                     }
                 })
         );
@@ -262,7 +273,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.container_main, newFragment);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
     private void configSuggestions() {

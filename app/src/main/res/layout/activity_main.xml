@@ -52,7 +52,8 @@
         app:mt_hint="Pesquise aí vá.."
         app:mt_navIconEnabled="true"
         app:mt_navIconUseTint="false"
-        app:mt_placeholder="Economiz" />
+        app:mt_placeholder="Economiz"
+        app:mt_placeholderColor="#555" />
 
     <ImageView
         android:id="@+id/logo"

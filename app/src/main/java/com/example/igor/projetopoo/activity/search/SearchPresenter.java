@@ -76,6 +76,7 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
     public void onReturnedResultList(List<Object> objects) {
         List<Category> categoryList = new ArrayList<>();
         List<Product> productList = new ArrayList<>();
+
         for (Object object: objects) {
             if (object instanceof Category) {
                 categoryList.add((Category) object);

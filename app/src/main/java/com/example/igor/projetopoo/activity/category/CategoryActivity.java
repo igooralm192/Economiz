@@ -110,9 +110,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     @Override
     public void onBackPressed() {
-        Integer count = getSupportFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) finish();
+        if (categoryLinks.get(currentCategory) == null) finish();
         else {
             presenterOps.getCategory(categoryLinks.get(currentCategory));
 
@@ -125,8 +123,6 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
                     else toolbar.setSubtitle(categoryLinks.get(currentCategory).getName());
                 }
             }, 500);
-
-            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -255,8 +251,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         FragmentTransaction transaction = manager.beginTransaction();
 
         transaction.add(R.id.container_category, newFragment, currentCategory.getName());
-        if (oldcategory != null) transaction.addToBackStack(null);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
 
         toolbar.postDelayed(new Runnable() {
             @Override
