@@ -11,7 +11,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,11 +36,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * É classe principal do projeto, sendo usada para mostrar a tela de pesquisa do aplicativo,
+ * representando a View no padrão MVP.
+ */
 public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewOps {
     private String lastQuery;
 
     private SearchMVP.PresenterOps presenterOps;
 
+    /**
+     * Método principal, chamado quando a tela é criada. Determina o layout, inicializa atributos,
+     * chama o método para construir a barra de pesquisa, configurar as sugestões e solicita a
+     * Presenter as categorias principais.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +79,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         getSearchBar().setCardViewElevation(8);
     }
 
+    // Inicializa alguns atributos
     @Override
     public void init() {
         setContext(this);
@@ -85,6 +94,8 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         getSearchBar().setPlaceHolder(lastQuery);
     }
 
+
+     // Mostra em um dropdown o resultado da pesquisa
     @Override
     public void showResults(List<Category> categoryList, List<Product> productList) {
         List<Result> resultList = new ArrayList<>();
@@ -148,11 +159,16 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
     }
 
 
+    // Mostra o símbolo de carregamento ou não a depender do valor de enabled.
     @Override
     public void showProgressBar(Boolean enabled) {
         getSwipeRefreshLayout().setRefreshing(enabled);
     }
 
+    /**
+     * Recebe uma RecyclerView (do fragmento) e define algumas configurações, como seu Adapter e
+     * LayourManager, retornando a lista configurada em seguida
+     */
     @Override
     public RecyclerView onListSettings(RecyclerView lista) {
         lista.setAdapter(getAdapter());
@@ -162,6 +178,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         return lista;
     }
 
+    // Verifica se a barra de pesquisa foi selecionada ou não e executa as animações necessárias.
     @Override
     public void onSearchStateChanged(boolean enabled) {
         TransitionDrawable background = (TransitionDrawable) getBlackLayout().getBackground();
@@ -182,6 +199,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         }
     }
 
+    //Exibe e atualiza as pesquisas recentes e chama o metodo para pesquisa no banco de dados
     @Override
     public void onSearchConfirmed(CharSequence text) {
         String newText = text.toString().trim();
@@ -222,6 +240,7 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
         } else getSearchBar().showSuggestionsList();
     }
 
+    // Ao clicar numa sugestão, verifica-se o seu tipo para poder redirecionar o usuário a tela correta.
     @Override
     public void onItemClick(View view) {
         TextView query = view.findViewById(R.id.name_suggestion);
@@ -266,6 +285,5 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
             }
         }
     }
-
 
 }

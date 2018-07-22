@@ -1,7 +1,6 @@
 package com.example.igor.projetopoo.activity.search;
 
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
 
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.activity.parent.ParentActivity;
@@ -32,6 +31,10 @@ public class SearchModel implements SearchMVP.ModelOps {
         this.database = database;
     }
 
+    /**
+     * Requisita ao banco de dados (Firebase) a lista de categorias e produtos que encaixam na pesquisa
+     * e envia para a Presenter a lista em formato Object
+     */
     @Override
     public void resultListRequest(String query, String upperbound) throws ConnectionException, DatabaseException {
         final ConstraintLayout layout = activity.findViewById(R.id.container_search);
@@ -51,8 +54,6 @@ public class SearchModel implements SearchMVP.ModelOps {
         final FirebaseFirestore firestore = database.getFirestore();
         CollectionReference collectionReference;
 
-        System.out.println(query + " " + upperbound);
-
         Query categoryQuery = firestore.collection("categories").orderBy("name").startAt(query).endBefore(upperbound);
         Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
         if (!categoryTask.isSuccessful()) throw new DatabaseException(activity);
@@ -62,7 +63,6 @@ public class SearchModel implements SearchMVP.ModelOps {
         Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
         if (!productTask.isSuccessful()) throw new DatabaseException(activity);
         querySnapshotList.add(productTask.getResult());
-
 
         for(QuerySnapshot queryDocumentSnapshots: querySnapshotList){
 

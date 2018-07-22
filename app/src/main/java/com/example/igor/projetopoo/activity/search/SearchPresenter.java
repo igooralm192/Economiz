@@ -22,6 +22,11 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
 
     }
 
+    /**
+     *  Executa uma AsyncTask (tarefas simultâneas), determinando que a View mostre o símbolo de
+     *  carregamento, enquanto requisita à Model a lista de produtos e/ou categorias e depois desabilita o
+     *  símbolo que estava sendo mostrado, após conclusão da pesquisa.
+     */
     @Override
     public void getResultList(final String query) {
         AsyncDownload asyncDownload = new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
@@ -35,6 +40,7 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
             public Object doInBackground(Object... objects) {
 
                 try {
+                    // Formata a string de pesquisa recebida
                     char lastChar = query.charAt(query.length()-1);
                     char letters[] = query.toCharArray();
 
@@ -72,6 +78,10 @@ public class SearchPresenter implements SearchMVP.PresenterOps, SearchMVP.ReqPre
     }
 
 
+    /**
+     * Separa em duas listas o(s) resultado(s) da consulta do banco de dados,
+     * de acordo com o tipo do resultado, e retorna  essas listas para a View
+     */
     @Override
     public void onReturnedResultList(List<Object> objects) {
         List<Category> categoryList = new ArrayList<>();
