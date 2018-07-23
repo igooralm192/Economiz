@@ -3,7 +3,6 @@ package com.example.igor.projetopoo.activity.category;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,7 +29,7 @@ import com.example.igor.projetopoo.activity.search.SearchActivity;
 import com.example.igor.projetopoo.adapter.ListAdapter;
 import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.entities.Category;
-import com.example.igor.projetopoo.entities.Entitie;
+import com.example.igor.projetopoo.entities.Entity;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
@@ -44,12 +42,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/*
+    Classe que representa a tela das subcategorias.
+    Baseado no modelo MVP, a CategoryActivity representa a View.
+ */
+
 public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqViewOps {
     private Toolbar toolbar;
 
     private CategoryMVP.PresenterOps presenterOps;
     private Map<Category, Category> categoryLinks = new HashMap<>();
     private Category currentCategory;
+
+    // Método principal onde é executado todas as operações para a execução do aplicativo.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     }
 
+    // Configurações iniciais
+
     @Override
     public void init() {
         setContext(getApplicationContext());
@@ -89,12 +96,16 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
     }
 
+    // Criação das opções do menu
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar_category, menu);
 
         return super.onCreateOptionsMenu(menu);
     }
+
+    // Método que trata o evento ao selecionar uma opção do menu
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -107,6 +118,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
         return super.onOptionsItemSelected(item);
     }
+
+    // Evento ao clicar no botão de voltar
 
     @Override
     public void onBackPressed() {
@@ -126,29 +139,31 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         }
     }
 
+    // Método que exibe tanto uma lista de subcategorias quanto de produtos
+
     @Override
-    public void showSubitems(List<Entitie> subitems) {
+    public void showSubitems(List<Entity> subitems) {
         setAdapter(new ListGenericAdapter<>(
                 getContext(),
                 subitems,
-                new ListAdapter<Entitie, Entitie.Holder>() {
+                new ListAdapter<Entity, Entity.Holder>() {
                     @Override
-                    public Entitie.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_entitie, parent, false);
+                    public Entity.Holder onCreateViewHolder(Context context, @NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(context).inflate(R.layout.item_list_entity, parent, false);
 
-                        return new Entitie.Holder(view, CategoryActivity.this);
+                        return new Entity.Holder(view, CategoryActivity.this);
                     }
 
                     @Override
-                    public void onBindViewHolder(List<Entitie> items, @NonNull Entitie.Holder holder, int position) {
-                        Entitie entitie = items.get(position);
+                    public void onBindViewHolder(List<Entity> items, @NonNull Entity.Holder holder, int position) {
+                        Entity entity = items.get(position);
 
-                        holder.setEntitie(entitie);
-                        holder.name.setText(entitie.getName());
-                        if (entitie instanceof Category) {
+                        holder.setEntity(entity);
+                        holder.name.setText(entity.getName());
+                        if (entity instanceof Category) {
                             holder.price.setText("");
                         } else {
-                            Product product = (Product) entitie;
+                            Product product = (Product) entity;
                             holder.price.setText(String.format(Locale.getDefault(), "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
                         }
                     }
@@ -160,10 +175,14 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         changeListFragment(listFragment);
     }
 
+    // Método que exibe a barra de progresso
+
     @Override
     public void showProgressBar(Boolean enabled) {
         getSwipeRefreshLayout().setRefreshing(enabled);
     }
+
+    // Método que seta as configurações da lista da activity.
 
     @Override
     public RecyclerView onListSettings(RecyclerView lista) {
@@ -175,12 +194,16 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         return lista;
     }
 
+    // Evento ao mudar o estado da barra de pesquisa
+
     @Override
     public void onSearchStateChanged(boolean enabled) {
         if (!enabled) {
             Animation.closeSearch(getSearchBar(), getBlackLayout());
         }
     }
+
+    // Evento ao clicar em uma sugestão da barra de pesquisa
 
     @Override
     public void onItemClick(View view) {
@@ -230,6 +253,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
         }
     }
 
+    // Evento ao clicar em uma categoria
+
     @Override
     public void onCategoryClick(Category category) {
         categoryLinks.put(category, currentCategory);
@@ -237,6 +262,8 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
         presenterOps.getCategory(category);
     }
+
+    // Método que faz a troca da lista do fragmento
 
     private void changeListFragment(ListFragment newFragment) {
         FragmentManager manager = getSupportFragmentManager();

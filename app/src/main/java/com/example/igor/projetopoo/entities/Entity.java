@@ -10,13 +10,13 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 
 import java.io.Serializable;
 
-public abstract class Entitie implements Comparable<Entitie>, Serializable {
+public abstract class Entity implements Comparable<Entity>, Serializable {
     private String id;
     private String name;
     private String parentCategory;
     private Number backgroundCategory;
 
-    public Entitie(String id, String name, String parentCategory, Number backgroundCategory) {
+    public Entity(String id, String name, String parentCategory, Number backgroundCategory) {
         this.id = id;
         this.name = name;
         this.parentCategory = parentCategory;
@@ -56,14 +56,14 @@ public abstract class Entitie implements Comparable<Entitie>, Serializable {
     }
 
     @Override
-    public int compareTo(@NonNull Entitie entitie) {
-        return this.getName().compareTo(entitie.getName());
+    public int compareTo(@NonNull Entity entity) {
+        return this.getName().compareTo(entity.getName());
     }
 
     public static class Holder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView price;
-        public Entitie entitie;
+        public Entity entity;
 
         public Holder(View view, final ListGenericAdapter.OnItemViewClickListener listener) {
             super(view);
@@ -71,23 +71,23 @@ public abstract class Entitie implements Comparable<Entitie>, Serializable {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (getEntitie() instanceof Category)
-                        listener.onCategoryClick((Category) getEntitie());
+                    if (getEntity() instanceof Category)
+                        listener.onCategoryClick((Category) getEntity());
                     else
-                        listener.onProductClick((Product) getEntitie());
+                        listener.onProductClick((Product) getEntity());
                 }
             });
 
-            name = view.findViewById(R.id.name_entitie);
-            price = view.findViewById(R.id.price_entitie);
+            name = view.findViewById(R.id.name_entity);
+            price = view.findViewById(R.id.price_entity);
         }
 
-        public Entitie getEntitie() {
-            return entitie;
+        public Entity getEntity() {
+            return entity;
         }
 
-        public void setEntitie(Entitie entitie) {
-            this.entitie = entitie;
+        public void setEntity(Entity entity) {
+            this.entity = entity;
         }
     }
 }

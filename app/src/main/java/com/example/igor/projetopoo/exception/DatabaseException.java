@@ -3,6 +3,8 @@ package com.example.igor.projetopoo.exception;
 import android.content.Context;
 import android.widget.Toast;
 
+// Exceção que trata as falhas das operações do firebase
+
 public class DatabaseException extends Exception {
     private Context context;
 

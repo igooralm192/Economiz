@@ -10,6 +10,8 @@ import com.example.igor.projetopoo.entities.Product;
 
 import java.util.List;
 
+// Classe genérica para adaptador das listas dos fragmentos
+
 public class ListGenericAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
     private Context context;
     private List<T> items;

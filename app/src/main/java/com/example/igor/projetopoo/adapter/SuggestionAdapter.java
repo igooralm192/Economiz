@@ -1,6 +1,5 @@
 package com.example.igor.projetopoo.adapter;
 
-
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +11,8 @@ import android.widget.TextView;
 import com.example.igor.projetopoo.R;
 import com.example.igor.projetopoo.entities.Item;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
+
+// Classe para adaptador da lista da barra de pesquisa
 
 public class SuggestionAdapter extends SuggestionsAdapter<Item, SuggestionAdapter.Holder> {
     private SuggestionAdapter.OnItemViewClickListener listener;

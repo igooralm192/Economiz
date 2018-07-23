@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+// Classe pai abstrata para todas as activities do aplicativo
+
 public abstract class ParentActivity extends AppCompatActivity implements
         ListFragment.OnListSettingsListener,
         MaterialSearchBar.OnSearchActionListener,
@@ -98,6 +100,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
     public void onSearchStateChanged(boolean enabled) {
 
     }
+
+    // Evento ao pesquisar na barra de pesquisa
 
     @Override
     public void onSearchConfirmed(CharSequence text) {
@@ -160,6 +164,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         startActivity(ProductActivity.class, map);
     }
 
+    // Método que filtra o texto da barra de pesquisa com as sugestões
+
     public void filterSuggestions(String query) {
         List<Category> categories = categoriesSuggestions;
         List<Product> products = productsSuggestions;
@@ -212,6 +218,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         searchBar.updateLastSuggestions(newSuggestions);
     }
 
+    // Método que armazena todas as sugestões da barra de pesquisa
+
     public void setAllSuggestions() {
         List<Category> categories = new ArrayList<>();
         List<Product> products = new ArrayList<>();
@@ -245,6 +253,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         }
     }
 
+    // Método que salva as pesquisas recentes
+
     public void saveRecentQueries(List<Item> recent) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -258,6 +268,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         editor.putString(Constant.RECENT_QUERIES, array.toString());
         editor.apply();
     }
+
+    // Método que carrega as pesquisas recentes
 
     public List<Item> loadRecentQueries() {
         List<Item> recent = new ArrayList<>();
@@ -301,6 +313,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         return recent;
     }
 
+    // Método que faz as configurações iniciais da barra de pesquisa
+
     public void createSearchBar() {
         getBlackLayout().setClickable(true);
 
@@ -336,6 +350,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
         searchBar.setOnSearchActionListener(this);
     }
 
+    // Método que inicializa uma activity
+
     public void startActivity(Class activity, Map<String, String> extras) {
         Intent intent = new Intent(this, activity);
 
@@ -344,6 +360,8 @@ public abstract class ParentActivity extends AppCompatActivity implements
 
         startActivity(intent);
     }
+
+    // Método que verifica a conexão com a internet
 
     public static boolean checkConnection(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

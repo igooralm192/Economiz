@@ -2,7 +2,7 @@ package com.example.igor.projetopoo.activity.category;
 
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
-import com.example.igor.projetopoo.entities.Entitie;
+import com.example.igor.projetopoo.entities.Entity;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.exception.ConnectionException;
 import com.example.igor.projetopoo.exception.DatabaseException;
@@ -11,6 +11,10 @@ import com.example.igor.projetopoo.helper.AsyncDownload;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+/*
+    Baseado no modelo MVP, a CategoryPresenter representa a Presenter.
+ */
 
 public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.ReqPresenterOps {
     private CategoryActivity activity;
@@ -22,6 +26,8 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
         this.reqViewOps = activity;
         this.modelOps = new CategoryModel(activity, this, database);
     }
+
+    // Método que busca as informações de uma categoria
 
     @Override
     public void getCategory(final Category category) {
@@ -54,10 +60,12 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
         asyncDownload.execute();
     }
 
+    // Evento ao retornar as informações de uma categoria
+
     @Override
     public void onReturnedCategory(List<Object> objects) {
-        List<Entitie> subcategories = new ArrayList<>();
-        List<Entitie> products = new ArrayList<>();
+        List<Entity> subcategories = new ArrayList<>();
+        List<Entity> products = new ArrayList<>();
 
         for (Object object : objects) {
             if (object instanceof Product)
@@ -74,7 +82,7 @@ public class CategoryPresenter implements CategoryMVP.PresenterOps, CategoryMVP.
 
         Collections.sort(subcategories);
 
-        List<Entitie> subitems = new ArrayList<>();
+        List<Entity> subitems = new ArrayList<>();
         subitems.addAll(products);
         subitems.addAll(subcategories);
 

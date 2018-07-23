@@ -1,5 +1,7 @@
 package com.example.igor.projetopoo.helper;
 
+// Classe abstrata para armazenamento das constantes utilizadas no aplicativo
+
 public abstract class Constant {
     public static final String RECENT_QUERIES = "Recent Queries";
     public static final String LAST_QUERY = "Last Query";

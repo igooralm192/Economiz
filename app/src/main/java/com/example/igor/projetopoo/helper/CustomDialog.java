@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.Window;
 
+// Classe para criação de uma caixa de diálogo customizada
+
 public class CustomDialog extends Dialog {
 
     public Activity activity;

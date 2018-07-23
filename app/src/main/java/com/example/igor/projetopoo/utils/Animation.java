@@ -12,6 +12,8 @@ import android.widget.FrameLayout;
 
 import com.mancj.materialsearchbar.MaterialSearchBar;
 
+// Classe para animação da barra de pesquisa
+
 public class Animation {
     public static final int ANIMATION_DURATION_SHORTEST = 150;
     public static final int ANIMATION_DURATION_SHORT = 250;

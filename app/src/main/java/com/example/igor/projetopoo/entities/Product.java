@@ -1,6 +1,5 @@
 package com.example.igor.projetopoo.entities;
 
-import android.util.Log;
 import android.util.Pair;
 
 import org.json.JSONException;
@@ -8,10 +7,9 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-public class Product extends Entitie implements Serializable {
+public class Product extends Entity implements Serializable {
     private Number averagePrice;
     private Pair<Number, Number> priceRange;
 

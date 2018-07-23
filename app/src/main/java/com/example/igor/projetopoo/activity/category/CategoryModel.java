@@ -21,6 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/*
+    Baseado no modelo MVP, a CategoryModel representa a Model.
+ */
+
 public class CategoryModel implements CategoryMVP.ModelOps {
     private CategoryActivity activity;
     private CategoryMVP.ReqPresenterOps reqPresenterOps;
@@ -31,6 +35,8 @@ public class CategoryModel implements CategoryMVP.ModelOps {
         this.reqPresenterOps = reqPresenterOps;
         this.database = database;
     }
+
+    // Método que requisita os dados de uma categoria no firebase
 
     @Override
     public void categoryRequest(final Category category) throws ConnectionException, DatabaseException {

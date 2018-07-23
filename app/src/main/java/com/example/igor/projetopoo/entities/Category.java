@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.Map;
 
-public class Category extends Entitie implements Serializable {
+public class Category extends Entity implements Serializable {
     public Category(String id, String name, String parentCategory, Number backgroundCategory) {
         super(id, name, parentCategory, backgroundCategory);
     }

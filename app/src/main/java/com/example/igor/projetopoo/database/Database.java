@@ -10,6 +10,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 
+// Classe para execução das operações no firebase
+
 public class Database implements DatabaseRequests {
     private FirebaseFirestore firestore;
 

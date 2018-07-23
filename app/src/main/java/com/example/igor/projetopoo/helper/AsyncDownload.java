@@ -2,6 +2,8 @@ package com.example.igor.projetopoo.helper;
 
 import android.os.AsyncTask;
 
+// Classe para execução de tarefas assíncronas
+
 public class AsyncDownload extends AsyncTask<Object, Void, Object>{
     private OnAsyncDownloadListener onAsyncDownloadListener;
 

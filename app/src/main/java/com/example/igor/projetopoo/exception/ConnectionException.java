@@ -21,6 +21,8 @@ import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Feedback;
 import com.example.igor.projetopoo.entities.Product;
 
+// Exceção para falhas na conexão com a internet
+
 public class ConnectionException extends Exception {
     private Context context;
     private Activity activity;

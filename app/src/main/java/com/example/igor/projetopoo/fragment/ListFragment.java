@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 
 import com.example.igor.projetopoo.R;
 
+// Fragmento para criação das listas
+
 public class ListFragment extends Fragment {
     private RecyclerView list;
     private OnListSettingsListener onListSettingsListener;

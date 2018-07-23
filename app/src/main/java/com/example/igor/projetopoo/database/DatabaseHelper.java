@@ -15,6 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+// Classe abstrata para facilitar adição de dados no firebase
+
 public abstract class DatabaseHelper {
     public static void addCategory(final Database database, final Category category) {
         new AsyncDownload(new AsyncDownload.OnAsyncDownloadListener() {
