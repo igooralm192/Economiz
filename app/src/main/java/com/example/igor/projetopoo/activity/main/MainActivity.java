@@ -236,13 +236,13 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
 
                     List list = getSearchBar().getLastSuggestions();
                     Item categoryItem = (Item) list.get(indItem);
-                    this.onCategoryClick((Category) categoryItem.getObject());
+                    this.onCategoryClick((Category) categoryItem.getEntity());
 
                 } else if (type.equals("product")) {
 
                     List list = getSearchBar().getLastSuggestions();
                     Item productItem = (Item) list.get(indItem);
-                    this.onProductClick((Product) productItem.getObject());
+                    this.onProductClick((Product) productItem.getEntity());
 
                 } else {
                     Map<String, String> map = new HashMap<>();
@@ -303,7 +303,7 @@ public class MainActivity extends ParentActivity implements MainMVP.ReqViewOps {
     // Configurar as sugestões, solicitando a Presenter, as categorias e produtos disponíveis.
     private void configSuggestions() {
         String sug = getSharedPreferences().getString(Constant.ALL_SUGGESTIONS, null);
-        presenterOps.getAllSuggestions(this);
+        presenterOps.getAllSuggestions();
     }
 
 }

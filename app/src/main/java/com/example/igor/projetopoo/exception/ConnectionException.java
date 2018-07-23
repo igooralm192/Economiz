@@ -45,7 +45,10 @@ public class ConnectionException extends Exception {
                 if (presenter instanceof MainPresenter) {
                     MainMVP.PresenterOps presenterOps = (MainMVP.PresenterOps) presenter;
 
-                    presenterOps.getCategoryList();
+                    if (object[0] instanceof Activity)
+                        presenterOps.getAllSuggestions();
+                    else
+                        presenterOps.getCategoryList();
                 }
 
                 if (presenter instanceof CategoryPresenter) {

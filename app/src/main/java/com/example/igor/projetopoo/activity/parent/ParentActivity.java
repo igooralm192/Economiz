@@ -21,6 +21,7 @@ import com.example.igor.projetopoo.adapter.ListGenericAdapter;
 import com.example.igor.projetopoo.adapter.SuggestionAdapter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
+import com.example.igor.projetopoo.entities.Entity;
 import com.example.igor.projetopoo.entities.Item;
 import com.example.igor.projetopoo.entities.Product;
 import com.example.igor.projetopoo.fragment.ListFragment;
@@ -182,38 +183,44 @@ public abstract class ParentActivity extends AppCompatActivity implements
             }
         }
 
-        for (Product product: products) {
-            if (countProduct >= 4 - countRecent) break;
+        if (products != null) {
+            for (Product product: products) {
+                if (countProduct >= 4 - countRecent) break;
 
-            if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
-                Item item = new Item(
-                        R.drawable.ic_shopping_cart_red_32dp,
-                        product.getName(),
-                        "product",
-                        product,
-                        String.format(Locale.US, "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ',')
-                );
+                if (product.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                    Item item = new Item(
+                            R.drawable.ic_shopping_cart_red_32dp,
+                            product.getName(),
+                            "product",
+                            product,
+                            String.format(Locale.US, "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ',')
+                    );
 
-                newSuggestions.add(item);
-                countProduct++;
+                    newSuggestions.add(item);
+                    countProduct++;
+                }
             }
         }
 
-        for (Category category: categories) {
-            if (countCategories >= 6 - (countRecent + countProduct)) break;
 
-            if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
-                Item item = new Item(
-                        R.drawable.ic_search_black_24dp,
-                        category.getName(),
-                        "category",
-                        category
-                );
+        if (categories != null) {
+            for (Category category: categories) {
+                if (countCategories >= 6 - (countRecent + countProduct)) break;
 
-                newSuggestions.add(item);
-                countCategories++;
+                if (category.getName().toLowerCase().startsWith( query.toLowerCase() )) {
+                    Item item = new Item(
+                            R.drawable.ic_search_black_24dp,
+                            category.getName(),
+                            "category",
+                            category
+                    );
+
+                    newSuggestions.add(item);
+                    countCategories++;
+                }
             }
         }
+
 
         searchBar.updateLastSuggestions(newSuggestions);
     }
@@ -261,7 +268,7 @@ public abstract class ParentActivity extends AppCompatActivity implements
         JSONArray array = new JSONArray();
 
         for (Item item : recent) {
-            JSONObject object = item.toJson();
+            JSONObject object = item.toJSON();
             array.put(object.toString());
         }
 
@@ -283,23 +290,23 @@ public abstract class ParentActivity extends AppCompatActivity implements
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject object = new JSONObject((String) array.get(i));
 
-                    Object obj = null;
+                    Entity entity = null;
                     Category category = null;
                     Product product = null;
 
                     if (object.getString("type").equals("category")) {
                         category = Category.toObject(object.getString("object"));
-                        obj = category;
+                        entity = category;
                     } else if (object.getString("type").equals("product")) {
                         product = Product.toObject(object.getString("object"));
-                        obj = product;
+                        entity = product;
                     }
 
                     Item item = new Item(
                             object.getInt("idIcon"),
                             object.getString("name"),
                             object.getString("type"),
-                            obj,
+                            entity,
                             object.getString("price")
                     );
 

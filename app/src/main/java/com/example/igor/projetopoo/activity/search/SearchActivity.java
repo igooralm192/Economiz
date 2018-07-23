@@ -259,12 +259,12 @@ public class SearchActivity extends ParentActivity implements SearchMVP.ReqViewO
                 if (type.equals("category")) {
                     List list = getSearchBar().getLastSuggestions();
                     Item categoryItem = (Item) list.get(indItem);
-                    super.onCategoryClick((Category) categoryItem.getObject());
+                    super.onCategoryClick((Category) categoryItem.getEntity());
 
                 } else if (type.equals("product")) {
                     List list = getSearchBar().getLastSuggestions();
                     Item productItem = (Item) list.get(indItem);
-                    super.onProductClick((Product) productItem.getObject());
+                    super.onProductClick((Product) productItem.getEntity());
 
                 } else {
                     lastQuery = query.getText().toString();

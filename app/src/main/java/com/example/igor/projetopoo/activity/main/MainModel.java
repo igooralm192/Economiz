@@ -84,17 +84,30 @@ public class MainModel implements MainMVP.ModelOps {
       uma lista de Objects.
      */
     @Override
-    public void suggestionsRequest() {
+    public void suggestionsRequest() throws ConnectionException, DatabaseException {
+        final ConstraintLayout layout = activity.findViewById(R.id.container_main);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                layout.removeAllViews();
+            }
+        });
+
+        if (!ParentActivity.checkConnection(activity)) throw new ConnectionException(activity, layout);
+
         List<Object> objects = new ArrayList<>();
         final List<QuerySnapshot> querySnapshotList = new ArrayList<>();
         final FirebaseFirestore firestore = database.getFirestore();
 
         Query categoryQuery = firestore.collection("categories").orderBy("name");
         Task<QuerySnapshot> categoryTask = database.getDocuments(categoryQuery);
+        if (!categoryTask.isSuccessful()) throw new DatabaseException(activity);
         querySnapshotList.add(categoryTask.getResult());
 
         Query productQuery = firestore.collection("products").orderBy("name");
         Task<QuerySnapshot> productTask = database.getDocuments(productQuery);
+        if (!productTask.isSuccessful()) throw new DatabaseException(activity);
         querySnapshotList.add(productTask.getResult());
 
         for (QuerySnapshot querySnapshot: querySnapshotList) {

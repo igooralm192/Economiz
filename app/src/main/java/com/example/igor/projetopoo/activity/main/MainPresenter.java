@@ -3,6 +3,7 @@ package com.example.igor.projetopoo.activity.main;
 import android.app.Activity;
 
 import com.example.igor.projetopoo.R;
+import com.example.igor.projetopoo.activity.category.CategoryPresenter;
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Category;
 import com.example.igor.projetopoo.entities.Product;
@@ -85,7 +86,7 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
       de mensagem.
      */
     @Override
-    public void getAllSuggestions(Activity activity) {
+    public void getAllSuggestions() {
         final CustomDialog loadSuggestions = new CustomDialog(activity, R.layout.load_suggestions);
         loadSuggestions.getWindow().setBackgroundDrawableResource(R.drawable.load_suggestions_background);
         loadSuggestions.setCanceledOnTouchOutside(false);
@@ -98,7 +99,13 @@ public class MainPresenter implements MainMVP.PresenterOps, MainMVP.ReqPresenter
 
             @Override
             public Object doInBackground(Object... objects) {
-                modelOps.suggestionsRequest();
+                try {
+                    modelOps.suggestionsRequest();
+                } catch (ConnectionException e) {
+                    e.connectionFail(MainPresenter.this, activity);
+                } catch (DatabaseException e) {
+                    e.failReadData();
+                }
                 return null;
             }
 

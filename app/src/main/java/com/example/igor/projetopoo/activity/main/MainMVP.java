@@ -18,13 +18,13 @@ public interface MainMVP {
     // Métodos implementados pela Presenter e os quais a View (MainActivity) possui acesso.
     public interface PresenterOps {
         void getCategoryList();
-        void getAllSuggestions(Activity activity);
+        void getAllSuggestions();
     }
 
     // Métodos implementados pela Model e os quais a Presenter tem acesso.
     public interface ModelOps {
         void categoryListRequest() throws ConnectionException, DatabaseException;
-        void suggestionsRequest();
+        void suggestionsRequest() throws ConnectionException, DatabaseException;
     }
 
     // Métodos implementados pela Presenter e os quais a Model tem acesso.

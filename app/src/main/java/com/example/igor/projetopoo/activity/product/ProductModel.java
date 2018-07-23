@@ -76,8 +76,26 @@ public class ProductModel implements ProductMVP.ModelOps {
     }
 
     @Override
-    public void insertFeedback(Feedback feedback) throws DatabaseException {
+    public void insertFeedback(Feedback feedback) throws ConnectionException, DatabaseException {
         //Adiciona feedback no banco de dados
+
+        final ConstraintLayout layout = activity.findViewById(R.id.container_product);
+
+        final AppBarLayout appbar = activity.findViewById(R.id.appbar);
+        final boolean hasConnectivity = ParentActivity.checkConnection(activity);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                layout.removeAllViews();
+                appbar.setExpanded(hasConnectivity);
+            }
+        });
+
+        if (!hasConnectivity) {
+            throw new ConnectionException(activity, layout);
+        }
+
         FirebaseFirestore firestore = database.getFirestore();
         task = database.addDocument(firestore.collection("feedbacks"),feedback);
         if (!task.isSuccessful()) throw new DatabaseException(activity);
@@ -85,8 +103,26 @@ public class ProductModel implements ProductMVP.ModelOps {
     }
 
     @Override
-    public void deleteFeedback() throws DatabaseException {
+    public void deleteFeedback() throws ConnectionException, DatabaseException {
         //Remove feedback do banco de dados
+
+        final ConstraintLayout layout = activity.findViewById(R.id.container_product);
+
+        final AppBarLayout appbar = activity.findViewById(R.id.appbar);
+        final boolean hasConnectivity = ParentActivity.checkConnection(activity);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                layout.removeAllViews();
+                appbar.setExpanded(hasConnectivity);
+            }
+        });
+
+        if (!hasConnectivity) {
+            throw new ConnectionException(activity, layout);
+        }
+
         database.deleteDocument(task.getResult());
         if (!task.isSuccessful()) throw new DatabaseException(activity);
         reqPresenterOps.onFeedbackDeleted();

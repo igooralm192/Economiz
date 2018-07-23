@@ -1,6 +1,7 @@
 package com.example.igor.projetopoo.activity.product;
 
 import android.app.Dialog;
+import android.util.Log;
 
 import com.example.igor.projetopoo.database.Database;
 import com.example.igor.projetopoo.entities.Feedback;
@@ -99,9 +100,12 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
             @Override
             public Object doInBackground(Object... objects) {
                 try {
+                    Log.i("TAG", "Aqui");
                     modelOps.insertFeedback(feedback);
                 } catch (ConnectionException e) {
+                    Log.i("TAG", "FAIL");
                     e.connectionFail(ProductPresenter.this, feedback, product, dialog);
+                    return "FAIL";
                 } catch (DatabaseException e) {
                     e.failWriteData();
                 }
@@ -111,7 +115,10 @@ public class ProductPresenter implements ProductMVP.PresenterOps, ProductMVP.Req
 
             @Override
             public void onPostExecute(Object object) {
-                ProductPresenter.this.getFeedbacks(product);
+                if (object instanceof String)
+                    reqViewOps.showProgressBar(false);
+                else
+                    ProductPresenter.this.getFeedbacks(product);
             }
         });
 

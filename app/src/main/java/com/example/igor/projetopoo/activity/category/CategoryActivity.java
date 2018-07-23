@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,6 +114,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
         if (id == android.R.id.home) this.onBackPressed();
         else if (id == R.id.search_icon_category) {
+            getBlackLayout().setVisibility(View.VISIBLE);
             Animation.openSearch(getSearchBar(), getBlackLayout());
         }
 
@@ -162,9 +164,11 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
                         holder.name.setText(entity.getName());
                         if (entity instanceof Category) {
                             holder.price.setText("");
+                            Log.i("T", holder.price.getText().toString());
                         } else {
                             Product product = (Product) entity;
                             holder.price.setText(String.format(Locale.getDefault(), "R$ %.2f", product.getAveragePrice().doubleValue()).replace('.', ','));
+                            Log.i("T", holder.price.getText().toString());
                         }
                     }
                 })
@@ -200,6 +204,12 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
     public void onSearchStateChanged(boolean enabled) {
         if (!enabled) {
             Animation.closeSearch(getSearchBar(), getBlackLayout());
+            getBlackLayout().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getBlackLayout().setVisibility(View.GONE);
+                }
+            }, 800);
         }
     }
 
@@ -223,7 +233,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
                 if (type.equals("category")) {
                     List list = getSearchBar().getLastSuggestions();
                     Item categoryItem = (Item) list.get(indItem);
-                    Category category = (Category) categoryItem.getObject();
+                    Category category = (Category) categoryItem.getEntity();
 
                     if (!category.getName().equals(currentCategory.getName()))
                         super.onCategoryClick(category);
@@ -232,7 +242,7 @@ public class CategoryActivity extends ParentActivity implements CategoryMVP.ReqV
 
                     List list = getSearchBar().getLastSuggestions();
                     Item productItem = (Item) list.get(indItem);
-                    this.onProductClick((Product) productItem.getObject());
+                    this.onProductClick((Product) productItem.getEntity());
 
                 } else {
                     Map<String, String> map = new HashMap<>();

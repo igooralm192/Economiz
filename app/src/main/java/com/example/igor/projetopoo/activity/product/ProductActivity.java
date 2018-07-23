@@ -206,7 +206,7 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
                         List list = getSearchBar().getLastSuggestions();
                         Item categoryItem = (Item) list.get(indItem);
-                        this.onCategoryClick((Category) categoryItem.getObject());
+                        this.onCategoryClick((Category) categoryItem.getEntity());
 
                         break;
                     }
@@ -214,10 +214,10 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
 
                         List list = getSearchBar().getLastSuggestions();
                         Item productItem = (Item) list.get(indItem);
-                        Product product = (Product) productItem.getObject();
+                        Product product = (Product) productItem.getEntity();
 
                         if (!product.getName().equals(currentProduct.getName()))
-                            super.onProductClick((Product) productItem.getObject());
+                            super.onProductClick((Product) productItem.getEntity());
 
                         break;
                     }
@@ -317,12 +317,12 @@ public class ProductActivity extends ParentActivity implements ProductMVP.ReqVie
             return;
         }
         if (Double.parseDouble(prc) > range.second.doubleValue()) {
-            String s = "R$ " + String.format(Locale.US, "%.2f", range.second);
+            String s = "R$ " + String.format(Locale.US, "%.2f", range.second.doubleValue());
             s = s.replace('.', ',');
             price.setError("O valor deve ser menor que " + s);
             return;
         } else if (Double.parseDouble(prc) < range.first.doubleValue()) {
-            String s = "R$ " + String.format(Locale.US, "%.2f", range.first);
+            String s = "R$ " + String.format(Locale.US, "%.2f", range.first.doubleValue());
             s = s.replace('.', ',');
             price.setError("O valor deve ser maior que " + s);
             return;

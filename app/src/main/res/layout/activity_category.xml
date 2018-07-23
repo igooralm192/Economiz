@@ -40,6 +40,7 @@
         android:id="@+id/search_bar_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="24dp"
         android:padding="4dp"
         android:visibility="invisible"
         app:mt_hint="Pesquise aí vá...">

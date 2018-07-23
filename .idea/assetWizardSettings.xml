@@ -34,7 +34,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\Igor\Pictures\images\cart.png" />
+                                      <entry key="imageAsset" value="$USER_HOME$/C:\Users\Igor\Pictures\images\cart.png" />
                                       <entry key="outputName" value="img_cart" />
                                     </map>
                                   </option>
@@ -46,7 +46,36 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="C:\Users\Victor\Pictures\food.jpg" />
+                                      <entry key="foregroundImage" value="$USER_HOME$/C:\Users\Victor\Pictures\food.jpg" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                            <entry key="launcherLegacy">
+                              <value>
+                                <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="paddingPercent" value="25" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="iconShape" value="CIRCLE" />
+                                      <entry key="imageAsset" value="$PROJECT_DIR$/app/src/main/res/drawable/cart.png" />
+                                      <entry key="outputName" value="ic_launcher_cart_round" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -56,7 +85,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
+                            <entry key="outputIconType" value="LAUNCHER_LEGACY" />
                           </map>
                         </option>
                       </PersistentState>

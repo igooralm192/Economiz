@@ -10,19 +10,19 @@ public class Item implements Serializable {
     private int idIcon;
     private String name;
     private String type;
-    private Object object;
+    private Entity entity;
     private String price;
 
-    public Item(int idIcon, String name, String type, Object object){
+    public Item(int idIcon, String name, String type, Entity entity){
         this.idIcon = idIcon;
         this.name = name;
         this.type = type;
-        this.object = object;
+        this.entity = entity;
         this.price = "";
     }
 
-    public Item(int idIcon, String name, String type, Object object, String price){
-        this(idIcon, name, type, object);
+    public Item(int idIcon, String name, String type, Entity entity, String price){
+        this(idIcon, name, type, entity);
         this.price = price;
     }
 
@@ -46,9 +46,13 @@ public class Item implements Serializable {
 
     public void setType(String type) { this.type = type; }
 
-    public Object getObject() { return object; }
+    public Entity getEntity() {
+        return entity;
+    }
 
-    public void setObject(Object object) { this.object = object; }
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
 
     public String getPrice() { return price; }
 
@@ -64,17 +68,17 @@ public class Item implements Serializable {
 
     }
 
-    public JSONObject toJson() {
+    public JSONObject toJSON() {
         JSONObject object = new JSONObject();
         try {
             object.put("idIcon", this.getIdIcon());
             object.put("name", this.getName());
             object.put("type", this.getType());
-            if (this.getObject() instanceof Category) {
-                Category category = (Category) this.getObject();
+            if (this.getEntity() instanceof Category) {
+                Category category = (Category) this.getEntity();
                 object.put("object", category.toJSON());
-            } else if (this.getObject() instanceof Product) {
-                Product product = (Product) this.getObject();
+            } else if (this.getEntity() instanceof Product) {
+                Product product = (Product) this.getEntity();
                 object.put("object", product.toJSON());
             } else object.put("object", null);
 
